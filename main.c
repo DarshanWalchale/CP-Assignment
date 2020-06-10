@@ -1,6 +1,7 @@
 // Library management system
 // HEADER FILES
 #include <stdio.h>
+#include <ctype.h>
 
 // DEFINES
 
@@ -31,6 +32,7 @@ struct user{
 
 
 // PROTOTYPES
+
 
 int main(void)
 {
