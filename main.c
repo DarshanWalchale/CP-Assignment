@@ -26,7 +26,6 @@ struct user{
     int u_book_ID; //10 digit ID
     int u_issue_ID; //10 digit ID
     int u_date_issue; //DDMMYYYY format
-    int u_date_return; //DDMMYYYY format
     char u_user_pwd[30]; //User password
 }
 
