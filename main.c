@@ -2,6 +2,7 @@
 // HEADER FILES
 #include <stdio.h>
 #include <bool.h>
+#include <ctype.h>
 
 // DEFINES
 
@@ -35,6 +36,7 @@ typedef struct{
 // PROTOTYPES
 void menu();
 void addUser(USER *);
+
 
 int main(void)
 {
