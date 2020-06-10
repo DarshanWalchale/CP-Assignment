@@ -17,7 +17,6 @@ struct book{
     int book_date_of_arrival; //DDMMYYYY format
     int b_user_ID; //10 digit ID
     int b_date_issue; //DDMMYYYY format
-    int b_date_return; //DDMMYYYY format
     char b_book_status; //'A' for available, 'R': Reserved, 'I': Issued
 }
 
