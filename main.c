@@ -5,6 +5,7 @@
 #include <ctype.h>
 #include <time.h>
 #include <string.h>
+#include <stdlib.h>
 
 // DEFINES
 
@@ -40,11 +41,11 @@ typedef struct BOOK{
 
 typedef struct USER{
     unsigned long u_user_ID; //10 digit ID
-    char user_name; //
+    char user_name[20]; //
     unsigned long u_book_ID; //10 digit ID
     unsigned long u_issue_ID; //10 digit ID
     char u_user_pwd[30]; //User password
-    bool admin;
+    bool u_admin;
     struct tm u_date_issue;    //
 } USER;
 
@@ -55,6 +56,10 @@ void welcomeScreen();
 void addUser(USER *);
 void login();
 void reg();
+void addNewUser(USER *user);
+void addNewBook(BOOK *book);
+USER * loadNextUser(FILE *, USER*);
+BOOK * loadNextBook(FILE *, BOOK*);
 
 
 int main(void)
@@ -119,10 +124,10 @@ void welcomeScreen()
 
 }
 
-void addUser(USER *user)
+void addNewUser(USER *user)
 {
     FILE *fp = fopen("userdata.txt", "a");
-    fprintf(fp, "%lu,%c,%lu,%lu,%s,%d,", user->u_user_ID, user->user_name, user->u_book_ID, user->u_issue_ID, user->u_user_pwd, user->admin);
+    fprintf(fp, "%lu,%s,%lu,%lu,%s,%d,", user->u_user_ID, user->user_name, user->u_book_ID, user->u_issue_ID, user->u_user_pwd, user->u_admin);
     fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,\n", user->u_date_issue.tm_sec, user->u_date_issue.tm_min, user->u_date_issue.tm_hour, 
                                                   user->u_date_issue.tm_mday, user->u_date_issue.tm_mon, user->u_date_issue.tm_year, 
                                                   user->u_date_issue.tm_wday, user->u_date_issue.tm_yday, user->u_date_issue.tm_isdst);
@@ -150,13 +155,156 @@ void addNewBook(BOOK *book)
     return;
 }
 
-/*
-    char b_book_title[30];
-    char b_book_author[30];
-    int b_book_ID; //10 digit ID
-    int b_issue_ID; //10 digit ID
-    int b_user_ID; //10 digit ID
-    char b_book_status;             // 'A' - Available, 'I' - issued, 'R' - reserved
-    struct tm book_date_of_arrival;    //
-    struct tm b_date_issue;
-*/
+// This function takes a file pointer and takes the next line of the file and stores that data using the given USER struct
+// WARNING it's upto the calling function to open a file buffer and use the USER structure
+USER * loadNextUser(FILE *fp, USER* user)
+{
+    // if the end of file has been reached, close the file pointer and return NULL
+    if(feof(fp))
+    {
+        fclose(fp);      // Not sure if I should close the file pointer here
+        fclose(fp);
+        return NULL;
+    }
+    
+    char buffer[4096] = {};
+    fgets(buffer, 4096, fp);
+    
+    char *pointer = strtok(buffer, ",");
+    user->u_user_ID = atol(pointer);
+    
+    pointer = strtok(NULL, ",");
+    strcpy(user->user_name, pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_book_ID = atol(pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_issue_ID = atol(pointer);
+    
+    pointer = strtok(NULL, ",");
+    strcpy(user->u_user_pwd, pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_admin = (bool)atoi(pointer);
+    
+    // TIME tm struct part
+    pointer = strtok(NULL, ",");
+    user->u_date_issue.tm_sec = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_date_issue.tm_min = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_date_issue.tm_hour = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_date_issue.tm_mday = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_date_issue.tm_mon = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_date_issue.tm_year = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_date_issue.tm_wday = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_date_issue.tm_yday = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    user->u_date_issue.tm_isdst = atoi(pointer);
+    
+    return user; 
+}
+
+BOOK * loadNextBook(FILE *fp, BOOK *book)
+{
+    // if the end of file has been reached, close the file pointer and return NULL
+    if(feof(fp))
+    {
+        fclose(fp);      // Not sure if I should close the file pointer here
+        fclose(fp);
+        return NULL;
+    }
+    
+    char buffer[4096] = {};
+    fgets(buffer, 4096, fp);
+    
+    char *pointer = strtok(buffer, ",");
+    strcpy(book->b_book_title, pointer);
+    
+    pointer = strtok(NULL, ",");
+    strcpy(book->b_book_author, pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_book_ID = atol(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_issue_ID = atol(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_user_ID = atol(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_book_status = pointer[0];
+    
+    //time tm struct part for date_of_arrival
+    pointer = strtok(NULL, ",");
+    book->book_date_of_arrival.tm_sec = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->book_date_of_arrival.tm_min = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->book_date_of_arrival.tm_hour = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->book_date_of_arrival.tm_mday = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->book_date_of_arrival.tm_mon = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->book_date_of_arrival.tm_year = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->book_date_of_arrival.tm_wday = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->book_date_of_arrival.tm_yday = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->book_date_of_arrival.tm_isdst = atoi(pointer);
+    
+    //time tm struct part for date_of_arrival
+    pointer = strtok(NULL, ",");
+    book->b_date_issue.tm_sec = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_date_issue.tm_min = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_date_issue.tm_hour = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_date_issue.tm_mday = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_date_issue.tm_mon = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_date_issue.tm_year = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_date_issue.tm_wday = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_date_issue.tm_yday = atoi(pointer);
+    
+    pointer = strtok(NULL, ",");
+    book->b_date_issue.tm_isdst = atoi(pointer);
+    
+    return book;
+}
