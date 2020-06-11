@@ -53,7 +53,6 @@ typedef struct USER{
 // PROTOTYPES
 void menu();
 void welcomeScreen();
-void addUser(USER *);
 void login();
 void reg();
 void addNewUser(USER *user);
