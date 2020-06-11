@@ -27,22 +27,22 @@
 //};
 
 
-typedef struct{
+typedef struct BOOK{
     char b_book_title[30];
     char b_book_author[30];
-    int b_book_ID; //10 digit ID
-    int b_issue_ID; //10 digit ID
-    int b_user_ID; //10 digit ID
+    unsigned long b_book_ID; //10 digit ID
+    unsigned long b_issue_ID; //10 digit ID
+    unsigned long b_user_ID; //10 digit ID
     char b_book_status;             // 'A' - Available, 'I' - issued, 'R' - reserved
     struct tm book_date_of_arrival;    //
     struct tm b_date_issue;            //
 } BOOK;
 
-typedef struct{
-    int u_user_ID; //10 digit ID
+typedef struct USER{
+    unsigned long u_user_ID; //10 digit ID
     char user_name; //
-    int u_book_ID; //10 digit ID
-    int u_issue_ID; //10 digit ID
+    unsigned long u_book_ID; //10 digit ID
+    unsigned long u_issue_ID; //10 digit ID
     char u_user_pwd[30]; //User password
     bool admin;
     struct tm u_date_issue;    //
@@ -122,7 +122,41 @@ void welcomeScreen()
 void addUser(USER *user)
 {
     FILE *fp = fopen("userdata.txt", "a");
-    fprintf(fp, "%d,%c,%d,%d,%s,%d,", user->u_user_ID, user->user_name, user->u_book_ID, user->u_issue_ID, user->u_user_pwd, user->admin);
-    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,\n", user->u_date_issue.tm_sec, user->u_date_issue.tm_min, user->u_date_issue.tm_hour, user->u_date_issue.tm_mday, user->u_date_issue.tm_mon, user->u_date_issue.tm_year, user->u_date_issue.tm_wday, user->u_date_issue.tm_yday, user->u_date_issue.tm_isdst);
+    fprintf(fp, "%lu,%c,%lu,%lu,%s,%d,", user->u_user_ID, user->user_name, user->u_book_ID, user->u_issue_ID, user->u_user_pwd, user->admin);
+    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,\n", user->u_date_issue.tm_sec, user->u_date_issue.tm_min, user->u_date_issue.tm_hour, 
+                                                  user->u_date_issue.tm_mday, user->u_date_issue.tm_mon, user->u_date_issue.tm_year, 
+                                                  user->u_date_issue.tm_wday, user->u_date_issue.tm_yday, user->u_date_issue.tm_isdst);
+    fclose(fp);
     return;
 }
+
+void addNewBook(BOOK *book)
+{
+    FILE *fp = fopen("books.txt", "a");
+    
+    fprintf(fp, "%s,%s,%lu,%lu,%lu,%c,", book->b_book_title, book->b_book_author, book->b_book_ID, book->b_issue_ID, 
+                                         book->b_user_ID, book->b_book_status);
+    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,", book->book_date_of_arrival.tm_sec, book->book_date_of_arrival.tm_min, 
+                                               book->book_date_of_arrival.tm_hour, book->book_date_of_arrival.tm_mday,
+                                               book->book_date_of_arrival.tm_mon, book->book_date_of_arrival.tm_year,
+                                               book->book_date_of_arrival.tm_wday, book->book_date_of_arrival.tm_yday,
+                                               book->book_date_of_arrival.tm_isdst);
+    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,\n", book->b_date_issue.tm_sec, book->b_date_issue.tm_min,
+                                                 book->b_date_issue.tm_hour, book->b_date_issue.tm_mday,
+                                                 book->b_date_issue.tm_mon, book->b_date_issue.tm_year,
+                                                 book->b_date_issue.tm_wday, book->b_date_issue.tm_yday,
+                                                 book->b_date_issue.tm_isdst);
+    fclose(fp);
+    return;
+}
+
+/*
+    char b_book_title[30];
+    char b_book_author[30];
+    int b_book_ID; //10 digit ID
+    int b_issue_ID; //10 digit ID
+    int b_user_ID; //10 digit ID
+    char b_book_status;             // 'A' - Available, 'I' - issued, 'R' - reserved
+    struct tm book_date_of_arrival;    //
+    struct tm b_date_issue;
+*/
