@@ -49,6 +49,12 @@ typedef struct USER{
     struct tm u_date_issue;    //
 } USER;
 
+typedef struct BOOKNODE         // this is used for the function bookCount
+{
+    BOOK book;
+    BOOKNODE *next;
+} BOOKNODE;
+
 
 // PROTOTYPES
 void menu();
@@ -59,6 +65,7 @@ void addNewUser(USER *user);
 void addNewBook(BOOK *book);
 USER * loadNextUser(FILE *, USER*);
 BOOK * loadNextBook(FILE *, BOOK*);
+void bookCount();
 
 
 int main(void)
@@ -154,15 +161,15 @@ void addNewBook(BOOK *book)
     return;
 }
 
-// This function takes a file pointer and takes the next line of the file and stores that data using the given USER struct
+// This function takes a file pointer opened in reading mode and takes the next line of the file and stores that data using the given USER struct
 // WARNING it's upto the calling function to open a file buffer and use the USER structure
 USER * loadNextUser(FILE *fp, USER* user)
 {
     // if the end of file has been reached, close the file pointer and return NULL
     if(feof(fp))
     {
-        fclose(fp);      // Not sure if I should close the file pointer here
-        fclose(fp);
+        //fclose(fp);      // Not sure if I should close the file pointer here
+        user = NULL;
         return NULL;
     }
     
@@ -223,8 +230,8 @@ BOOK * loadNextBook(FILE *fp, BOOK *book)
     // if the end of file has been reached, close the file pointer and return NULL
     if(feof(fp))
     {
-        fclose(fp);      // Not sure if I should close the file pointer here
-        fclose(fp);
+        //fclose(fp);      // Not sure if I should close the file pointer here
+        book = NULL;
         return NULL;
     }
     
@@ -306,4 +313,42 @@ BOOK * loadNextBook(FILE *fp, BOOK *book)
     book->b_date_issue.tm_isdst = atoi(pointer);
     
     return book;
+}
+
+void bookCount()
+{
+    FILE *fp = fopen("books.txt", "r");
+    char buffer[4096] = {};
+    fgets(buffer, 4096, fp);
+    char *pointer;
+    BOOK *book;
+    book = loadNextBook(fp, book);
+    
+    char current_title[30];
+    strcpy(current_title, book->b_book_title);
+    
+    BOOKNODE *head = NULL, *current = NULL;
+    head->next = malloc(sizeof(BOOKNODE));
+    current = head->next;
+    
+    // Loads the library into memory
+    while(!feof(fp))
+    {
+        
+    }
+    
+    
+    if(book = NULL)
+    {
+        printf("--------------------NO BOOKS TO DISPLAY--------------------\n");
+    }
+    printf("--------------------------------------------------\n");
+    printf("BOOK TITLE\t\t\t\tCOUNT\n");
+    while(book != NULL)
+    {
+        
+        book = loadNextBook(fp, book);
+    }
+    printf("--------------------------------------------------\n");
+    return;
 }
