@@ -1,7 +1,7 @@
 void searchBook(){
     char search; //char to account for non-numeric invalid inputs
     printf("Search books by \n1. Title\n2. Author\n3. Book ID\n");
-    scanf(" %c",search);
+    scanf(" %c",&search);
     switch(search){
         case '1': {
         char title_search[30];
@@ -9,7 +9,7 @@ void searchBook(){
         short flag=0; //To end searching on finding the exact book
         char closest_search[100][30]; //To store 100 closest matching searches
         printf("Search by title: ");
-        scanf("%s",title_search);
+        scanf("%s",&title_search);
         while(flag==0){//To be updated to search all books !!!
 
             //Iterating through all characters of a single book title
@@ -66,7 +66,7 @@ void searchBook(){
         char closest_search[100][30]; //To store 100 closest matching searches
         short flag=0; //To end searching on finding the exact book
         printf("Search by author: ");
-        scanf("%s",author_search);
+        scanf("%s",&author_search);
         while(flag==0){//To be updated to search all books !!!
 
             //Iterating through all characters of a single book author
@@ -123,7 +123,7 @@ void searchBook(){
     {
         int ID_search;
     printf("Search by ID: ");
-    scanf("%d",ID_search);
+    scanf("%d",&ID_search);
      while(flag==0){//To be updated to search all books !!!
      //Iterating through all characters of a single book title
         if(BOOK.b_book_ID==ID_search){
