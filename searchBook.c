@@ -1,42 +1,47 @@
 void searchBook(){
     char search; //char to account for non-numeric invalid inputs
     printf("Search books by \n1. Title\n2. Author\n3. Book ID\n");
-    scanf(" %c",&search);
+    scanf(" %c",search);
     switch(search){
         case '1': {
-        char title_search[30];
+        char title_search[30] = {};
         short cs_count=0; //To count number of closest searches
         short flag=0; //To end searching on finding the exact book
         char closest_search[100][30]; //To store 100 closest matching searches
         printf("Search by title: ");
-        scanf("%s",&title_search);
+        scanf("%30[^\n]",title_search);
+        while(getchar() != '\n');
+        int title_search_length = strlen(title_search);
+
         while(flag==0){//To be updated to search all books !!!
 
             //Iterating through all characters of a single book title
-            for(int j=0;j<30;j++){
+            for(int j=0; j<30; j++){
+
                 //Skip the current book if atleast 3 characters don't match
-                if(tolower(title_search[j])!=BOOK.b_book_title[j]&&j<3){
+                if(tolower(title_search[j]) != BOOK.b_book_title[j] && j<3){
                 break;
                 }
+                
                 //Store the closest matching search (book) and skip current iteration
-                else if(tolower(title_search[j])!=BOOK.b_book_title[j]&&j<strlen(title_search)){
-                if(cs_count<100){
-                strcpy(closest_search[cs_count],BOOK.b_book_title);
-                cs_count++;
-                }
-                break;
+                else if(tolower(title_search[j]) != BOOK.b_book_title[j] && j < title_search_length)){
+                    if(cs_count < 100){
+                        strcpy(closest_search[cs_count], BOOK.b_book_title);
+                        cs_count++;
+                    }
+                    break;
                 }
                 //If the search matches exactly, stop searching
                 else{
-                printf("Book found: %s ",BOOK.b_book_title);
+                    printf("Book found: %s ",BOOK.b_book_title);
                 if(BOOK.b_book_status=='A')
-                printf("(Available)\n");
+                    printf("(Available)\n");
                 else if(BOOK.b_book_status=='R')
-                printf("(Reserved)\n");
-                else if(BOOK.b_book_status=='R')
-                printf("(Not available (Issued))\n");
+                    printf("(Reserved)\n");
+                else if(BOOK.b_book_status=='I')
+                    printf("(Not available (Issued))\n");
                 else
-                printf("Undefined)\n"); //To account for faulty/incomplete entry of status of book
+                    printf("Undefined\n"); //To account for faulty/incomplete entry of status of book
                 }
                 printf("\tAuthor: %s\n",BOOK.b_book_author);
                 printf("\tBook ID: %s\n",BOOK.b_book_ID);
@@ -66,7 +71,7 @@ void searchBook(){
         char closest_search[100][30]; //To store 100 closest matching searches
         short flag=0; //To end searching on finding the exact book
         printf("Search by author: ");
-        scanf("%s",&author_search);
+        scanf("%s",author_search);
         while(flag==0){//To be updated to search all books !!!
 
             //Iterating through all characters of a single book author
@@ -123,7 +128,7 @@ void searchBook(){
     {
         int ID_search;
     printf("Search by ID: ");
-    scanf("%d",&ID_search);
+    scanf("%d",ID_search);
      while(flag==0){//To be updated to search all books !!!
      //Iterating through all characters of a single book title
         if(BOOK.b_book_ID==ID_search){

@@ -3,7 +3,8 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <ctype.h>
-
+#include <time.h>
+#include <string.h>
 
 // DEFINES
 
@@ -12,15 +13,29 @@
 // STRUCTURES
 
 //Structure variables starting with single characters will be used in different functions
+/*
+//struct tm {
+//   int tm_sec;    /* Seconds (0-60) */
+//    int tm_min;    /* Minutes (0-59) */
+//    int tm_hour;   /* Hours (0-23) */
+//    int tm_mday;   /* Day of the month (1-31) */
+//    int tm_mon;    /* Month (0-11) */
+//    int tm_year;   /* Year - 1900 */
+//    int tm_wday;   /* Day of the week (0-6, Sunday = 0) */
+//    int tm_yday;   /* Day in the year (0-365, 1 Jan = 0) */
+//    int tm_isdst;  /* Daylight saving time */
+//};
+
+
 typedef struct{
     char b_book_title[30];
     char b_book_author[30];
     int b_book_ID; //10 digit ID
     int b_issue_ID; //10 digit ID
-    int book_date_of_arrival; //DDMMYYYY format
     int b_user_ID; //10 digit ID
-    int b_date_issue; //DDMMYYYY format
-    char b_book_status; //'A' for available, 'R': Reserved, 'I': Issued
+    char b_book_status;             // 'A' - Available, 'I' - issued, 'R' - reserved
+    struct tm book_date_of_arrival;    //
+    struct tm b_date_issue;            //
 } BOOK;
 
 typedef struct{
@@ -28,9 +43,9 @@ typedef struct{
     char user_name; //
     int u_book_ID; //10 digit ID
     int u_issue_ID; //10 digit ID
-    int u_date_issue; //DDMMYYYY format
     char u_user_pwd[30]; //User password
     bool admin;
+    struct tm u_date_issue;    //
 } USER;
 
 
@@ -102,4 +117,12 @@ void welcomeScreen()
     }
 
 
+}
+
+void addUser(USER *user)
+{
+    FILE *fp = fopen("userdata.txt", "a");
+    fprintf(fp, "%d,%c,%d,%d,%s,%d,", user->u_user_ID, user->user_name, user->u_book_ID, user->u_issue_ID, user->u_user_pwd, user->admin);
+    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,\n", user->u_date_issue.tm_sec, user->u_date_issue.tm_min, user->u_date_issue.tm_hour, user->u_date_issue.tm_mday, user->u_date_issue.tm_mon, user->u_date_issue.tm_year, user->u_date_issue.tm_wday, user->u_date_issue.tm_yday, user->u_date_issue.tm_isdst);
+    return;
 }
