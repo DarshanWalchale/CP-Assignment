@@ -49,7 +49,7 @@ typedef struct USER{
     struct tm u_date_issue;    //
 } USER;
 
-typedef struct BOOKNODE         // this is used for the function bookCount
+typedef struct BOOKNODE         // this is used for the function titleCount
 {
     BOOK book;
     BOOKNODE *next;
@@ -65,7 +65,7 @@ void addNewUser(USER *user);
 void addNewBook(BOOK *book);
 USER * loadNextUser(FILE *, USER*);
 BOOK * loadNextBook(FILE *, BOOK*);
-void bookCount();
+int titleCount(char *);
 
 
 int main(void)
@@ -315,29 +315,35 @@ BOOK * loadNextBook(FILE *fp, BOOK *book)
     return book;
 }
 
-void bookCount()
+int titleCount(char *title)
 {
     FILE *fp = fopen("books.txt", "r");
-    char buffer[4096] = {};
-    fgets(buffer, 4096, fp);
-    char *pointer;
     BOOK *book;
     book = loadNextBook(fp, book);
+    int count = 0;
     
-    char current_title[30];
-    strcpy(current_title, book->b_book_title);
+    for(; book != NULL; book = loadNextBook(fp, book))
+    {
+        if(strcmp(book->b_book_title, title) == 0)
+        {
+            count++;
+        }
+    }
     
+    return count;
+    
+    /*
     BOOKNODE *head = NULL, *current = NULL;
     head->next = malloc(sizeof(BOOKNODE));
     current = head->next;
+    
     
     // Loads the library into memory
     while(!feof(fp))
     {
         
     }
-    
-    
+
     if(book = NULL)
     {
         printf("--------------------NO BOOKS TO DISPLAY--------------------\n");
@@ -350,5 +356,8 @@ void bookCount()
         book = loadNextBook(fp, book);
     }
     printf("--------------------------------------------------\n");
+    
+    
     return;
+    */
 }
