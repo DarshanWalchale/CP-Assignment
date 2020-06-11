@@ -49,7 +49,7 @@ typedef struct USER{
     struct tm u_date_issue;    //
 } USER;
 
-typedef struct BOOKNODE         // this is used for the function bookCount
+typedef struct BOOKNODE         // this is used for the function titleCount
 {
     BOOK book;
     BOOKNODE *next;
@@ -65,7 +65,7 @@ void addNewUser(USER *user);
 void addNewBook(BOOK *book);
 USER * loadNextUser(FILE *, USER*);
 BOOK * loadNextBook(FILE *, BOOK*);
-void bookCount();
+void titleCount();
 
 
 int main(void)
@@ -315,7 +315,7 @@ BOOK * loadNextBook(FILE *fp, BOOK *book)
     return book;
 }
 
-void bookCount()
+void titleCount()
 {
     FILE *fp = fopen("books.txt", "r");
     char buffer[4096] = {};
