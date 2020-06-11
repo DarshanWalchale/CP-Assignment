@@ -8,6 +8,7 @@
 #include <stdlib.h>
 
 // DEFINES
+#define MAX_TITLE_LENGTH 60
 
 // GLOBAL VARIABLES
 
@@ -15,7 +16,7 @@
 
 //Structure variables starting with single characters will be used in different functions
 /*
-//struct tm {
+//struct tm {                                   //struct tm for reference
 //   int tm_sec;    /* Seconds (0-60) */
 //    int tm_min;    /* Minutes (0-59) */
 //    int tm_hour;   /* Hours (0-23) */
@@ -29,7 +30,7 @@
 
 
 typedef struct BOOK{
-    char b_book_title[30];
+    char b_book_title[MAX_TITLE_LENGTH];
     char b_book_author[30];
     unsigned long b_book_ID; //10 digit ID
     unsigned long b_issue_ID; //10 digit ID
@@ -52,11 +53,12 @@ typedef struct USER{
 typedef struct BOOKNODE         // this is used for the function titleCount
 {
     BOOK book;
-    BOOKNODE *next;
+    struct BOOKNODE *next;
 } BOOKNODE;
 
 
 // PROTOTYPES
+BOOKNODE * loadLibrary(BOOKNODE *);
 void menu();
 void welcomeScreen();
 void login();
@@ -128,6 +130,65 @@ void welcomeScreen()
     }
 
 
+}
+
+// Give pointer to head BOOKNODE (likely initialized in main)
+// Loads the entire library into memory using a dynamic linked list (utilizes higher reading speed of RAM and reduces file I/O process requirement)
+BOOKNODE * loadLibrary(BOOKNODE *head)
+{
+    FILE *fp = fopen("books.txt", "r");
+    BOOK book_load;
+    loadNextBook(fp, &book_load);
+    BOOKNODE *current;
+    head->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
+    current = head->next;
+    current->next = NULL;
+    
+    while(1)
+    {
+        strcpy(current->book.b_book_title, book_load.b_book_title);
+        strcpy(current->book.b_book_author, book_load.b_book_author);
+        current->book.b_book_ID = book_load.b_book_ID;
+        current->book.b_issue_ID = book_load.b_issue_ID;
+        current->book.b_user_ID = book_load.b_user_ID;
+        current->book.b_book_status = book_load.b_book_status;
+        //time struct tm part
+        current->book.book_date_of_arrival.tm_sec = book_load.book_date_of_arrival.tm_sec;
+        current->book.book_date_of_arrival.tm_min = book_load.book_date_of_arrival.tm_min;
+        current->book.book_date_of_arrival.tm_hour = book_load.book_date_of_arrival.tm_hour;
+        current->book.book_date_of_arrival.tm_mday = book_load.book_date_of_arrival.tm_mday;
+        current->book.book_date_of_arrival.tm_mon = book_load.book_date_of_arrival.tm_mon;
+        current->book.book_date_of_arrival.tm_year = book_load.book_date_of_arrival.tm_year;
+        current->book.book_date_of_arrival.tm_wday = book_load.book_date_of_arrival.tm_wday;
+        current->book.book_date_of_arrival.tm_yday = book_load.book_date_of_arrival.tm_yday;
+        current->book.book_date_of_arrival.tm_isdst = book_load.book_date_of_arrival.tm_isdst;
+        
+        current->book.b_date_issue.tm_sec = book_load.b_date_issue.tm_sec;
+        current->book.b_date_issue.tm_min = book_load.b_date_issue.tm_min;
+        current->book.b_date_issue.tm_hour = book_load.b_date_issue.tm_hour;
+        current->book.b_date_issue.tm_mday = book_load.b_date_issue.tm_mday;
+        current->book.b_date_issue.tm_mon = book_load.b_date_issue.tm_mon;
+        current->book.b_date_issue.tm_year = book_load.b_date_issue.tm_year;
+        current->book.b_date_issue.tm_wday = book_load.b_date_issue.tm_wday;
+        current->book.b_date_issue.tm_yday = book_load.b_date_issue.tm_yday;
+        current->book.b_date_issue.tm_isdst = book_load.b_date_issue.tm_isdst;
+        
+        
+        loadNextBook(fp, &book_load);
+        if(&book_load == NULL)
+        {
+            break;
+        }
+        else
+        {
+            current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
+            current = current->next;
+        }
+        
+    }
+    
+    
+    return head;
 }
 
 void addNewUser(USER *user)
