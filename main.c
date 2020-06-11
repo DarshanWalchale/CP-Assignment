@@ -184,9 +184,7 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
             current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
             current = current->next;
         }
-        
     }
-    
     
     return head;
 }
