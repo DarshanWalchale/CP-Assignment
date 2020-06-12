@@ -69,6 +69,7 @@ void addNewBook(BOOK *book);
 USER * loadNextUser(FILE *, USER*);
 BOOK * loadNextBook(FILE *, BOOK*);
 int titleCount(char *);
+void searchBookbyTitle();
 
 
 int main(void)
