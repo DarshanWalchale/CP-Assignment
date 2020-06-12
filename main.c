@@ -73,6 +73,7 @@ int titleCount(char *);
 void makeFile();
 unsigned long generateBookID();
 void searchBookbyTitle();
+void displayAllBooks(BOOKNODE *head);
 
 //--------------------------------------------------------------------------------------------------------------
 
