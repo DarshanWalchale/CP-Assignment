@@ -114,7 +114,7 @@ void makeFile()
         sec = 0.9 * time(NULL);
         printf("sec = %lu \n", sec);
         printf("current time: %s\n", ctime(&sec));
-        struct tm time_of_event = *(localtime(&sec));
+        time_of_event = *(localtime(&sec));
 
         //date of arrival struct tm
         book.book_date_of_arrival.tm_sec = time_of_event.tm_sec;
@@ -222,8 +222,8 @@ void welcomeScreen()
 BOOKNODE * loadLibrary(BOOKNODE *head)
 {
     FILE *fp = fopen("books.txt", "r");
-    BOOK book_load;
-    loadNextBook(fp, &book_load);
+    BOOK *book_load = calloc(1, sizeof(BOOK));
+    loadNextBook(fp, book_load);
     BOOKNODE *current;
     head->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
     current = head->next;
@@ -231,36 +231,36 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
 
     while(1)
     {
-        strcpy(current->book.b_book_title, book_load.b_book_title);
-        strcpy(current->book.b_book_author, book_load.b_book_author);
-        current->book.b_book_ID = book_load.b_book_ID;
-        current->book.b_issue_ID = book_load.b_issue_ID;
-        current->book.b_user_ID = book_load.b_user_ID;
-        current->book.b_book_status = book_load.b_book_status;
+        strcpy(current->book.b_book_title, book_load->b_book_title);
+        strcpy(current->book.b_book_author, book_load->b_book_author);
+        current->book.b_book_ID = book_load->b_book_ID;
+        current->book.b_issue_ID = book_load->b_issue_ID;
+        current->book.b_user_ID = book_load->b_user_ID;
+        current->book.b_book_status = book_load->b_book_status;
         //time struct tm part
-        current->book.book_date_of_arrival.tm_sec = book_load.book_date_of_arrival.tm_sec;
-        current->book.book_date_of_arrival.tm_min = book_load.book_date_of_arrival.tm_min;
-        current->book.book_date_of_arrival.tm_hour = book_load.book_date_of_arrival.tm_hour;
-        current->book.book_date_of_arrival.tm_mday = book_load.book_date_of_arrival.tm_mday;
-        current->book.book_date_of_arrival.tm_mon = book_load.book_date_of_arrival.tm_mon;
-        current->book.book_date_of_arrival.tm_year = book_load.book_date_of_arrival.tm_year;
-        current->book.book_date_of_arrival.tm_wday = book_load.book_date_of_arrival.tm_wday;
-        current->book.book_date_of_arrival.tm_yday = book_load.book_date_of_arrival.tm_yday;
-        current->book.book_date_of_arrival.tm_isdst = book_load.book_date_of_arrival.tm_isdst;
+        current->book.book_date_of_arrival.tm_sec = book_load->book_date_of_arrival.tm_sec;
+        current->book.book_date_of_arrival.tm_min = book_load->book_date_of_arrival.tm_min;
+        current->book.book_date_of_arrival.tm_hour = book_load->book_date_of_arrival.tm_hour;
+        current->book.book_date_of_arrival.tm_mday = book_load->book_date_of_arrival.tm_mday;
+        current->book.book_date_of_arrival.tm_mon = book_load->book_date_of_arrival.tm_mon;
+        current->book.book_date_of_arrival.tm_year = book_load->book_date_of_arrival.tm_year;
+        current->book.book_date_of_arrival.tm_wday = book_load->book_date_of_arrival.tm_wday;
+        current->book.book_date_of_arrival.tm_yday = book_load->book_date_of_arrival.tm_yday;
+        current->book.book_date_of_arrival.tm_isdst = book_load->book_date_of_arrival.tm_isdst;
 
-        current->book.b_date_issue.tm_sec = book_load.b_date_issue.tm_sec;
-        current->book.b_date_issue.tm_min = book_load.b_date_issue.tm_min;
-        current->book.b_date_issue.tm_hour = book_load.b_date_issue.tm_hour;
-        current->book.b_date_issue.tm_mday = book_load.b_date_issue.tm_mday;
-        current->book.b_date_issue.tm_mon = book_load.b_date_issue.tm_mon;
-        current->book.b_date_issue.tm_year = book_load.b_date_issue.tm_year;
-        current->book.b_date_issue.tm_wday = book_load.b_date_issue.tm_wday;
-        current->book.b_date_issue.tm_yday = book_load.b_date_issue.tm_yday;
-        current->book.b_date_issue.tm_isdst = book_load.b_date_issue.tm_isdst;
+        current->book.b_date_issue.tm_sec = book_load->b_date_issue.tm_sec;
+        current->book.b_date_issue.tm_min = book_load->b_date_issue.tm_min;
+        current->book.b_date_issue.tm_hour = book_load->b_date_issue.tm_hour;
+        current->book.b_date_issue.tm_mday = book_load->b_date_issue.tm_mday;
+        current->book.b_date_issue.tm_mon = book_load->b_date_issue.tm_mon;
+        current->book.b_date_issue.tm_year = book_load->b_date_issue.tm_year;
+        current->book.b_date_issue.tm_wday = book_load->b_date_issue.tm_wday;
+        current->book.b_date_issue.tm_yday = book_load->b_date_issue.tm_yday;
+        current->book.b_date_issue.tm_isdst = book_load->b_date_issue.tm_isdst;
 
 
-        loadNextBook(fp, &book_load);
-        if(&book_load == NULL)
+        loadNextBook(fp, book_load);
+        if(book_load == NULL)
         {
             break;
         }
@@ -285,9 +285,12 @@ void addNewUser(USER *user)
     return;
 }
 
+/*
 void addNewBook(BOOK *book)
 {
     FILE *fp = fopen("books.txt", "a");
+    
+    //fwrite(book, sizeof(BOOK), 1, fp);
 
     fprintf(fp, "%s,%s,%lu,%lu,%lu,%c,", book->b_book_title, book->b_book_author, book->b_book_ID, book->b_issue_ID,
                                          book->b_user_ID, book->b_book_status);
@@ -458,11 +461,12 @@ BOOK * loadNextBook(FILE *fp, BOOK *book)
 
     return book;
 }
+*/
 
 int titleCount(char *title)
 {
     FILE *fp = fopen("books.txt", "r");
-    BOOK *book;
+    BOOK *book = calloc(1, sizeof(BOOK));
     book = loadNextBook(fp, book);
     int count = 0;
 
