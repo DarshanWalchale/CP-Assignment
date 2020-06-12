@@ -82,7 +82,7 @@ int main(void)
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //makeFile();
     welcomeScreen();
-    
+
     return 0;
 }
 
@@ -99,23 +99,23 @@ void makeFile()
     {
         //printf("DO\n");
         printf("Enter Book Title:\n->");
-        scanf(" %60[^\n]", book.b_book_title); //MAX_TITLE_LENGTH 
+        scanf(" %60[^\n]", book.b_book_title); //MAX_TITLE_LENGTH
         while(getchar() != '\n');
-        
+
         printf("Enter Book Author\n->");
         scanf(" %30[^\n]", book.b_book_author);
         while(getchar() != '\n');
-        
+
         book.b_book_ID = generateBookID();
         book.b_issue_ID = 0;
         book.b_user_ID = 0;
         book.b_book_status = 'A';
-        
+
         sec = 0.9 * time(NULL);
         printf("sec = %lu \n", sec);
         printf("current time: %s\n", ctime(&sec));
         struct tm time_of_event = *(localtime(&sec));
-        
+
         //date of arrival struct tm
         book.book_date_of_arrival.tm_sec = time_of_event.tm_sec;
         book.book_date_of_arrival.tm_min = time_of_event.tm_min;
@@ -136,10 +136,10 @@ void makeFile()
         book.b_date_issue.tm_sec = 0;
         book.b_date_issue.tm_sec = 0;
         book.b_date_issue.tm_sec = 0;
-        
-        
+
+
         addNewBook(&book);
-        
+
         printf("again?(y/n): ");
         scanf(" %c", &choice);
         while(getchar() != '\n');
@@ -151,9 +151,9 @@ void makeFile()
         {
             break;
         }
-        
+
     }while(1);
-    
+
     return;
 }
 
@@ -228,7 +228,7 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
     head->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
     current = head->next;
     current->next = NULL;
-    
+
     while(1)
     {
         strcpy(current->book.b_book_title, book_load.b_book_title);
@@ -247,7 +247,7 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
         current->book.book_date_of_arrival.tm_wday = book_load.book_date_of_arrival.tm_wday;
         current->book.book_date_of_arrival.tm_yday = book_load.book_date_of_arrival.tm_yday;
         current->book.book_date_of_arrival.tm_isdst = book_load.book_date_of_arrival.tm_isdst;
-        
+
         current->book.b_date_issue.tm_sec = book_load.b_date_issue.tm_sec;
         current->book.b_date_issue.tm_min = book_load.b_date_issue.tm_min;
         current->book.b_date_issue.tm_hour = book_load.b_date_issue.tm_hour;
@@ -257,8 +257,8 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
         current->book.b_date_issue.tm_wday = book_load.b_date_issue.tm_wday;
         current->book.b_date_issue.tm_yday = book_load.b_date_issue.tm_yday;
         current->book.b_date_issue.tm_isdst = book_load.b_date_issue.tm_isdst;
-        
-        
+
+
         loadNextBook(fp, &book_load);
         if(&book_load == NULL)
         {
@@ -270,7 +270,7 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
             current = current->next;
         }
     }
-    
+
     return head;
 }
 
@@ -278,8 +278,8 @@ void addNewUser(USER *user)
 {
     FILE *fp = fopen("userdata.txt", "a");
     fprintf(fp, "%lu,%s,%lu,%lu,%s,%d,", user->u_user_ID, user->user_name, user->u_book_ID, user->u_issue_ID, user->u_user_pwd, user->u_admin);
-    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,\n", user->u_date_issue.tm_sec, user->u_date_issue.tm_min, user->u_date_issue.tm_hour, 
-                                                  user->u_date_issue.tm_mday, user->u_date_issue.tm_mon, user->u_date_issue.tm_year, 
+    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,\n", user->u_date_issue.tm_sec, user->u_date_issue.tm_min, user->u_date_issue.tm_hour,
+                                                  user->u_date_issue.tm_mday, user->u_date_issue.tm_mon, user->u_date_issue.tm_year,
                                                   user->u_date_issue.tm_wday, user->u_date_issue.tm_yday, user->u_date_issue.tm_isdst);
     fclose(fp);
     return;
@@ -288,10 +288,10 @@ void addNewUser(USER *user)
 void addNewBook(BOOK *book)
 {
     FILE *fp = fopen("books.txt", "a");
-    
-    fprintf(fp, "%s,%s,%lu,%lu,%lu,%c,", book->b_book_title, book->b_book_author, book->b_book_ID, book->b_issue_ID, 
+
+    fprintf(fp, "%s,%s,%lu,%lu,%lu,%c,", book->b_book_title, book->b_book_author, book->b_book_ID, book->b_issue_ID,
                                          book->b_user_ID, book->b_book_status);
-    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,", book->book_date_of_arrival.tm_sec, book->book_date_of_arrival.tm_min, 
+    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,", book->book_date_of_arrival.tm_sec, book->book_date_of_arrival.tm_min,
                                                book->book_date_of_arrival.tm_hour, book->book_date_of_arrival.tm_mday,
                                                book->book_date_of_arrival.tm_mon, book->book_date_of_arrival.tm_year,
                                                book->book_date_of_arrival.tm_wday, book->book_date_of_arrival.tm_yday,
@@ -316,57 +316,57 @@ USER * loadNextUser(FILE *fp, USER* user)
         user = NULL;
         return NULL;
     }
-    
+
     char buffer[4096] = {};
     fgets(buffer, 4096, fp);
-    
+
     char *pointer = strtok(buffer, ",");
     user->u_user_ID = atol(pointer);
-    
+
     pointer = strtok(NULL, ",");
     strcpy(user->user_name, pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_book_ID = atol(pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_issue_ID = atol(pointer);
-    
+
     pointer = strtok(NULL, ",");
     strcpy(user->u_user_pwd, pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_admin = (bool)atoi(pointer);
-    
+
     // TIME tm struct part
     pointer = strtok(NULL, ",");
     user->u_date_issue.tm_sec = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_date_issue.tm_min = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_date_issue.tm_hour = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_date_issue.tm_mday = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_date_issue.tm_mon = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_date_issue.tm_year = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_date_issue.tm_wday = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_date_issue.tm_yday = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     user->u_date_issue.tm_isdst = atoi(pointer);
-    
-    return user; 
+
+    return user;
 }
 
 BOOK * loadNextBook(FILE *fp, BOOK *book)
@@ -378,84 +378,84 @@ BOOK * loadNextBook(FILE *fp, BOOK *book)
         book = NULL;
         return NULL;
     }
-    
+
     char buffer[4096] = {};
     fgets(buffer, 4096, fp);
-    
+
     char *pointer = strtok(buffer, ",");
     strcpy(book->b_book_title, pointer);
-    
+
     pointer = strtok(NULL, ",");
     strcpy(book->b_book_author, pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_book_ID = atol(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_issue_ID = atol(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_user_ID = atol(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_book_status = pointer[0];
-    
+
     //time tm struct part for date_of_arrival
     pointer = strtok(NULL, ",");
     book->book_date_of_arrival.tm_sec = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->book_date_of_arrival.tm_min = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->book_date_of_arrival.tm_hour = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->book_date_of_arrival.tm_mday = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->book_date_of_arrival.tm_mon = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->book_date_of_arrival.tm_year = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->book_date_of_arrival.tm_wday = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->book_date_of_arrival.tm_yday = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->book_date_of_arrival.tm_isdst = atoi(pointer);
-    
+
     //time tm struct part for date_of_arrival
     pointer = strtok(NULL, ",");
     book->b_date_issue.tm_sec = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_date_issue.tm_min = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_date_issue.tm_hour = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_date_issue.tm_mday = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_date_issue.tm_mon = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_date_issue.tm_year = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_date_issue.tm_wday = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_date_issue.tm_yday = atoi(pointer);
-    
+
     pointer = strtok(NULL, ",");
     book->b_date_issue.tm_isdst = atoi(pointer);
-    
+
     return book;
 }
 
@@ -465,7 +465,7 @@ int titleCount(char *title)
     BOOK *book;
     book = loadNextBook(fp, book);
     int count = 0;
-    
+
     for(; book != NULL; book = loadNextBook(fp, book))
     {
         if(strcmp(book->b_book_title, title) == 0)
@@ -473,19 +473,19 @@ int titleCount(char *title)
             count++;
         }
     }
-    
+
     return count;
-    
+
     /*
     BOOKNODE *head = NULL, *current = NULL;
     head->next = malloc(sizeof(BOOKNODE));
     current = head->next;
-    
-    
+
+
     // Loads the library into memory
     while(!feof(fp))
     {
-        
+
     }
 
     if(book = NULL)
@@ -496,31 +496,32 @@ int titleCount(char *title)
     printf("BOOK TITLE\t\t\t\tCOUNT\n");
     while(book != NULL)
     {
-        
+
         book = loadNextBook(fp, book);
     }
     printf("--------------------------------------------------\n");
-    
-    
+
+
     return;
     */
 }
 
 
-void searchBookbyTitle(){
+void searchBookbyTitle(BOOKNODE *head){
+    BOOKNODE *current = head;
     char title_search[MAX_TITLE_LENGTH];
     short cs_count=0; //To count number of closest searches
     short flag=0; //To end searching on finding the exact book or when no results
     char closest_search[MAX_CLOSE_SEARCH][MAX_TITLE_LENGTH]; //To store MAX_CLOSE_SEARCH closest matching searches
     printf("Search by title: ");
     fgets(title_search,MAX_TITLE_LENGTH,stdin);
-    while(flag==0&&(loadNextBook(fp,book)!=NULL)){
-        temp=*book;
+    while(flag==0&&current->next != NULL){
+        current=current->next;
         //Iterating through all characters of a single book title
         for(int j=0;j<MAX_TITLE_LENGTH;j++){
 
             //Skip the current book if atleast 3 characters don't match
-        if((tolower(title_search[j])!=tolower(temp.b_book_title[j]))&&j<3){
+        if((tolower(title_search[j])!=tolower(current->book.b_book_title[j]))&&j<3){
             //printf("\n First 3 not matching"); For ref only, to be removed before submission
             if(strlen(title_search)<=3)
                 printf("Enter atleast four characters to search\n");
@@ -531,20 +532,20 @@ void searchBookbyTitle(){
             }
 
             //If atleast one character does not match,Store the closest matching search (book) and skip current iteration
-        else if(tolower(title_search[j])!=tolower(temp.b_book_title[j])&&j<strlen(temp.b_book_title)&&j>2){
+        else if(tolower(title_search[j])!=tolower(current->book.b_book_title[j])&&j<strlen(current->book.b_book_title)&&j>2){
                 //printf("\n Close"); For ref only, to be removed before submission
             if(cs_count<MAX_CLOSE_SEARCH){
-                strcpy(closest_search[cs_count],temp.b_book_title);
+                strcpy(closest_search[cs_count],current->book.b_book_title);
                 char curr_ID[11];
-                sprintf(curr_ID, "%d", temp.b_book_ID); //Appending ID to display
+                sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
                 strcat(closest_search[cs_count],"\n\tID: ");
                strcat(closest_search[cs_count],curr_ID);
                 strcat(closest_search[cs_count],"\n\tStatus: ");
-                    if(temp.b_book_status=='A')
+                    if(current->book.b_book_status=='A')
                         strcat(closest_search[cs_count], "Available");
-                    else if(temp.b_book_status=='R')
+                    else if(current->book.b_book_status=='R')
                         strcat(closest_search[cs_count], "Reserved");
-                    else if(temp.b_book_status=='I')
+                    else if(current->book.b_book_status=='I')
                         strcat(closest_search[cs_count], "Not available (Issued");
                     else
                         strcat(closest_search[cs_count], "Undefined");
@@ -555,25 +556,25 @@ void searchBookbyTitle(){
             }
 
             //Continue if some (not all) characters match
-        else if(tolower(title_search[j])==tolower(temp.b_book_title[j])&&j<strlen(temp.b_book_title)){
+        else if(tolower(title_search[j])==tolower(current->book.b_book_title[j])&&j<strlen(current->book.b_book_title)){
              //printf("\n Almost"); For ref only, to be removed before submission
                 continue;
         }
                 //If the search matches exactly, stop searching
         else{
                 //printf("\n Found");
-                printf("Book found: %s ",temp.b_book_title);
-                if(temp.b_book_status=='A')
+                printf("Book found: %s ",current->book.b_book_title);
+                if(current->book.b_book_status=='A')
                 printf("(Available)\n");
-                else if(temp.b_book_status=='R')
+                else if(current->book.b_book_status=='R')
                 printf("(Reserved)\n");
-                else if(temp.b_book_status=='I')
+                else if(current->book.b_book_status=='I')
                 printf("(Not available (Issued))\n");
                 else
                 printf("Undefined)\n"); //To account for faulty/incomplete entry of status of book
 
-                printf("\tAuthor: %s\n",temp.b_book_author);
-                printf("\tBook ID: %d\n",temp.b_book_ID);
+                printf("\tAuthor: %s\n",current->book.b_book_author);
+                printf("\tBook ID: %ld\n",current->book.b_book_ID);
                 //if EOF reached, flag=1 (TO BE ADDED)
                 flag=3;
                 break;
@@ -603,11 +604,11 @@ void displayAllBooks(BOOKNODE *head)
     {
         printf("--------------------NO BOOKS TO DISPLAY--------------------");
     }
-    
+
     printf("------------------------------------------------------------\n");
     printf("TITLE\t\t\t\tAUTHOR\t\t\t\tAVAILABILITY\n");
     char availability[15] = {};
-    
+
     while(current->next != NULL)
     {
         current = current->next;
@@ -630,6 +631,6 @@ void displayAllBooks(BOOKNODE *head)
         printf("%s\t\t\t\t%s\t\t\t\t%s", current->book.b_book_title, current->book.b_book_author, availability);
     }
     printf("------------------------------------------------------------\n");
-    
+
     return;
 }
