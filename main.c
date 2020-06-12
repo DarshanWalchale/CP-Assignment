@@ -72,6 +72,7 @@ BOOK * loadNextBook(FILE *, BOOK*);
 int titleCount(char *);
 void makeFile();
 unsigned long generateBookID();
+void searchBookbyTitle();
 
 //--------------------------------------------------------------------------------------------------------------
 
