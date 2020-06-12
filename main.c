@@ -12,6 +12,7 @@
 
 // GLOBAL VARIABLES
 
+
 // STRUCTURES
 
 //Structure variables starting with single characters will be used in different functions
