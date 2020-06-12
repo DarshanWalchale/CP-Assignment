@@ -78,7 +78,7 @@ unsigned long generateBookID();
 int main(void)
 {
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
-    makeFile();
+    //makeFile();
     welcomeScreen();
     
     return 0;
