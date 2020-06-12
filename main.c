@@ -12,12 +12,13 @@
 #define MAX_CLOSE_SEARCH 30
 
 // GLOBAL VARIABLES
+unsigned long Book_ID_Counter = 394;
 
 // STRUCTURES
 
 //Structure variables starting with single characters will be used in different functions
 /*
-//struct tm {                                   //struct tm for reference
+//struct tm {                                   //struct tm FOR REFFERENCE
 //   int tm_sec;    /* Seconds (0-60) */
 //    int tm_min;    /* Minutes (0-59) */
 //    int tm_hour;   /* Hours (0-23) */
@@ -69,15 +70,96 @@ void addNewBook(BOOK *book);
 USER * loadNextUser(FILE *, USER*);
 BOOK * loadNextBook(FILE *, BOOK*);
 int titleCount(char *);
+void makeFile();
+unsigned long generateBookID();
 
+//--------------------------------------------------------------------------------------------------------------
 
 int main(void)
 {
-  welcomeScreen();
-
-  return 0;
+    //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
+    makeFile();
+    welcomeScreen();
+    
+    return 0;
 }
 
+
+void makeFile()
+{
+    BOOK book;
+    time_t sec = 0.9 * time(NULL);
+    printf("sec = %lu \n", sec);
+    printf("current time: %s\n", ctime(&sec));
+    struct tm time_of_event = *(localtime(&sec));
+    char choice;
+    do
+    {
+        //printf("DO\n");
+        printf("Enter Book Title:\n->");
+        scanf(" %60[^\n]", book.b_book_title); //MAX_TITLE_LENGTH 
+        while(getchar() != '\n');
+        
+        printf("Enter Book Author\n->");
+        scanf(" %30[^\n]", book.b_book_author);
+        while(getchar() != '\n');
+        
+        book.b_book_ID = generateBookID();
+        book.b_issue_ID = 0;
+        book.b_user_ID = 0;
+        book.b_book_status = 'A';
+        
+        sec = 0.9 * time(NULL);
+        printf("sec = %lu \n", sec);
+        printf("current time: %s\n", ctime(&sec));
+        struct tm time_of_event = *(localtime(&sec));
+        
+        //date of arrival struct tm
+        book.book_date_of_arrival.tm_sec = time_of_event.tm_sec;
+        book.book_date_of_arrival.tm_min = time_of_event.tm_min;
+        book.book_date_of_arrival.tm_hour = time_of_event.tm_hour;
+        book.book_date_of_arrival.tm_mday = time_of_event.tm_mday;
+        book.book_date_of_arrival.tm_mon = time_of_event.tm_mon;
+        book.book_date_of_arrival.tm_year = time_of_event.tm_year;
+        book.book_date_of_arrival.tm_wday = time_of_event.tm_wday;
+        book.book_date_of_arrival.tm_yday = time_of_event.tm_yday;
+        book.book_date_of_arrival.tm_isdst = time_of_event.tm_isdst;
+        //date_issue struct tm
+        book.b_date_issue.tm_sec = 0;
+        book.b_date_issue.tm_sec = 0;
+        book.b_date_issue.tm_sec = 0;
+        book.b_date_issue.tm_sec = 0;
+        book.b_date_issue.tm_sec = 0;
+        book.b_date_issue.tm_sec = 0;
+        book.b_date_issue.tm_sec = 0;
+        book.b_date_issue.tm_sec = 0;
+        book.b_date_issue.tm_sec = 0;
+        
+        
+        addNewBook(&book);
+        
+        printf("again?(y/n): ");
+        scanf(" %c", &choice);
+        while(getchar() != '\n');
+        if(choice == 'n')
+        {
+            break;
+        }
+        if(choice == 'N')
+        {
+            break;
+        }
+        
+    }while(1);
+    
+    return;
+}
+
+unsigned long generateBookID()
+{
+    Book_ID_Counter++;
+    return (Book_ID_Counter - 1);
+}
 
 
 void welcomeScreen()
@@ -91,7 +173,7 @@ void welcomeScreen()
 
   printf("\n\n\n\n\t\t\t\tPress Enter to proceed");
 
-  if(getchar() == 13)
+  while(getchar() != '\n'); // Won't proceed till \n entered, wont leave remanents in input buffer
   printf("\n\n\n\n\n\n\n\n\n\n\n\n");
 
 
