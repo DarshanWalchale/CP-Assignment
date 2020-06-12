@@ -9,6 +9,7 @@
 
 // DEFINES
 #define MAX_TITLE_LENGTH 60
+#define MAX_CLOSE_SEARCH 30
 
 // GLOBAL VARIABLES
 
@@ -419,4 +420,94 @@ int titleCount(char *title)
     
     return;
     */
+}
+
+
+void searchBookbyTitle(){
+    char title_search[MAX_TITLE_LENGTH];
+    short cs_count=0; //To count number of closest searches
+    short flag=0; //To end searching on finding the exact book or when no results
+    char closest_search[MAX_CLOSE_SEARCH][MAX_TITLE_LENGTH]; //To store MAX_CLOSE_SEARCH closest matching searches
+    printf("Search by title: ");
+    fgets(title_search,MAX_TITLE_LENGTH,stdin);
+    while(flag==0&&(loadNextBook(fp,book)!=NULL)){
+        temp=*book;
+        //Iterating through all characters of a single book title
+        for(int j=0;j<MAX_TITLE_LENGTH;j++){
+
+            //Skip the current book if atleast 3 characters don't match
+        if((tolower(title_search[j])!=tolower(temp.b_book_title[j]))&&j<3){
+            //printf("\n First 3 not matching"); For ref only, to be removed before submission
+            if(strlen(title_search)<=3)
+                printf("Enter atleast four characters to search\n");
+            else
+                printf("No results found!\n");
+            flag=1;
+            break;
+            }
+
+            //If atleast one character does not match,Store the closest matching search (book) and skip current iteration
+        else if(tolower(title_search[j])!=tolower(temp.b_book_title[j])&&j<strlen(temp.b_book_title)&&j>2){
+                //printf("\n Close"); For ref only, to be removed before submission
+            if(cs_count<MAX_CLOSE_SEARCH){
+                strcpy(closest_search[cs_count],temp.b_book_title);
+                char curr_ID[11];
+                sprintf(curr_ID, "%d", temp.b_book_ID); //Appending ID to display
+                strcat(closest_search[cs_count],"\n\tID: ");
+               strcat(closest_search[cs_count],curr_ID);
+                strcat(closest_search[cs_count],"\n\tStatus: ");
+                    if(temp.b_book_status=='A')
+                        strcat(closest_search[cs_count], "Available");
+                    else if(temp.b_book_status=='R')
+                        strcat(closest_search[cs_count], "Reserved");
+                    else if(temp.b_book_status=='I')
+                        strcat(closest_search[cs_count], "Not available (Issued");
+                    else
+                        strcat(closest_search[cs_count], "Undefined");
+
+                cs_count++;
+            }
+            break;
+            }
+
+            //Continue if some (not all) characters match
+        else if(tolower(title_search[j])==tolower(temp.b_book_title[j])&&j<strlen(temp.b_book_title)){
+             //printf("\n Almost"); For ref only, to be removed before submission
+                continue;
+        }
+                //If the search matches exactly, stop searching
+        else{
+                //printf("\n Found");
+                printf("Book found: %s ",temp.b_book_title);
+                if(temp.b_book_status=='A')
+                printf("(Available)\n");
+                else if(temp.b_book_status=='R')
+                printf("(Reserved)\n");
+                else if(temp.b_book_status=='I')
+                printf("(Not available (Issued))\n");
+                else
+                printf("Undefined)\n"); //To account for faulty/incomplete entry of status of book
+
+                printf("\tAuthor: %s\n",temp.b_book_author);
+                printf("\tBook ID: %d\n",temp.b_book_ID);
+                //if EOF reached, flag=1 (TO BE ADDED)
+                flag=3;
+                break;
+                }
+            }
+
+        }
+
+        //To print all closest searches (upto MAX_CLOSE_SEARCH) when book is not found
+        if(cs_count>0&&flag!=3){
+        cs_count=0;
+        printf("Closest searches:\n");
+        while(strlen(closest_search[cs_count])!=0){
+            printf("%hi. %s",cs_count+1,closest_search[cs_count]);
+            cs_count++;
+            if(cs_count=MAX_CLOSE_SEARCH)
+            break; //Stop on reaching MAX_CLOSE_SEARCH closest search
+        }
+        }
+
 }
