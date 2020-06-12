@@ -515,6 +515,7 @@ void searchBookbyTitle(BOOKNODE *head){
     printf("Search by title: ");
     fgets(title_search,MAX_TITLE_LENGTH,stdin);
     while(flag==0&&current->next != NULL){
+        current=current->next;
         //Iterating through all characters of a single book title
         for(int j=0;j<MAX_TITLE_LENGTH;j++){
 
