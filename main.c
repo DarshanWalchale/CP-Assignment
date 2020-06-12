@@ -594,3 +594,41 @@ void searchBookbyTitle(){
         }
 
 }
+
+void displayAllBooks(BOOKNODE *head)
+{
+    BOOKNODE *current = head;
+    if(head->next == NULL)
+    {
+        printf("--------------------NO BOOKS TO DISPLAY--------------------");
+    }
+    
+    printf("------------------------------------------------------------\n");
+    printf("TITLE\t\t\t\tAUTHOR\t\t\t\tAVAILABILITY\n");
+    char availability[15] = {};
+    
+    while(current->next != NULL)
+    {
+        current = current->next;
+        if(current->book.b_book_status == 'A')
+        {
+            strcpy(availability, "Available");
+        }
+        else if(current->book.b_book_status == 'I')
+        {
+            strcpy(availability, "Already Issued");
+        }
+        else if(current->book.b_book_status == 'R')
+        {
+            strcpy(availability, "Reserved");
+        }
+        else
+        {
+            strcpy(availability, "Unknown");
+        }
+        printf("%s\t\t\t\t%s\t\t\t\t%s", current->book.b_book_title, current->book.b_book_author, availability);
+    }
+    printf("------------------------------------------------------------\n");
+    
+    return;
+}
