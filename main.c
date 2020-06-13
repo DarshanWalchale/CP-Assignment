@@ -13,12 +13,7 @@
 #define MAX_CLOSE_AUTH_SEARCH 20 //Maximum number of closest seraches of authors to display
 #define MAX_SAME_AUTHOR 100 //Maximum number of books of same author to display
 
-// GLOBAL VARIABLES
-unsigned long Book_ID_Counter = 394;
-
 // STRUCTURES
-
-//Structure variables starting with single characters will be used in different functions
 /*
 //struct tm {                                   //struct tm FOR REFFERENCE
 //   int tm_sec;     Seconds (0-60)
@@ -33,7 +28,7 @@ unsigned long Book_ID_Counter = 394;
 //};
 */
 
-
+//Structure variables starting with single characters will be used in different functions
 typedef struct BOOK{
     char b_book_title[MAX_TITLE_LENGTH];
     char b_book_author[30];
@@ -61,6 +56,9 @@ typedef struct BOOKNODE         // this is used for the function titleCount
     struct BOOKNODE *next;
 } BOOKNODE;
 
+// GLOBAL VARIABLES
+unsigned long Book_ID_Counter = 394;
+USER Current_User; //capitalized cuz global variable 
 
 // PROTOTYPES
 BOOKNODE * loadLibrary(BOOKNODE *);
@@ -231,6 +229,8 @@ void welcomeScreen()
 
 
 }
+
+
 
 // Give pointer to head BOOKNODE (likely initialized in main)
 // Loads the entire library into memory using a dynamic linked list (utilizes higher reading speed of RAM and reduces file I/O process requirement)
