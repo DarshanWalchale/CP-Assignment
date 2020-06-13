@@ -316,33 +316,6 @@ int titleCount(char *title)
 
     return count;
 
-    /*
-    BOOKNODE *head = NULL, *current = NULL;
-    head->next = malloc(sizeof(BOOKNODE));
-    current = head->next;
-
-
-    // Loads the library into memory
-    while(!feof(fp))
-    {
-
-    }
-
-    if(book == NULL)
-    {
-        printf("--------------------NO BOOKS TO DISPLAY--------------------\n");
-    }
-    printf("--------------------------------------------------\n");
-    printf("BOOK TITLE\t\t\t\tCOUNT\n");
-    while(book != NULL)
-    {
-
-        book = loadNextBook(fp, book);
-    }
-    printf("--------------------------------------------------\n");
-
-    return count;
-    */
 }
 
 
