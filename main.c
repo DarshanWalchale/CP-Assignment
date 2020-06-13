@@ -19,16 +19,17 @@ unsigned long Book_ID_Counter = 394;
 //Structure variables starting with single characters will be used in different functions
 /*
 //struct tm {                                   //struct tm FOR REFFERENCE
-//   int tm_sec;    /* Seconds (0-60) */
-//    int tm_min;    /* Minutes (0-59) */
-//    int tm_hour;   /* Hours (0-23) */
-//    int tm_mday;   /* Day of the month (1-31) */
-//    int tm_mon;    /* Month (0-11) */
-//    int tm_year;   /* Year - 1900 */
-//    int tm_wday;   /* Day of the week (0-6, Sunday = 0) */
-//    int tm_yday;   /* Day in the year (0-365, 1 Jan = 0) */
-//    int tm_isdst;  /* Daylight saving time */
+//   int tm_sec;     Seconds (0-60)
+//    int tm_min;     Minutes (0-59)
+//    int tm_hour;    Hours (0-23)
+//    int tm_mday;    Day of the month (1-31)
+//    int tm_mon;     Month (0-11)
+//    int tm_year;    Year - 1900
+//    int tm_wday;    Day of the week (0-6, Sunday = 0)
+//    int tm_yday;    Day in the year (0-365, 1 Jan = 0)
+//    int tm_isdst;   Daylight saving time
 //};
+*/
 
 
 typedef struct BOOK{
@@ -81,6 +82,14 @@ int main(void)
 {
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //makeFile();
+
+
+    BOOKNODE *head = calloc(1, sizeof(BOOKNODE));
+    //printf("Program Start(head malloc successful)\n");
+    head = loadLibrary(head);
+    printf("Books database loaded into memory successfully\n");
+    displayAllBooks(head);
+    
     welcomeScreen();
 
     return 0;
@@ -89,6 +98,7 @@ int main(void)
 
 void makeFile()
 {
+    FILE *fp = fopen("books.txt", "a");
     BOOK book;
     time_t sec = 0.9 * time(NULL);
     printf("sec = %lu \n", sec);
@@ -138,7 +148,7 @@ void makeFile()
         book.b_date_issue.tm_sec = 0;
 
 
-        addNewBook(&book);
+        fwrite(&book, sizeof(BOOK), 1, fp);
 
         printf("again?(y/n): ");
         scanf(" %c", &choice);
@@ -153,6 +163,8 @@ void makeFile()
         }
 
     }while(1);
+
+    fclose(fp);
 
     return;
 }
@@ -221,14 +233,17 @@ void welcomeScreen()
 // Loads the entire library into memory using a dynamic linked list (utilizes higher reading speed of RAM and reduces file I/O process requirement)
 BOOKNODE * loadLibrary(BOOKNODE *head)
 {
+    //printf("loadLibrary");
     FILE *fp = fopen("books.txt", "r");
     BOOK *book_load = calloc(1, sizeof(BOOK));
-    loadNextBook(fp, book_load);
+    //loadNextBook(fp, book_load);
+    fread(book_load, sizeof(BOOK), 1, fp);
+
     BOOKNODE *current;
     head->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
     current = head->next;
     current->next = NULL;
-
+    //printf("\t1\n");
     while(1)
     {
         strcpy(current->book.b_book_title, book_load->b_book_title);
@@ -237,6 +252,7 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
         current->book.b_issue_ID = book_load->b_issue_ID;
         current->book.b_user_ID = book_load->b_user_ID;
         current->book.b_book_status = book_load->b_book_status;
+        
         //time struct tm part
         current->book.book_date_of_arrival.tm_sec = book_load->book_date_of_arrival.tm_sec;
         current->book.book_date_of_arrival.tm_min = book_load->book_date_of_arrival.tm_min;
@@ -247,7 +263,7 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
         current->book.book_date_of_arrival.tm_wday = book_load->book_date_of_arrival.tm_wday;
         current->book.book_date_of_arrival.tm_yday = book_load->book_date_of_arrival.tm_yday;
         current->book.book_date_of_arrival.tm_isdst = book_load->book_date_of_arrival.tm_isdst;
-
+        //date of issue struct tm part
         current->book.b_date_issue.tm_sec = book_load->b_date_issue.tm_sec;
         current->book.b_date_issue.tm_min = book_load->b_date_issue.tm_min;
         current->book.b_date_issue.tm_hour = book_load->b_date_issue.tm_hour;
@@ -257,10 +273,12 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
         current->book.b_date_issue.tm_wday = book_load->b_date_issue.tm_wday;
         current->book.b_date_issue.tm_yday = book_load->b_date_issue.tm_yday;
         current->book.b_date_issue.tm_isdst = book_load->b_date_issue.tm_isdst;
+        //printf("A");
 
-
-        loadNextBook(fp, book_load);
-        if(book_load == NULL)
+        //loadNextBook(fp, book_load);
+        fread(book_load, sizeof(BOOK), 1, fp);
+        //printf("B");
+        if(feof(fp))
         {
             break;
         }
@@ -270,9 +288,9 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
             current = current->next;
         }
     }
-
     return head;
 }
+
 
 void addNewUser(USER *user)
 {
@@ -285,11 +303,11 @@ void addNewUser(USER *user)
     return;
 }
 
-/*
+
 void addNewBook(BOOK *book)
 {
     FILE *fp = fopen("books.txt", "a");
-    
+
     //fwrite(book, sizeof(BOOK), 1, fp);
 
     fprintf(fp, "%s,%s,%lu,%lu,%lu,%c,", book->b_book_title, book->b_book_author, book->b_book_ID, book->b_issue_ID,
@@ -461,7 +479,8 @@ BOOK * loadNextBook(FILE *fp, BOOK *book)
 
     return book;
 }
-*/
+
+
 
 int titleCount(char *title)
 {
@@ -492,7 +511,7 @@ int titleCount(char *title)
 
     }
 
-    if(book = NULL)
+    if(book == NULL)
     {
         printf("--------------------NO BOOKS TO DISPLAY--------------------\n");
     }
@@ -505,10 +524,11 @@ int titleCount(char *title)
     }
     printf("--------------------------------------------------\n");
 
-
-    return;
+    return count;
     */
 }
+
+
 
 
 void searchBookbyTitle(BOOKNODE *head){
@@ -601,16 +621,18 @@ void searchBookbyTitle(BOOKNODE *head){
 
 }
 
+
 void displayAllBooks(BOOKNODE *head)
 {
     BOOKNODE *current = head;
     if(head->next == NULL)
     {
-        printf("--------------------NO BOOKS TO DISPLAY--------------------");
+        printf("--------------------NO BOOKS TO DISPLAY--------------------\n");
     }
 
     printf("------------------------------------------------------------\n");
-    printf("TITLE\t\t\t\tAUTHOR\t\t\t\tAVAILABILITY\n");
+    printf("AVAILABILITY\tAUTHOR\t\tTITLE\n");
+    printf("------------------------------------------------------------\n");
     char availability[15] = {};
 
     while(current->next != NULL)
@@ -632,7 +654,7 @@ void displayAllBooks(BOOKNODE *head)
         {
             strcpy(availability, "Unknown");
         }
-        printf("%s\t\t\t\t%s\t\t\t\t%s", current->book.b_book_title, current->book.b_book_author, availability);
+        printf("%s\t%s\t\t%s\n", availability, current->book.b_book_author,current->book.b_book_title);
     }
     printf("------------------------------------------------------------\n");
 
