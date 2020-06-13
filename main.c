@@ -625,7 +625,7 @@ void searchBookbyTitle(BOOKNODE *head){
         while(strlen(closest_search[cs_count])!=0){
             printf("%hi. %s",cs_count+1,closest_search[cs_count]);
             cs_count++;
-            if(cs_count=MAX_CLOSE_TITLE_SEARCH)
+            if(cs_count==MAX_CLOSE_TITLE_SEARCH)
             break; //Stop on reaching MAX_CLOSE_TITLE_SEARCH closest search
         }
         }
@@ -771,7 +771,7 @@ void searchBookbyAuthor(BOOKNODE *head){
         while(strlen(closest_search[cs_count])!=0){
             printf("%hi. %s",cs_count+1,closest_search[cs_count]);
             cs_count++;
-            if(cs_count=MAX_CLOSE_AUTH_SEARCH)
+            if(cs_count==MAX_CLOSE_AUTH_SEARCH)
             break; //Stop on reaching MAX_CLOSE_AUTH_SEARCH closest search
         }
         }
@@ -862,7 +862,7 @@ void searchBookbyID(BOOKNODE *head){
         while(strlen(closest_search[cs_count])!=0){
             printf("%hi. %s",cs_count+1,closest_search[cs_count]);
             cs_count++;
-            if(cs_count=MAX_CLOSE_ID)
+            if(cs_count==MAX_CLOSE_ID)
             break; //Stop on reaching MAX_CLOSE_ID closest search
         }
         }
