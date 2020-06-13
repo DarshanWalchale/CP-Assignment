@@ -519,9 +519,17 @@ void searchBookbyTitle(BOOKNODE *head){
     char title_search[MAX_TITLE_LENGTH];
     short cs_count=0; //To count number of closest searches
     short flag=0; //To end searching on finding the exact book or when no results
-    char closest_search[MAX_CLOSE_TITLE_SEARCH][MAX_TITLE_LENGTH]; //To store MAX_CLOSE_TITLE_SEARCH closest matching searches
+    char closest_search[MAX_CLOSE_TITLE_SEARCH][MAX_TITLE_LENGTH+30]; //To store MAX_CLOSE_TITLE_SEARCH closest matching title searches
+    LAB1: //a label to return if <=3 chars entered
     printf("Search by title: ");
     fgets(title_search,MAX_TITLE_LENGTH,stdin);
+
+    //Restart search if less than three characters entered
+    if(strlen(title_search)<4){
+        printf("Enter at least three characters to search");
+        goto LAB1;
+    }
+
     while(flag==0&&current->next != NULL){
         current=current->next;
         //Iterating through all characters of a single book title
@@ -530,11 +538,6 @@ void searchBookbyTitle(BOOKNODE *head){
             //Skip the current book if atleast 3 characters don't match
         if((tolower(title_search[j])!=tolower(current->book.b_book_title[j]))&&j<3){
             //printf("\n First 3 not matching"); For ref only, to be removed before submission
-            if(strlen(title_search)<=3)
-                printf("Enter atleast four characters to search\n");
-            else
-                printf("No results found!\n");
-            flag=1;
             break;
             }
 
@@ -589,6 +592,9 @@ void searchBookbyTitle(BOOKNODE *head){
             }
 
         }
+
+        if(flag==0&&cs_count==0)
+        printf("No results found");
 
         //To print all closest searches (upto MAX_CLOSE_TITLE_SEARCH) when book is not found
         if(cs_count>0&&flag!=3){
@@ -654,21 +660,26 @@ void searchBookbyAuthor(BOOKNODE *head){
     char all_same_auth[MAX_SAME_AUTHOR][80]; //To store list of all books of same author
     char auth_found[30]; //Author (matched with search)
 
+    LAB2: //a label to return if <=3 chars entered
+
     printf("Search by author: ");
     fgets(author_search,30,stdin);
+
+        //Restart search if less than three characters entered
+     if(strlen(author_search)<4){
+            printf("Enter atleast three characters to search\n");
+            goto LAB2;
+        }
+
     while(flag==0&&current->next != NULL){
         current=current->next;
         //Iterating through all characters of a single book author
         for(int j=0;j<30;j++){
 
-            //Skip the current book if atleast 3 characters don't match
+
+        //Skip the current book if atleast 3 characters don't match
         if((tolower(author_search[j])!=tolower(current->book.b_book_author[j]))&&j<3){
             //printf("\n First 3 not matching"); For ref only, to be removed before submission
-            if(strlen(author_search)<3)
-                printf("Enter atleast three characters to search\n");
-            else
-                printf("No results found!\n");
-            flag=1;
             break;
             }
 
@@ -680,7 +691,7 @@ void searchBookbyAuthor(BOOKNODE *head){
             //To prevent repetition of closest search 'authors'
             for(int m=0;m<cs_count;m++)
             {
-                if(strcmp(closest_search[m],book.b_book_author)==0)
+                if(strcmp(closest_search[m],current->book.b_book_author)==0)
                 check_repeat=1;
             }
             if(check_repeat!=0)
@@ -705,10 +716,8 @@ void searchBookbyAuthor(BOOKNODE *head){
                 strcpy(auth_found,current->book.b_book_title);
                 strcat(all_same_auth[same_auth_count],"Title: ");
                 strcat(all_same_auth[same_auth_count],current->book.b_book_title);
-                strcat(all_same_auth[same_auth_count],"\n\tID: ");
-                strcat(all_same_auth[same_auth_count],current->book.b_book_ID);
-                har curr_ID[11];
-                sprintf(curr_ID, "%d", temp.b_book_ID); //Appending ID to display
+                char curr_ID[11];
+                sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
                 strcat(all_same_auth[same_auth_count],"\n\tID: ");
                 strcat(all_same_auth[same_auth_count],curr_ID);
 
@@ -727,6 +736,9 @@ void searchBookbyAuthor(BOOKNODE *head){
             }
 
         }
+
+        if(flag==0&&cs_count==0)
+        printf("No results found");
 
         //To print all closest searches of authors when exact match is not found
         if(cs_count>0&&same_auth_count==0){
