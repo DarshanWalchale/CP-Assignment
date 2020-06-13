@@ -59,7 +59,7 @@ typedef struct BOOKNODE         // this is used for the function titleCount
 
 // GLOBAL VARIABLES
 unsigned long Book_ID_Counter = 394;
-USER Current_User; //capitalized cuz global variable 
+USER Current_User; //capitalized cuz global variable
 
 // PROTOTYPES
 BOOKNODE * loadLibrary(BOOKNODE *);
@@ -77,7 +77,8 @@ unsigned long generateBookID();
 void searchBookbyTitle();
 void displayAllBooks(BOOKNODE *head);
 void searchBookbyAuthor(BOOKNODE *head);
-void searchBookbyID(BOOKNODE *head);
+void searchBookbyID(BOOKNODE *head)
+
 //--------------------------------------------------------------------------------------------------------------
 
 int main(void)
@@ -91,7 +92,7 @@ int main(void)
     head = loadLibrary(head);
     printf("Books database loaded into memory successfully\n");
     displayAllBooks(head);
-    
+
     welcomeScreen();
 
     return 0;
@@ -256,7 +257,7 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
         current->book.b_issue_ID = book_load->b_issue_ID;
         current->book.b_user_ID = book_load->b_user_ID;
         current->book.b_book_status = book_load->b_book_status;
-        
+
         //time struct tm part
         current->book.book_date_of_arrival.tm_sec = book_load->book_date_of_arrival.tm_sec;
         current->book.book_date_of_arrival.tm_min = book_load->book_date_of_arrival.tm_min;
@@ -869,3 +870,5 @@ void searchBookbyID(BOOKNODE *head){
         if(cs_count==0&&flag!=3)
         printf("No results found");
 }
+
+
