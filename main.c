@@ -65,8 +65,9 @@ typedef struct USERNODE         // this is used to load all userdata into memory
 } USERNODE;
 
 // GLOBAL VARIABLES
-unsigned long Book_ID_Counter;           //3943
+unsigned long Book_ID_Counter;           // 3943
 unsigned long Issue_ID_Counter;          // 20195
+unsigned long User_ID_Counter;           // 1791
 USER Current_User; //capitalized cuz global variable
 
 // PROTOTYPES
@@ -84,6 +85,7 @@ int titleCount(char *);
 void makeFile();
 unsigned long generateBookID();
 unsigned long generateIssueID();
+unsigned long generateUserID();
 void searchBookbyTitle();
 void displayAllBooks(BOOKNODE *head);
 void searchBookbyAuthor(BOOKNODE *head);
@@ -109,7 +111,7 @@ int main(void)
     head = loadLibrary(head);
     printf("Books database loaded into memory successfully\n");
     displayAllBooks(head);
-    //printf("Counters: %lu,%lu\n", generateBookID(), generateIssueID());
+    printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID());
 
     welcomeScreen();
 
@@ -333,7 +335,7 @@ void makeFile()
 {
     FILE *fp = fopen("books.txt", "a");
     BOOK book;
-    time_t sec = 0.9 * time(NULL);
+    time_t sec = time(NULL);
     printf("sec = %lu \n", sec);
     printf("current time: %s\n", ctime(&sec));
     struct tm time_of_event = *(localtime(&sec));
@@ -406,7 +408,7 @@ unsigned long generateBookID()
 {
     Book_ID_Counter++;
     FILE *fp = fopen("counterdata.txt", "w");
-    fprintf(fp, "%lu,%lu", Book_ID_Counter, Issue_ID_Counter);
+    fprintf(fp, "%lu,%lu,%lu", Book_ID_Counter, Issue_ID_Counter, User_ID_Counter);
     fclose(fp);
     return (Book_ID_Counter);
 }
@@ -415,9 +417,18 @@ unsigned long generateIssueID()
 {
     Issue_ID_Counter++;
     FILE *fp = fopen("counterdata.txt", "w");
-    fprintf(fp, "%lu,%lu", Book_ID_Counter, Issue_ID_Counter);
+    fprintf(fp, "%lu,%lu,%lu", Book_ID_Counter, Issue_ID_Counter, User_ID_Counter);
     fclose(fp);
     return (Issue_ID_Counter);
+}
+
+unsigned long generateUserID()
+{
+    User_ID_Counter++;
+    FILE *fp = fopen("counterdata.txt", "w");
+    fprintf(fp, "%lu,%lu,%lu", Book_ID_Counter, Issue_ID_Counter, User_ID_Counter);
+    fclose(fp);
+    return (User_ID_Counter);
 }
 
 
@@ -526,14 +537,19 @@ void loadCounters()
     FILE *fp = fopen("counterdata.txt", "r");
     char buffer[256] = {};
     fgets(buffer, 256, fp);
+    
     char * pointer = strtok(buffer, ",");
-
-    printf("loadcounters:\t%lu\t", atol(pointer));
+    //printf("loadcounters:\t%lu\t", atol(pointer));
     Book_ID_Counter = atol(pointer);
+    
     pointer = strtok(NULL, ",");
-    printf("%lu\n", atol(pointer));
+    //printf("%lu\n", atol(pointer));
     Issue_ID_Counter = atol(pointer);
-    printf("%lu\t%lu\n", Book_ID_Counter, Issue_ID_Counter);
+    
+    pointer = strtok(NULL, ",");
+    User_ID_Counter = atol(pointer);
+    
+    printf("%lu\t%lu\t%lu\n", Book_ID_Counter, Issue_ID_Counter, User_ID_Counter);
     fclose(fp);
 
     return;
@@ -957,7 +973,6 @@ void newlyAddedBooks(BOOKNODE *head)
     return;
 }
 
-// WORK IN PROGRESS
 void notifications(BOOKNODE *head, USER *user)
 {
     time_t sec = time(NULL);
