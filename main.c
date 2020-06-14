@@ -43,11 +43,11 @@ typedef struct BOOK{
 
 typedef struct USER{
     unsigned long u_user_ID; //10 digit ID
-    char user_name[20]; //
+    char user_name[30]; //
     unsigned long u_book_ID; //10 digit ID
     unsigned long u_issue_ID; //10 digit ID
     char u_user_pwd[30]; //User password
-    bool u_admin;
+    bool u_admin; // 1 if admin
     struct tm u_date_issue;    //
     char u_requested[MAX_TITLE_LENGTH];
 } USER;
@@ -72,11 +72,11 @@ USER Current_User; //capitalized cuz global variable
 // PROTOTYPES
 BOOKNODE * loadLibrary(BOOKNODE *);
 void loadCounters();
-void menu();
 void welcomeScreen();
-void login();
-void reg();
-//void addNewUser(USER *user);
+void menu(USER *user);
+void adminMenu(USER *user);
+void addUser(void);
+void deleteUser(USER *user);
 //void addNewBook(BOOK *book);
 //USER * loadNextUser(FILE *, USER*);
 //BOOK * loadNextBook(FILE *, BOOK*);
@@ -93,7 +93,6 @@ void notifications(BOOKNODE *head, USER *user);
 void setCurrentUser(USER *);
 void saveLibrary(BOOKNODE *head);
 void freeLibrary(BOOKNODE *head);
-void deleteUser(USER *user);
 void saveUserList(USERNODE *head);
 void freeUserList(USERNODE *head);
 
@@ -113,12 +112,221 @@ int main(void)
     //printf("Counters: %lu,%lu\n", generateBookID(), generateIssueID());
 
     welcomeScreen();
-    
-    
+
+
+
     saveLibrary(head);
     freeLibrary(head);
     return 0;
 }
+
+void welcomeScreen()
+{
+  int choice;
+
+
+  printf("\n\n\n\n\n\t\t\t\tLIBRARY MANAGEMENT SYSTEM");
+
+  printf("\n\t\t\t\t*************************");
+
+  printf("\n\n\n\n\t\t\t\tPress Enter to proceed");
+
+  while(getchar() != '\n'); // Won't proceed till \n entered, wont leave remanents in input buffer
+  printf("\n\n\n\n\n\n\n\n\n\n\n\n");
+
+
+  PQ: // just a label to come back to if we want to re-enter choice
+
+  printf("\n\n\n\t\t\t1. LOGIN\n\t\t\t2. REGISTER");
+
+  printf("\n\n\n\t\t\t\tENTER YOUR CHOICE: ");
+
+  scanf("%d",&choice);
+  while(getchar() != '\n');
+
+  static int count = 0; // if user can't register or login successfully in 5 attempts, just exit
+  char c;
+  USER *pUser = (USER *)malloc(sizeof(USER));
+        FILE *fp;
+        char uName[30];
+        char pwd[30]; // local char arrays to store details just as entered
+
+  switch(choice)
+    {
+
+        case 1:
+
+        // login();
+
+        if (( fp = fopen("userdata.txt", "r+")) == NULL)
+        {
+            printf ("Could not open file\n");
+            count++;
+        }
+
+
+        printf("Username: ");
+        scanf("%29s",uName);
+
+
+        printf("Password: ");
+        scanf("%29s",pwd);
+
+
+            while (fread (pUser, sizeof(struct USER), 1, fp) == 1)
+            {
+                if(strcmp (pUser -> user_name, uName) == 0)
+                {
+                    printf ("Username Matched\n");
+                    if(strcmp ( pUser -> u_user_pwd, pwd) == 0)
+                    {
+                        printf ("Password Matched\n");
+                        // particular user's account opened
+                        setCurrentUser(pUser);
+
+                        if(pUser -> u_admin == 1)
+                        {
+                            //adminMenu(pUser);
+                        }
+                        else
+                        {
+                           // menu(pUser);
+                        }
+                    }
+                }
+            }
+
+        break;
+
+        case 2:
+
+        // reg();
+        // REGISTER will be an admin aciton bhut let's keep it for now to add users conveniently :)
+
+
+        do
+            {
+                if ( ( fp = fopen("userdata.txt", "a+")) == NULL)
+                {
+
+                printf ("Could not open file\n");
+                count++;
+
+                }
+                printf("Choose A Username: ");
+                scanf("%29s",pUser -> user_name);
+                while(getchar() != '\n');
+
+                printf("Choose A Password: ");
+                scanf("%29s",pUser -> u_user_pwd);
+                while(getchar() != '\n');
+
+                fwrite (pUser, sizeof(struct USER), 1, fp);
+
+                printf("Add another account? (Y/N): ");
+                scanf(" %c", &c);
+                while(getchar() != '\n');
+            }
+            while(c == 'Y'|| c == 'y');
+        break;
+
+        default:
+        printf("\n\n\t\t\t\tINVALID OPTION");
+        count++;
+        if(count >= 5)
+        {
+            printf("Sorry, too many unsuccessful attempts!\n");
+            return;
+        }
+
+        printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+
+        char ch2 = scanf("%c",&ch2);
+        if(ch2 == '\n')
+        goto PQ;
+
+    }
+}
+
+//Under Construction
+// void adminMenu(USER *user)
+// {
+//     printf("Welcome Admin\n");
+
+//     int choice;
+
+//     ADMIN: // in case we need to retun here again
+//     printf("1. Add Library members\n");
+//     printf("2. Delete Library members\n");
+//     printf("3. Count books of a particular title\n");
+//     printf("4. Order books\n");
+//     printf("5. Place a request to another Library\n");
+//     printf("6. Delete existing reservations\n");
+
+//     printf("\n\nEnter your choice: ");
+//     scanf("%d", &choice);
+
+//     switch(choice)
+//     {
+//         case 1:
+//         addUser();
+
+//         printf("Press Enter to return to the Admin menu");
+//         char ch2 = scanf("%c",&ch2);
+//         if(ch2 == '\n')
+//         goto ADMIN;
+//         break;
+
+//         case 2:
+//         deleteMember()
+
+
+
+
+
+
+
+// }
+
+
+void addUser(void)
+{
+    FILE *fp;
+    char c;
+    USER *pUser = (USER *)malloc(sizeof(USER));
+    do
+    {
+        if (( fp = fopen("userdata.txt", "a+")) == NULL)
+        {
+            printf ("Could not open file\n");
+        }
+
+    printf("Choose A Username: ");
+    scanf("%29s",pUser -> user_name);
+    while(getchar() != '\n');
+
+    printf("Choose A Password: ");
+    scanf("%29s",pUser -> u_user_pwd);
+    while(getchar() != '\n');
+
+    fwrite (pUser, sizeof(struct USER), 1, fp);
+
+    printf("Add another account? (Y/N): ");
+    scanf(" %c", &c);
+    while(getchar() != '\n');
+
+    }
+    while(c == 'Y'|| c == 'y');
+    free (pUser);//free allocated memory
+    fclose(fp);
+
+}
+
+//Under Construction
+// void deleteUser(void)
+// {
+
+// }
 
 
 void makeFile()
@@ -213,136 +421,7 @@ unsigned long generateIssueID()
 }
 
 
-void welcomeScreen()
-{
-  int choice;
 
-
-  printf("\n\n\n\n\n\t\t\t\tLIBRARY MANAGEMENT SYSTEM");
-
-  printf("\n\t\t\t\t*************************");
-
-  printf("\n\n\n\n\t\t\t\tPress Enter to proceed");
-
-  while(getchar() != '\n'); // Won't proceed till \n entered, wont leave remanents in input buffer
-  printf("\n\n\n\n\n\n\n\n\n\n\n\n");
-
-
-
-
-
-  PQ: // just a label to come back to if we want to re-enter choice
-
-  printf("\n\n\n\t\t\t1. LOGIN\n\t\t\t2. REGISTER");
-
-  printf("\n\n\n\t\t\t\tENTER YOUR CHOICE: ");
-
-  scanf("%d",&choice);
-  while(getchar() != '\n');
-
-  static int count = 0; // if user can't register or login successfully in 5 attempts, just exit
-  char c;
-  USER *pUser = (USER *)malloc(sizeof(USER));
-        FILE *fp;
-        char uName[30];
-        char pwd[30]; // local char arrays to store details just as entered
-
-  switch(choice)
-    {
-
-        case 1:
-        printf("Login function\n");
-        // login();
-
-
-
-
-
-
-        if (( fp = fopen("userdata.txt", "r+")) == NULL)
-        {
-            printf ("Could not open file\n");
-            count++;
-        }
-
-
-        printf("Username: ");
-        scanf("%29s",uName);
-        while(getchar() != '\n');
-
-        printf("Password: ");
-        scanf("%29s",pwd);
-        while(getchar() != '\n');
-        
-            while (fread (pUser, sizeof(struct USER), 1, fp) == 1)
-            {
-                if(strcmp (pUser -> user_name, uName) == 0)
-                {
-                    printf ("Username Matched\n");
-                    if(strcmp ( pUser -> u_user_pwd, pwd) == 0)
-                    {
-                        printf ("Password Matched\n");
-                        // particular user's account opened
-                    }
-                }
-            }
-
-        break;
-
-        case 2:
-        printf("Register function\n");
-        // reg();
-        // REGISTER will be an admin aciton bhut let's keep it for now to add users conveniently :)
-
-
-        do
-            {
-                if ( ( fp = fopen("userdata.txt", "a+")) == NULL)
-                {
-
-                printf ("Could not open file\n");
-                count++;
-
-                }
-                printf("Choose A Username: ");
-                scanf("%29s",pUser -> user_name);
-                while(getchar() != '\n');
-
-                printf("Choose A Password: ");
-                scanf("%29s",pUser -> u_user_pwd);
-                while(getchar() != '\n');
-
-                fwrite (pUser, sizeof(struct USER), 1, fp);
-
-                printf("Add another account? (Y/N): ");
-                scanf(" %c", &c);
-                while(getchar() != '\n');
-            }
-            while(c == 'Y'|| c == 'y');
-        break;
-
-        default:
-        printf("\n\n\t\t\t\tINVALID OPTION");
-        count++;
-        printf("\n\n\t\t\tPress Enter to re-Enter the choice");
-
-        if(count >= 5)
-        {
-            printf("Sorry, too many unsuccessful attempts!\n");
-            return;
-        }
-
-
-        char ch2 = scanf("%c",&ch2);
-        if(ch2 == '\n')
-        goto PQ;
-
-    }
-
-
-
-
-}
 
 
 
@@ -393,7 +472,7 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
         current->book.b_date_issue.tm_isdst = book_load->b_date_issue.tm_isdst;
         //printf("A");
 
-        
+
         //printf("B");
         if(feof(fp))
         {
@@ -418,10 +497,10 @@ void saveLibrary(BOOKNODE *head)
     FILE *fp = fopen("books.txt", "w");
     BOOKNODE *current, *temp;
     current = head -> next;
-    
+
     while(current != NULL)
     {
-        
+
         fwrite(&(current->book), sizeof(BOOK), 1, fp);
         current = current->next;
     }
@@ -982,7 +1061,7 @@ void deleteUser(USER *user)
         current->user.u_issue_ID = user_load->u_issue_ID;
         strcpy(current->user.u_user_pwd, user_load->u_user_pwd);
         current->user.u_admin = user_load->u_admin;
-        
+
         //date of issue struct tm part
         current->user.u_date_issue.tm_sec = user_load->u_date_issue.tm_sec;
         current->user.u_date_issue.tm_min = user_load->u_date_issue.tm_min;
@@ -1007,13 +1086,13 @@ void deleteUser(USER *user)
         }
     }
     fclose(fp);
-    
+
     // saves userlist in memory to file
     saveUserList(head);
-    
+
     // frees dynamically allocated linked list of users' data from memory
     freeUserList(head);
-    
+
     return;
 }
 
@@ -1023,10 +1102,10 @@ void saveUserList(USERNODE *head)
     FILE *fp = fopen("userdata.txt", "w");
     USERNODE *current;
     current = head -> next;
-    
+
     while(current != NULL)
     {
-        
+
         fwrite(&current->user, sizeof(USER), 1, fp);
         current = current->next;
     }
