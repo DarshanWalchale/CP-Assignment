@@ -52,11 +52,17 @@ typedef struct USER{
     char u_requested[MAX_TITLE_LENGTH];
 } USER;
 
-typedef struct BOOKNODE         // this is used for the function titleCount
+typedef struct BOOKNODE         // this is used to load the library into memory
 {
     BOOK book;
     struct BOOKNODE *next;
 } BOOKNODE;
+
+typedef struct USERNODE         // this is used to load all userdata into memory (for deleteUser)
+{
+    USER user;
+    struct USERNODE *next;
+} USERNODE;
 
 // GLOBAL VARIABLES
 unsigned long Book_ID_Counter;           //3943
@@ -65,6 +71,7 @@ USER Current_User; //capitalized cuz global variable
 
 // PROTOTYPES
 BOOKNODE * loadLibrary(BOOKNODE *);
+void loadCounters();
 void menu();
 void welcomeScreen();
 void login();
@@ -84,7 +91,10 @@ void searchBookbyID(BOOKNODE *head);
 void newlyAddedBooks(BOOKNODE *head);
 void notifications(BOOKNODE *head, USER *user);
 void setCurrentUser(USER *);
-void loadCounters();
+void deleteUser(USER *user);
+void saveUserList(USERNODE *head);
+void freeUserList(USERNODE *head);
+
 
 //--------------------------------------------------------------------------------------------------------------
 
@@ -300,8 +310,7 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
         current->book.b_date_issue.tm_isdst = book_load->b_date_issue.tm_isdst;
         //printf("A");
 
-        //loadNextBook(fp, book_load);
-        fread(book_load, sizeof(BOOK), 1, fp);
+        
         //printf("B");
         if(feof(fp))
         {
@@ -311,12 +320,43 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
         {
             current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
             current = current->next;
+            //loadNextBook(fp, book_load);
+            fread(book_load, sizeof(BOOK), 1, fp);
         }
     }
     
     fclose(fp);
     
     return head;
+}
+
+void saveLibrary(BOOKNODE *head)
+{
+    FILE *fp = fopen("books.txt", "w");
+    BOOKNODE *current, *temp;
+    current = head -> next;
+    
+    while(current != NULL)
+    {
+        
+        fwrite(&(current->book), sizeof(BOOK), 1, fp);
+        current = current->next;
+    }
+    return;
+}
+
+void freeLibrary(BOOKNODE *head)
+{
+    if(head->next == NULL)
+    {
+        free(head);
+        return;
+    }
+    else
+    {
+        freeLibrary(head->next);
+    }
+    return;
 }
 
 void loadCounters()
@@ -835,9 +875,95 @@ void setCurrentUser(USER *user)
     return;
 }
 
+void deleteUser(USER *user)
+{
+    //loads all users into a linked list in memory except the user matching that passed into this function
+    FILE *fp = fopen("userdata.txt", "r");
+    USER *user_load = calloc(1, sizeof(USER));
+    fread(user_load, sizeof(USER), 1, fp);
 
+    USERNODE *current, *head = (USERNODE *)calloc(1, sizeof(USERNODE));
+    head->next = (USERNODE *)calloc(1, sizeof(USERNODE));
+    current = head->next;
+    current->next = NULL;
+    //printf("\t1\n");
+    while(1)
+    {
+        if(user_load->u_user_ID == user->u_user_ID)
+        {
+            continue;
+        }
+        current->user.u_user_ID = user_load->u_user_ID;
+        strcpy(current->user.user_name, user_load->user_name);
+        current->user.u_book_ID = user_load->u_book_ID;
+        current->user.u_issue_ID = user_load->u_issue_ID;
+        strcpy(current->user.u_user_pwd, user_load->u_user_pwd);
+        current->user.u_admin = user_load->u_admin;
+        
+        //date of issue struct tm part
+        current->user.u_date_issue.tm_sec = user_load->u_date_issue.tm_sec;
+        current->user.u_date_issue.tm_min = user_load->u_date_issue.tm_min;
+        current->user.u_date_issue.tm_hour = user_load->u_date_issue.tm_hour;
+        current->user.u_date_issue.tm_mday = user_load->u_date_issue.tm_mday;
+        current->user.u_date_issue.tm_mon = user_load->u_date_issue.tm_mon;
+        current->user.u_date_issue.tm_year = user_load->u_date_issue.tm_year;
+        current->user.u_date_issue.tm_wday = user_load->u_date_issue.tm_wday;
+        current->user.u_date_issue.tm_yday = user_load->u_date_issue.tm_yday;
+        current->user.u_date_issue.tm_isdst = user_load->u_date_issue.tm_isdst;
+        //printf("A");
 
+        if(feof(fp))
+        {
+            break;
+        }
+        else
+        {
+            current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
+            current = current->next;
+            fread(user_load, sizeof(USER), 1, fp);
+        }
+    }
+    fclose(fp);
+    
+    // saves userlist in memory to file
+    saveUserList(head);
+    
+    // frees dynamically allocated linked list of users' data from memory
+    freeUserList(head);
+    
+    return;
+}
 
+// saves userlist in memory to file
+void saveUserList(USERNODE *head)
+{
+    FILE *fp = fopen("userdata.txt", "w");
+    USERNODE *current;
+    current = head -> next;
+    
+    while(current != NULL)
+    {
+        
+        fwrite(&current->user, sizeof(USER), 1, fp);
+        current = current->next;
+    }
+    return;
+}
+
+// frees dynamically allocated linked list of users' data from memory
+void freeUserList(USERNODE *head)
+{
+    if(head->next == NULL)
+    {
+        free(head);
+        return;
+    }
+    else
+    {
+        freeUserList(head->next);
+    }
+    return;
+}
 
 
 
