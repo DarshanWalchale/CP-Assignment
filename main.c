@@ -91,6 +91,8 @@ void searchBookbyID(BOOKNODE *head);
 void newlyAddedBooks(BOOKNODE *head);
 void notifications(BOOKNODE *head, USER *user);
 void setCurrentUser(USER *);
+void saveLibrary(BOOKNODE *head);
+void freeLibrary(BOOKNODE *head);
 void deleteUser(USER *user);
 void saveUserList(USERNODE *head);
 void freeUserList(USERNODE *head);
@@ -108,10 +110,13 @@ int main(void)
     head = loadLibrary(head);
     printf("Books database loaded into memory successfully\n");
     displayAllBooks(head);
-    printf("Counters: %lu,%lu\n", generateBookID(), generateIssueID());
+    //printf("Counters: %lu,%lu\n", generateBookID(), generateIssueID());
 
     welcomeScreen();
-
+    
+    
+    saveLibrary(head);
+    freeLibrary(head);
     return 0;
 }
 
@@ -233,6 +238,7 @@ void welcomeScreen()
   printf("\n\n\n\t\t\t\tENTER YOUR CHOICE: ");
 
   scanf("%d",&choice);
+  while(getchar() != '\n');
 
   static int count = 0; // if user can't register or login successfully in 5 attempts, just exit
   char c;
@@ -253,7 +259,7 @@ void welcomeScreen()
 
 
 
-        if (( fp = fopen("user_name_pwd.txt", "r+")) == NULL)
+        if (( fp = fopen("userdata.txt", "r+")) == NULL)
         {
             printf ("Could not open file\n");
             count++;
@@ -262,10 +268,12 @@ void welcomeScreen()
 
         printf("Username: ");
         scanf("%29s",uName);
+        while(getchar() != '\n');
 
         printf("Password: ");
         scanf("%29s",pwd);
-
+        while(getchar() != '\n');
+        
             while (fread (pUser, sizeof(struct USER), 1, fp) == 1)
             {
                 if(strcmp (pUser -> user_name, uName) == 0)
@@ -284,12 +292,12 @@ void welcomeScreen()
         case 2:
         printf("Register function\n");
         // reg();
-
+        // REGISTER will be an admin aciton bhut let's keep it for now to add users conveniently :)
 
 
         do
             {
-                if ( ( fp = fopen("user_name_pwd.txt", "a+")) == NULL)
+                if ( ( fp = fopen("userdata.txt", "a+")) == NULL)
                 {
 
                 printf ("Could not open file\n");
@@ -298,20 +306,23 @@ void welcomeScreen()
                 }
                 printf("Choose A Username: ");
                 scanf("%29s",pUser -> user_name);
+                while(getchar() != '\n');
 
                 printf("Choose A Password: ");
                 scanf("%29s",pUser -> u_user_pwd);
+                while(getchar() != '\n');
 
                 fwrite (pUser, sizeof(struct USER), 1, fp);
 
                 printf("Add another account? (Y/N): ");
                 scanf(" %c", &c);
+                while(getchar() != '\n');
             }
             while(c == 'Y'|| c == 'y');
         break;
 
         default:
-        printf("\n\n\t\t\t\tNO MATCH FOUND");
+        printf("\n\n\t\t\t\tINVALID OPTION");
         count++;
         printf("\n\n\t\t\tPress Enter to re-Enter the choice");
 
