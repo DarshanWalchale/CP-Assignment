@@ -102,15 +102,15 @@ int main(void)
 {
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //makeFile();
-    
+
     BOOKNODE *head = calloc(1, sizeof(BOOKNODE));
     //printf("Program Start(head malloc successful)\n");
     head = loadLibrary(head);
     printf("Books database loaded into memory successfully\n");
     displayAllBooks(head);
     printf("Counters: %lu,%lu\n", generateBookID(), generateIssueID());
-    
-    //welcomeScreen();
+
+    welcomeScreen();
 
     return 0;
 }
@@ -234,22 +234,92 @@ void welcomeScreen()
 
   scanf("%d",&choice);
 
+  static int count = 0; // if user can't register or login successfully in 5 attempts, just exit
+  char c;
+  USER *pUser = (USER *)malloc(sizeof(USER));
+        FILE *fp;
+        char uName[30];
+        char pwd[30]; // local char arrays to store details just as entered
+
   switch(choice)
     {
 
         case 1:
         printf("Login function\n");
         // login();
+
+
+
+
+
+
+        if (( fp = fopen("user_name_pwd.txt", "r+")) == NULL)
+        {
+            printf ("Could not open file\n");
+            count++;
+        }
+
+
+        printf("Username: ");
+        scanf("%29s",uName);
+
+        printf("Password: ");
+        scanf("%29s",pwd);
+
+            while (fread (pUser, sizeof(struct USER), 1, fp) == 1)
+            {
+                if(strcmp (pUser -> user_name, uName) == 0)
+                {
+                    printf ("Username Matched\n");
+                    if(strcmp ( pUser -> u_user_pwd, pwd) == 0)
+                    {
+                        printf ("Password Matched\n");
+                        // particular user's account opened
+                    }
+                }
+            }
+
         break;
 
         case 2:
         printf("Register function\n");
         // reg();
+
+
+
+        do
+            {
+                if ( ( fp = fopen("user_name_pwd.txt", "a+")) == NULL)
+                {
+
+                printf ("Could not open file\n");
+                count++;
+
+                }
+                printf("Choose A Username: ");
+                scanf("%29s",pUser -> user_name);
+
+                printf("Choose A Password: ");
+                scanf("%29s",pUser -> u_user_pwd);
+
+                fwrite (pUser, sizeof(struct USER), 1, fp);
+
+                printf("Add another account? (Y/N): ");
+                scanf(" %c", &c);
+            }
+            while(c == 'Y'|| c == 'y');
         break;
 
         default:
         printf("\n\n\t\t\t\tNO MATCH FOUND");
+        count++;
         printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+
+        if(count >= 5)
+        {
+            printf("Sorry, too many unsuccessful attempts!\n");
+            return;
+        }
 
 
         char ch2 = scanf("%c",&ch2);
@@ -257,6 +327,8 @@ void welcomeScreen()
         goto PQ;
 
     }
+
+
 
 
 }
@@ -324,9 +396,9 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
             fread(book_load, sizeof(BOOK), 1, fp);
         }
     }
-    
+
     fclose(fp);
-    
+
     return head;
 }
 
@@ -365,7 +437,7 @@ void loadCounters()
     char buffer[256] = {};
     fgets(buffer, 256, fp);
     char * pointer = strtok(buffer, ",");
-    
+
     printf("loadcounters:\t%lu\t", atol(pointer));
     Book_ID_Counter = atol(pointer);
     pointer = strtok(NULL, ",");
@@ -373,7 +445,7 @@ void loadCounters()
     Issue_ID_Counter = atol(pointer);
     printf("%lu\t%lu\n", Book_ID_Counter, Issue_ID_Counter);
     fclose(fp);
-    
+
     return;
 }
 
@@ -487,7 +559,7 @@ void searchBookbyTitle(BOOKNODE *head){
         cs_count=0;
         printf("Closest searches:\n");
         while(strlen(closest_search[cs_count])!=0){
-            printf("%hi. %s",cs_count+1,closest_search[cs_count]);
+            printf("%hi. %s",(short)(cs_count+1),closest_search[cs_count]);
             cs_count++;
             if(cs_count==MAX_CLOSE_TITLE_SEARCH)
             break; //Stop on reaching MAX_CLOSE_TITLE_SEARCH closest search
@@ -633,7 +705,7 @@ void searchBookbyAuthor(BOOKNODE *head){
         cs_count=0;
         printf("Did you mean?:\n");
         while(strlen(closest_search[cs_count])!=0){
-            printf("%hi. %s",cs_count+1,closest_search[cs_count]);
+            printf("%hi. %s",(short)(cs_count+1),closest_search[cs_count]);
             cs_count++;
             if(cs_count==MAX_CLOSE_AUTH_SEARCH)
             break; //Stop on reaching MAX_CLOSE_AUTH_SEARCH closest search
@@ -642,8 +714,8 @@ void searchBookbyAuthor(BOOKNODE *head){
 
         if(same_auth_count>0){
             for(int m=0;m<same_auth_count;m++)
-                printf("%hi. %s",m+1,all_same_auth[m]);
-            printf("Total of %hi books authored by %s",same_auth_count,auth_found);
+                printf("%hi. %s",(short)(m+1),all_same_auth[m]);
+            printf("Total of %hi books authored by %s",(short)same_auth_count,auth_found);
         }
 
 }
@@ -724,7 +796,7 @@ void searchBookbyID(BOOKNODE *head){
         cs_count=0;
         printf("Closest searches:\n");
         while(strlen(closest_search[cs_count])!=0){
-            printf("%hi. %s",cs_count+1,closest_search[cs_count]);
+            printf("%hi. %s",(short)(cs_count+1),closest_search[cs_count]);
             cs_count++;
             if(cs_count==MAX_CLOSE_ID)
             break; //Stop on reaching MAX_CLOSE_ID closest search
@@ -745,7 +817,7 @@ void newlyAddedBooks(BOOKNODE *head)
     {
         printf("--------------------NO BOOKS TO DISPLAY--------------------\n");
     }
-    
+
     printf("------------------------------------------------------------\n");
     printf("AVAILABILITY\tAUTHOR\t\tTITLE\n");
     printf("------------------------------------------------------------\n");
@@ -768,9 +840,9 @@ void newlyAddedBooks(BOOKNODE *head)
                 continue;
             }
         }
-            
-            
-                
+
+
+
             if(current->book.b_book_status == 'A')
             {
                 strcpy(availability, "Available");
@@ -788,7 +860,7 @@ void newlyAddedBooks(BOOKNODE *head)
                 strcpy(availability, "Unknown");
             }
             printf("%s\t%s\t\t%s\n", availability, current->book.b_book_author,current->book.b_book_title);
-        
+
     }
     printf("------------------------------------------------------------\n");
 
@@ -803,14 +875,14 @@ void notifications(BOOKNODE *head, USER *user)
     printf("----------------------PLEASE RETURN----------------------\n");
     BOOKNODE *current = head;
     bool no_books_due = true, book_notify = false;
-    
+
     printf("AUTHOR\t\tTITLE\n");
     char availability[15] = {};
 
     while(current->next != NULL)
     {
         current = current->next;
-        
+
         if(!(book_notify) && strcmp(current->book.b_book_title, user->u_requested) == 0)
         {
             if(current->book.b_book_status == 'A')
@@ -818,7 +890,7 @@ void notifications(BOOKNODE *head, USER *user)
                 book_notify = true;
             }
         }
-        
+
         if(no_books_due)
         {
             if(current->book.b_user_ID == user->u_user_ID)
@@ -843,13 +915,13 @@ void notifications(BOOKNODE *head, USER *user)
         printf("No Book Returns Due\n");
     }
     printf("------------------------------------------------------------\n");
-    
+
     if(book_notify)
     {
         printf("%s IS NOW AVAILABLE TO CHECKOUT!\n", user->u_requested);
         strcpy(user->u_requested, "\0");
     }
-    
+
     return;
 }
 
