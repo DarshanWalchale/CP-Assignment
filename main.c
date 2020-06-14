@@ -283,7 +283,7 @@ void welcomeScreen()
                 {
 
                 printf ("Could not open file\n");
-                exit (1);
+                count++;
 
                 }
                 printf("Choose A Username: ");
