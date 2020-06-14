@@ -59,7 +59,8 @@ typedef struct BOOKNODE         // this is used for the function titleCount
 } BOOKNODE;
 
 // GLOBAL VARIABLES
-unsigned long Book_ID_Counter = 394;
+unsigned long Book_ID_Counter;           //3943
+unsigned long Issue_ID_Counter;          // 20195
 USER Current_User; //capitalized cuz global variable
 
 // PROTOTYPES
@@ -75,12 +76,15 @@ void reg();
 int titleCount(char *);
 void makeFile();
 unsigned long generateBookID();
+unsigned long generateIssueID();
 void searchBookbyTitle();
 void displayAllBooks(BOOKNODE *head);
 void searchBookbyAuthor(BOOKNODE *head);
 void searchBookbyID(BOOKNODE *head);
 void newlyAddedBooks(BOOKNODE *head);
 void notifications(BOOKNODE *head, USER *user);
+void setCurrentUser(USER *);
+void loadCounters();
 
 //--------------------------------------------------------------------------------------------------------------
 
@@ -88,15 +92,15 @@ int main(void)
 {
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //makeFile();
-
-
+    
     BOOKNODE *head = calloc(1, sizeof(BOOKNODE));
     //printf("Program Start(head malloc successful)\n");
     head = loadLibrary(head);
     printf("Books database loaded into memory successfully\n");
     displayAllBooks(head);
-
-    welcomeScreen();
+    printf("Counters: %lu,%lu\n", generateBookID(), generateIssueID());
+    
+    //welcomeScreen();
 
     return 0;
 }
@@ -178,7 +182,19 @@ void makeFile()
 unsigned long generateBookID()
 {
     Book_ID_Counter++;
-    return (Book_ID_Counter - 1);
+    FILE *fp = fopen("counterdata.txt", "w");
+    fprintf(fp, "%lu,%lu", Book_ID_Counter, Issue_ID_Counter);
+    fclose(fp);
+    return (Book_ID_Counter);
+}
+
+unsigned long generateIssueID()
+{
+    Issue_ID_Counter++;
+    FILE *fp = fopen("counterdata.txt", "w");
+    fprintf(fp, "%lu,%lu", Book_ID_Counter, Issue_ID_Counter);
+    fclose(fp);
+    return (Issue_ID_Counter);
 }
 
 
@@ -241,6 +257,7 @@ void welcomeScreen()
 // Loads the entire library into memory using a dynamic linked list (utilizes higher reading speed of RAM and reduces file I/O process requirement)
 BOOKNODE * loadLibrary(BOOKNODE *head)
 {
+    loadCounters();
     //printf("loadLibrary");
     FILE *fp = fopen("books.txt", "r");
     BOOK *book_load = calloc(1, sizeof(BOOK));
@@ -296,7 +313,28 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
             current = current->next;
         }
     }
+    
+    fclose(fp);
+    
     return head;
+}
+
+void loadCounters()
+{
+    FILE *fp = fopen("counterdata.txt", "r");
+    char buffer[256] = {};
+    fgets(buffer, 256, fp);
+    char * pointer = strtok(buffer, ",");
+    
+    printf("loadcounters:\t%lu\t", atol(pointer));
+    Book_ID_Counter = atol(pointer);
+    pointer = strtok(NULL, ",");
+    printf("%lu\n", atol(pointer));
+    Issue_ID_Counter = atol(pointer);
+    printf("%lu\t%lu\n", Book_ID_Counter, Issue_ID_Counter);
+    fclose(fp);
+    
+    return;
 }
 
 int titleCount(char *title)
@@ -306,12 +344,13 @@ int titleCount(char *title)
     fread(book, sizeof(BOOK), 1, fp);
     int count = 0;
 
-    for(; book != NULL; fread(book, sizeof(BOOK), 1, fp))
+    while(book != NULL)
     {
         if(strcmp(book->b_book_title, title) == 0)
         {
             count++;
         }
+        fread(book, sizeof(BOOK), 1, fp);
     }
 
     return count;
@@ -773,6 +812,31 @@ void notifications(BOOKNODE *head, USER *user)
     
     return;
 }
+
+void setCurrentUser(USER *user)
+{
+    Current_User.u_user_ID = user->u_user_ID;
+    strcpy(Current_User.user_name, user->user_name);
+    Current_User.u_book_ID = user->u_book_ID;
+    Current_User.u_issue_ID = user->u_issue_ID;
+    strcpy(Current_User.u_user_pwd, user->u_user_pwd);
+    Current_User.u_admin = user->u_admin;
+    strcpy(Current_User.u_requested, user->u_requested);
+    // struct tm date of issue
+    Current_User.u_date_issue.tm_sec = user->u_date_issue.tm_sec;
+    Current_User.u_date_issue.tm_min = user->u_date_issue.tm_min;
+    Current_User.u_date_issue.tm_hour = user->u_date_issue.tm_hour;
+    Current_User.u_date_issue.tm_mday = user->u_date_issue.tm_mday;
+    Current_User.u_date_issue.tm_mon = user->u_date_issue.tm_mon;
+    Current_User.u_date_issue.tm_year = user->u_date_issue.tm_year;
+    Current_User.u_date_issue.tm_wday = user->u_date_issue.tm_wday;
+    Current_User.u_date_issue.tm_yday = user->u_date_issue.tm_yday;
+    Current_User.u_date_issue.tm_isdst = user->u_date_issue.tm_isdst;
+    return;
+}
+
+
+
 
 
 
