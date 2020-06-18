@@ -1,7 +1,7 @@
 Library Management System created by
-Darshan Walchale        (2019B3PS0569P)
-Shreyas Sheeranali      ()
-Aditya Krishna Rao      ()
+Darshan Walchale                 (2019B3PS0569P)
+Shreyas Ravishankar Sheeranali   (2019B3PS0387P)
+Aditya Krishna Rao               (2019B3PS0576P)
 of Lab Section 12 (Sakshi)
 
 
