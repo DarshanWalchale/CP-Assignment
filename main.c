@@ -650,9 +650,6 @@ void searchBookbyTitle(BOOKNODE *head){
 
                 printf("\tAuthor: %s\n",current->book.b_book_author);
                 printf("\tBook ID: %ld\n",current->book.b_book_ID);
-                //if EOF reached, flag=1 (TO BE ADDED)
-                flag=3;
-                break;
                 }
             }
 
