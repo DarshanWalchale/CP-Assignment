@@ -76,6 +76,7 @@ void loadCounters();
 void welcomeScreen();
 void menu(USER *user);
 void adminMenu(USER *user);
+void booksearchMenu(BOOKNODE *head);
 void addUser(void);
 void deleteUser(USER *user);
 //void addNewBook(BOOK *book);
@@ -86,9 +87,9 @@ void makeFile();
 unsigned long generateBookID();
 unsigned long generateIssueID();
 unsigned long generateUserID();
-void searchBookbyTitle();
-void vendorManagement() 
+void vendorManagement();
 void displayAllBooks(BOOKNODE *head);
+void searchBookbyTitle(BOOKNODE *head);
 void searchBookbyAuthor(BOOKNODE *head);
 void searchBookbyID(BOOKNODE *head);
 void newlyAddedBooks(BOOKNODE *head);
@@ -106,15 +107,16 @@ int main(void)
 {
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //makeFile();
-
     BOOKNODE *head = calloc(1, sizeof(BOOKNODE));
-    //printf("Program Start(head malloc successful)\n");
     head = loadLibrary(head);
+
+
+
     printf("Books database loaded into memory successfully\n");
     displayAllBooks(head);
     printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID());
 
-    welcomeScreen();
+     welcomeScreen();
 
 
 
@@ -187,14 +189,7 @@ void welcomeScreen()
                         // particular user's account opened
                         setCurrentUser(pUser);
 
-                        if(pUser -> u_admin == 1)
-                        {
-                            //adminMenu(pUser);
-                        }
-                        else
-                        {
-                           // menu(pUser);
-                        }
+                        menu(pUser);
                     }
                 }
             }
@@ -251,45 +246,195 @@ void welcomeScreen()
     }
 }
 
-//Under Construction
-// void adminMenu(USER *user)
-// {
-//     printf("Welcome Admin\n");
+void menu(USER *user)
+{
+    printf("Welcome User\n");
 
-//     int choice;
+    int choice;
 
-//     ADMIN: // in case we need to retun here again
-//     printf("1. Add Library members\n");
-//     printf("2. Delete Library members\n");
-//     printf("3. Count books of a particular title\n");
-//     printf("4. Order books\n");
-//     printf("5. Place a request to another Library\n");
-//     printf("6. Delete existing reservations\n");
+    userchoice: // label to return to user menu
+    printf("1. Search Books\n");
+    printf("2. Book Transaction\n");
 
-//     printf("\n\nEnter your choice: ");
-//     scanf("%d", &choice);
+    if(user -> u_admin == 1)
+    {
+        printf("3. Admin Menu\n");
+    }
 
-//     switch(choice)
-//     {
-//         case 1:
-//         addUser();
+    printf("\n\nEnter your choice: ");
+    scanf("%d", &choice);
 
-//         printf("Press Enter to return to the Admin menu");
-//         char ch2 = scanf("%c",&ch2);
-//         if(ch2 == '\n')
-//         goto ADMIN;
-//         break;
+    switch(choice)
+    {
+        case 1:
+        booksearchMenu(head);
 
-//         case 2:
-//         deleteMember()
+        printf("Press 0 to return to the User menu");
+        char ch2 = scanf("%c",&ch2);
+        if(ch2 == '0')
+        goto userchoice;
+        break;
+
+        case 2:
+        int option;
+
+        transaction:  // label to reach transaction menu
+        printf("Book Transaction Menu\n");
+
+        printf("1. Checkout a Book\n");
+        printf("2. Return Book\n");
+
+        printf("Enter Choice: ");
+        scanf("%d",&option);
+
+        switch(option)
+        {
+            case 1:
+            //checkout book
+            break;
+
+            case 2:
+            //return book
+            break;
+
+            default:
+            printf("\n\n\t\t\t\tINVALID OPTION");
+            printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+
+            char ch3 = scanf("%c",&ch3);
+            if(ch3 == '\n')
+            goto transaction;
+        }
+
+        case 3:
+        adminMenu(user);
+        break;
+
+        default:
+
+        printf("\n\n\t\t\t\tINVALID OPTION");
+        printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+
+        char ch4 = scanf("%c",&ch4);
+        if(ch4 == '\n')
+        goto userchoice;
+
+    }
+}
+
+void booksearchMenu()
+{
+    int choice;
+
+    booksearch:
+    printf("Book Search Menu\n");
+
+    printf("1. Search Book by Title\n");
+    printf("2. Search Book by Author\n");
+    printf("2. Search Book by Book ID\n");
+
+   printf("Enter choice: ");
+   scanf("%d", &choice);
+
+   switch(choice)
+   {
+       case 1:
+       searchBookbyTitle(head);
+        printf("Press 0 to return to the Search menu");
+        char ch13 = scanf("%c",&ch13);
+        if(ch13 == '0')
+        goto booksearch;
+        break;
+
+        case 2:
+        searchBookbyAuthor(head);
+        printf("Press 0 to return to the Search menu");
+        char ch12 = scanf("%c",&ch12);
+        if(ch12 == '0')
+        goto booksearch;
+        break;
+
+        case 3:
+        searchBookbyID(head);
+        printf("Press 0 to return to the Search menu");
+        char ch11 = scanf("%c",&ch11);
+        if(ch11 == '0')
+        goto booksearch;
+        break;
+
+        default:
+
+        printf("\n\n\t\t\t\tINVALID OPTION");
+        printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+
+        char ch10 = scanf("%c",&ch10);
+        if(ch10 == '\n')
+        goto booksearch;
+
+   }
+}
+
+void adminMenu(USER *user)
+{
+    printf("Welcome Admin\n");
+
+    int choice;
+
+    ADMIN: // in case we need to retun here again
+    printf("1. Add Library members\n");
+    printf("2. Delete Library members\n");
+    printf("3. Count books of a particular title\n");
+    printf("4. Vendor / Library requests\n");
 
 
+    printf("\n\nEnter your choice: ");
+    scanf("%d", &choice);
 
+    switch(choice)
+    {
+        case 1:
+        addUser();
 
+        printf("Press 0 to return to the Admin menu");
+        char ch2 = scanf("%c",&ch2);
+        if(ch2 == '0')
+        goto ADMIN;
+        break;
 
+        case 2:
+        deleteUser(user);
+        printf("Press 0 to return to the Admin menu");
+        char ch9 = scanf("%c",&ch9);
+        if(ch9 == '0')
+        goto ADMIN;
+        break;
 
+        case 3:
+        searchBookbyTitle(head);
+        printf("Press 0 to return to the Admin menu");
+        char ch7 = scanf("%c",&ch7);
+        if(ch7 == '0')
+        goto ADMIN;
+        break;
 
-// }
+        case 4:
+        vendorManagement();
+        printf("Press 0 to return to the Admin menu");
+        char ch6 = scanf("%c",&ch6);
+        if(ch6 == '0')
+        goto ADMIN;
+        break;
+
+        default:
+        printf("\n\n\t\t\t\tINVALID OPTION");
+        printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+
+        char ch5 = scanf("%c",&ch5);
+        if(ch5 == '\n')
+        goto ADMIN;
+
+    }
+}
 
 
 void addUser(void)
@@ -325,11 +470,7 @@ void addUser(void)
 
 }
 
-//Under Construction
-// void deleteUser(void)
-// {
 
-// }
 
 
 void makeFile()
@@ -579,7 +720,8 @@ int titleCount(char *title)
 
 
 
-void searchBookbyTitle(BOOKNODE *head){
+void searchBookbyTitle(BOOKNODE *head)
+{
     BOOKNODE *current = head;
     char title_search[MAX_TITLE_LENGTH];
     short cs_count=0; //To count number of closest searches
@@ -590,15 +732,18 @@ void searchBookbyTitle(BOOKNODE *head){
     fgets(title_search,MAX_TITLE_LENGTH,stdin);
 
     //Restart search if less than three characters entered
-    if(strlen(title_search)<4){
+    if(strlen(title_search)<4)
+    {
         printf("Enter at least three characters to search");
         goto LAB1;
     }
 
-    while(flag==0&&current->next != NULL){
+    while(flag==0&&current->next != NULL)
+    {
         current=current->next;
         //Iterating through all characters of a single book title
-        for(int j=0;j<MAX_TITLE_LENGTH;j++){
+        for(int j=0;j<MAX_TITLE_LENGTH;j++)
+        {
 
             //Skip the current book if atleast 3 characters don't match
         if((tolower(title_search[j])!=tolower(current->book.b_book_title[j]))&&j<3){
@@ -659,16 +804,19 @@ void searchBookbyTitle(BOOKNODE *head){
         printf("No results found");
 
         //To print all closest searches (upto MAX_CLOSE_TITLE_SEARCH) when book is not found
-        if(cs_count>0&&flag!=3){
+        if(cs_count>0&&flag!=3)
+        {
         cs_count=0;
         printf("Closest searches:\n");
-        while(strlen(closest_search[cs_count])!=0){
+        while(strlen(closest_search[cs_count])!=0)
+        {
             printf("%hi. %s",(short)(cs_count+1),closest_search[cs_count]);
             cs_count++;
             if(cs_count==MAX_CLOSE_TITLE_SEARCH)
             break; //Stop on reaching MAX_CLOSE_TITLE_SEARCH closest search
         }
         }
+
 
 }
 
