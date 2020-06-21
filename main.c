@@ -78,8 +78,8 @@ BOOKNODE * loadLibrary(BOOKNODE *);
 USERNODE * loadUsers(USERNODE *);
 void loadCounters();
 void welcomeScreen();
-void menu(USER *user);
-void adminMenu(USER *user);
+void menu(/*USER *user*/);
+void adminMenu(/*USER *user*/);
 void booksearchMenu(/*BOOKNODE *head*/);
 void addUser(void);
 void deleteUser(USER *user);
@@ -120,9 +120,14 @@ int main(void)
 
     printf("Books database loaded into memory successfully\n");
     displayAllBooks(BookHead);
-    printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID());
+    //printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID());
 
-     welcomeScreen();
+    welcomeScreen();
+    notifications(BookHead, UserHead);
+    do
+    {
+        menu(UserHead);
+    }while();
 
 
 
@@ -160,9 +165,9 @@ void welcomeScreen()
   static int count = 0; // if user can't register or login successfully in 5 attempts, just exit
   char c;
   USER *pUser = (USER *)malloc(sizeof(USER));
-        FILE *fp;
-        char uName[30];
-        char pwd[30]; // local char arrays to store details just as entered
+  FILE *fp;
+  char uName[30];
+  char pwd[30]; // local char arrays to store details just as entered
 
   switch(choice)
     {
@@ -180,10 +185,12 @@ void welcomeScreen()
 
         printf("Username: ");
         scanf("%29s",uName);
+        while(getchar() != '\n');
 
 
         printf("Password: ");
         scanf("%29s",pwd);
+        while(getchar() != '\n');
 
 
             while (fread (pUser, sizeof(struct USER), 1, fp) == 1)
@@ -197,20 +204,20 @@ void welcomeScreen()
                         // particular user's account opened
                         setCurrentUser(pUser);
 
-                        notifications(BookHead, pUser);
-                        printf("\n\n");
+                        //notifications(BookHead, UserHead); // also better to be done in main (beter program layout, rather than somewhere further down in the program)
+                        //printf("\n\n");
 
-                        menu(pUser);
+                        //menu(pUser); // call this in main and put it in a do while loop
                     }
                 }
             }
 
         break;
 
-        case 2:
+        case 2222: // our hack to add members for now lol
 
         // reg();
-        // REGISTER will be an admin aciton bhut let's keep it for now to add users conveniently :)
+        // REGISTER will be an admin action but let's keep it for now to add users conveniently :)
 
 
         do
@@ -230,7 +237,7 @@ void welcomeScreen()
                 scanf("%29s",pUser -> u_user_pwd);
                 while(getchar() != '\n');
 
-                fwrite (pUser, sizeof(struct USER), 1, fp);
+                //fwrite (pUser, sizeof(struct USER), 1, fp); Don't write to file, add to the linked list and saveUserList
 
 
                 printf("Add another account? (Y/N): ");
@@ -272,9 +279,11 @@ void menu(USER *user)
     {
         printf("3. Admin Menu\n");
     }
+    printf("0. Exit\n");
 
     printf("\n\nEnter your choice: ");
-    scanf("%d", &choice);
+    scanf(" %d", &choice);
+    while(getchar() != '\n');
     int option;
 
     switch(choice)
@@ -296,6 +305,7 @@ void menu(USER *user)
 
         printf("1. Checkout a Book\n");
         printf("2. Return Book\n");
+        printf("3. return");
 
         printf("Enter Choice: ");
         scanf("%d",&option);
@@ -304,101 +314,109 @@ void menu(USER *user)
         {
             case 1:
             //checkout book
-            
-            displayAllBooks(BookHead);
-    
-            if(user -> u_issued == 1)                      // user already issued a book
-             {
-                printf("\nPlease return issued book first.\n");
-                printf("Press 0 to return to the Book Tnasaction Menu menu");
-                char ch2 = scanf("%c",&ch2);
-                if(ch2 == '0')
-                goto transaction;
-             }
-             
-             else                                             // user has no issued book
-             {
-                FILE *fp = fopen("books.txt", "w+");
-                time_t sec = time(NULL);
-                struct tm time_of_event = *(localtime(&sec));
-                printf("Enter Book ID of the book to be issued:\n ->");
-                int matches;
-	            
-	            char temp[512]; // used to store id which user enters
-	            
-	            while(fgets(temp, 512, fp) != NULL)
-	            {
-		            if((strstr(temp, str)) != NULL)           //book id entered matched
-		            {
-		                strcpy(user -> u_book_ID, temp);
-		                // Change u_date_issue to current date
-		                
-		                user ->u_date_issue.tm_sec = time_of_event.tm_sec;
-                        user ->u_date_issue.tm_min = time_of_event.tm_min;
-                        user ->u_date_issue.tm_hour = time_of_event.tm_hour;
-                        user ->u_date_issue.tm_mday = time_of_event.tm_mday;
-                        user ->u_date_issue.tm_mon = time_of_event.tm_mon;
-                        user ->u_date_issue.tm_year = time_of_event.tm_year;
-                        user ->u_date_issue.tm_wday = time_of_event.tm_wday;
-                        user ->u_date_issue.tm_yday = time_of_event.tm_yday;
-                        user ->u_date_issue.tm_isdst = time_of_event.tm_isdst;
-                        
-                        user ->u_issued = 1;
-                        
-                        // to change book details of search found
-                        // to save Library and User List
-                        
-		                
-		                
-		                
-		                                                 
-			            
-			            matches++;
-		            }
-	            }
 
-	            if(matches == 0)           // no ID found 
-	            {
-		            printf("\nSorry, no match found.\n");
-		            printf("Press 0 to return to the Book Tnasaction Menu menu");
-                    char ch2 = scanf("%c",&ch2);
-                    if(ch2 == '0')
+                //displayAllBooks(BookHead); What? Why are displaying the whole booklist, just ask for the correct title and the program should handle the BookID by itself, Shreyas made the book search function, I had also made a function
+
+                if(user -> u_issued == 1)                      // user already issued a book
+                 {
+                    printf("\nPlease return issued book first.\n");
+                    printf("Press Enter to return to the Book Transaction Menu menu");
+                    while(getchar() != '\n');
+                    //char ch2 = scanf("%c",&ch2);
+                    //if(ch2 == '0')
                     goto transaction;
-	            }
-                 
-             }
+                 }
+    
+                 else                                             // user has no issued book
+                 {
+                    FILE *fp = fopen("books.txt", "w+");
+                    //time_t sec = time(NULL);
+                    struct tm time_of_event = *(localtime(&sec));
+                    printf("Enter Book ID of the book to be issued:\n ->");
+                    int matches;
+    
+    	            char temp[512]; // used to store id which user enters
+    
+    	            while(fgets(temp, 512, fp) != NULL) 
+    	            {
+    		            if((strstr(temp, str)) != NULL)           //book id entered matched
+    		            {
+    		                strcpy(user -> u_book_ID, temp);
+    		                // Change u_date_issue to current date
+    
+    		                user ->u_date_issue.tm_sec = time_of_event.tm_sec;
+                            user ->u_date_issue.tm_min = time_of_event.tm_min;
+                            user ->u_date_issue.tm_hour = time_of_event.tm_hour;
+                            user ->u_date_issue.tm_mday = time_of_event.tm_mday;
+                            user ->u_date_issue.tm_mon = time_of_event.tm_mon;
+                            user ->u_date_issue.tm_year = time_of_event.tm_year;
+                            user ->u_date_issue.tm_wday = time_of_event.tm_wday;
+                            user ->u_date_issue.tm_yday = time_of_event.tm_yday;
+                            user ->u_date_issue.tm_isdst = time_of_event.tm_isdst;
+    
+                            user ->u_issued = 1;
+    
+                            // to change book details of search found
+                            // to save Library and User List
+    
+    
+    
+    
+    
+    
+    			            matches++;
+    		            }
+    	            }
+    
+    	            if(matches == 0)           // no ID found
+    	            {
+    		            printf("\nSorry, no match found.\n");
+    		            printf("Press Enter to return to the Book Transaction Menu menu");
+                        //char ch2 = scanf("%c",&ch2);
+                        //if(ch2 == '0')
+                        while(getchar() != '\n');
+                        goto transaction;
+    	            }
+    
+                 }
+    
+    
 
-            
-            
-            
+
             break;
 
             case 2:
-            //return book
+                //return book
+                break;
+    
+                default:
+                printf("\n\n\t\t\t\tINVALID OPTION");
+                printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+    
+                char ch3 = scanf("%c",&ch3);
+                if(ch3 == '\n')
+                goto transaction;
+        }
+    
+        case 3: 
+        // Bro you don't let this be accessable to non-admins
+            if(user->u_admin)
+            {
+                adminMenu(user);
+            }
             break;
-
-            default:
+            
+        case 4:
+            return;
+        
+        default:
             printf("\n\n\t\t\t\tINVALID OPTION");
             printf("\n\n\t\t\tPress Enter to re-Enter the choice");
-
-            char ch3 = scanf("%c",&ch3);
-            if(ch3 == '\n')
-            goto transaction;
-        }
-
-        case 3:
-        adminMenu(user);
-        break;
-
-        default:
-
-        printf("\n\n\t\t\t\tINVALID OPTION");
-        printf("\n\n\t\t\tPress Enter to re-Enter the choice");
-
-        char ch4 = scanf("%c",&ch4);
-        if(ch4 == '\n')
-        goto userchoice;
-
+                //char ch4 = scanf("%c",&ch4);
+            //if(ch4 == '\n')
+            while(getchar() != '\n');
+            goto userchoice;
+            break;
     }
 }
 
@@ -423,25 +441,28 @@ void booksearchMenu()
    {
        case 1:
        searchBookbyTitle(BookHead);
-        printf("\nPress 0 to return to the Search menu");
-        char ch13 = scanf("%c",&ch13);
-        if(ch13 == '0')
+        printf("\nPress Enter to return to the Search menu");
+        //char ch13 = scanf("%c",&ch13);
+        //if(ch13 == '0')
+        while(getchar() != '\n');
         goto booksearch;
         break;
 
         case 2:
         searchBookbyAuthor(BookHead);
-        printf("\nPress 0 to return to the Search menu");
-        char ch12 = scanf("%c",&ch12);
-        if(ch12 == '0')
+        printf("\nPress Enter to return to the Search menu");
+        //char ch12 = scanf("%c",&ch12);
+        //if(ch12 == '0')
+        while(getchar() != '\n');
         goto booksearch;
         break;
 
         case 3:
         searchBookbyID(BookHead);
-        printf("Press 0 to return to the Search menu");
-        char ch11 = scanf("%c",&ch11);
-        if(ch11 == '0')
+        printf("Press Enter to return to the Search menu");
+        //char ch11 = scanf("%c",&ch11);
+        //if(ch11 == '0')
+        while(getchar() != '\n');
         goto booksearch;
         break;
 
@@ -450,10 +471,10 @@ void booksearchMenu()
         printf("\n\n\t\t\t\tINVALID OPTION");
         printf("\n\n\t\t\tPress Enter to re-Enter the choice");
 
-        char ch10 = scanf("%c",&ch10);
-        if(ch10 == '\n')
+        //char ch10 = scanf("%c",&ch10);
+        //if(ch10 == '\n')
+        while(getchar() != '\n');
         goto booksearch;
-
    }
 }
 
@@ -478,42 +499,58 @@ void adminMenu(USER *user)
         case 1:
         addUser();
 
-        printf("\nPress 0 to return to the Admin menu");
-        char ch2 = scanf("%c",&ch2);
-        if(ch2 == '0')
-        goto ADMIN;
+        //printf("\nPress enter to return to the Admin menu");
+        //char ch2 = scanf("%c",&ch2);
+        //if(ch2 == '0')
+        //while(getchar() != '\n');
+        //goto ADMIN;
+        return;
         break;
 
         case 2:
         deleteUser(user);
-        printf("\nPress 0 to return to the Admin menu");
-        char ch9 = scanf("%c",&ch9);
-        if(ch9 == '0')
-        goto ADMIN;
+        //printf("\nPress enter to return to the Admin menu");
+        //char ch9 = scanf("%c",&ch9);
+        //if(ch9 == '0')
+        //while(getchar() != '\n');
+        //goto ADMIN;
+        return;
         break;
 
         case 3:
-        searchBookbyTitle(BookHead);
-        printf("\nPress 0 to return to the Admin menu");
-        char ch7 = scanf("%c",&ch7);
-        if(ch7 == '0')
-        goto ADMIN;
+        //searchBookbyTitle(BookHead); //Bruh
+
+        printf("Enter title: ");
+        char title;
+        scanf(" %60[^\n]", title); //MAX_TITLE_LENGTH
+        while(getchar() != '\n');
+
+        printf("Number of books by the title \"%s\" = %d", titleCount(title));
+
+        //printf("\nPress enter to return to the Admin menu");
+        //char ch7 = scanf("%c",&ch7);
+        //if(ch7 == '0')
+        //while(getchar() != '\n');
+        //goto ADMIN;
+        return;
         break;
 
         case 4:
         vendorManagement();
-        printf("\nPress 0 to return to the Admin menu");
-        char ch6 = scanf("%c",&ch6);
-        if(ch6 == '0')
-        goto ADMIN;
+        //printf("\nPress enter to return to the Admin menu");
+        //char ch6 = scanf("%c",&ch6);
+        //if(ch6 == '0')
+        //while(getchar() != '\n');
+        //goto ADMIN;
         break;
 
         default:
         printf("\n\n\t\t\t\tINVALID OPTION");
         printf("\n\n\t\t\tPress Enter to re-Enter the choice");
 
-        char ch5 = scanf("%c",&ch5);
-        if(ch5 == '\n')
+        //char ch5 = scanf("%c",&ch5);
+        //if(ch5 == '\n')
+        while(getchar() != '\n');
         goto ADMIN;
 
     }
@@ -617,7 +654,7 @@ void makeFile()
         {
             break;
         }
-        
+
 
     }while(1);
 
@@ -981,7 +1018,7 @@ void searchBookbyTitle(BOOKNODE *head)
                 char curr_ID[11];
                 sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
                 strcat(closest_search[cs_count],"\n\tID: ");
-               strcat(closest_search[cs_count],curr_ID);
+                strcat(closest_search[cs_count],curr_ID);
                 strcat(closest_search[cs_count],"\n\tStatus: ");
                     if(current->book.b_book_status=='A')
                         strcat(closest_search[cs_count], "Available");
@@ -999,7 +1036,7 @@ void searchBookbyTitle(BOOKNODE *head)
 
             //Continue if some (not all) characters match
         else if(tolower(title_search[j])==tolower(current->book.b_book_title[j])&&j<strlen(current->book.b_book_title)){
-             //printf("\n Almost"); For ref only, to be removed before submission
+                //printf("\n Almost"); For ref only, to be removed before submission
                 continue;
         }
                 //If the search matches exactly, stop searching
