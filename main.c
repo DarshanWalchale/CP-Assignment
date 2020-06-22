@@ -78,10 +78,10 @@ BOOKNODE * loadLibrary(BOOKNODE *);
 USERNODE * loadUsers(USERNODE *);
 void loadCounters();
 void welcomeScreen();
-void menu(USERNODE *UserHead);
+int menu(USERNODE *UserHead);
 int checkout(char *title);
-void adminMenu(/*USER *user*/);
-void booksearchMenu(/*BOOKNODE *head*/);
+void adminMenu(USER *user);
+void booksearchMenu(BOOKNODE *head);
 void addUser(void);
 void deleteUser(USER *user);
 //void addNewBook(BOOK *book);
@@ -112,8 +112,7 @@ int main(void)
 {
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //makeFile();
-    do
-    {
+    do{
     BookHead = calloc(1, sizeof(BOOKNODE));
     BookHead = loadLibrary(BookHead);
 
@@ -192,7 +191,8 @@ void welcomeScreen()
 
         printf("Password: ");
         scanf("%29s",pwd);
-        while(getchar() != '\n');
+        while(getchar() != '\n')
+        ;
 
 
             while (fread (pUser, sizeof(struct USER), 1, fp) == 1)
