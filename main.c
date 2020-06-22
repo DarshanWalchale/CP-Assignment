@@ -50,7 +50,7 @@ typedef struct USER{
     bool u_admin; // 1 if admin
     struct tm u_date_issue;    //
     char u_requested[MAX_TITLE_LENGTH];
-    
+
 } USER;
 
 typedef struct BOOKNODE         // this is used to load the library into memory
@@ -79,6 +79,7 @@ USERNODE * loadUsers(USERNODE *);
 void loadCounters();
 void welcomeScreen();
 void menu(USERNODE *UserHead);
+int checkout(char *title);
 void adminMenu(/*USER *user*/);
 void booksearchMenu(/*BOOKNODE *head*/);
 void addUser(void);
@@ -97,7 +98,7 @@ void searchBookbyTitle(BOOKNODE *head);
 void searchBookbyAuthor(BOOKNODE *head);
 void searchBookbyID(BOOKNODE *head);
 void newlyAddedBooks(BOOKNODE *head);
-void notifications(BOOKNODE *head, USER *user);
+void notifications(BOOKNODE *head, USERNODE *user);
 void setCurrentUser(USER *);
 void saveLibrary(BOOKNODE *head);
 void freeLibrary(BOOKNODE *head);
@@ -111,6 +112,8 @@ int main(void)
 {
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //makeFile();
+    do
+    {
     BookHead = calloc(1, sizeof(BOOKNODE));
     BookHead = loadLibrary(BookHead);
 
@@ -124,8 +127,9 @@ int main(void)
 
     welcomeScreen();
     notifications(BookHead, UserHead);
+    }while(menu(UserHead));
 
-    while(menu (UserHead));
+
 
 
 
@@ -255,8 +259,7 @@ void welcomeScreen()
 
         printf("\n\n\t\t\tPress Enter to re-Enter the choice");
 
-        char ch2 = scanf("%c",&ch2);
-        if(ch2 == '\n')
+        while(getchar() != '\n');
         goto PQ;
 
     }
@@ -285,9 +288,8 @@ int menu(USERNODE *UserHead)
         case 1:
         booksearchMenu(BookHead);
 
-        printf("Press 0 to return to the User menu");
-        char ch2 = scanf("%c",&ch2);
-        if(ch2 == '0')
+        printf("Press Enter to return to the User menu");
+        while (getchar() != '\n');
         goto userchoice;
         break;
 
@@ -307,77 +309,45 @@ int menu(USERNODE *UserHead)
         {
             case 1:
             //checkout book
+            searchBookbyTitle(BookHead);
 
+            char title[MAX_TITLE_LENGTH]; // to save title entered by user temporarily
 
-                if(UserHead -> user.u_book_ID != 0)                      // user already issued a book
-                 {
-                    printf("\nPlease return issued book first.\n");
-                    printf("Press Enter to return to the Book Transaction Menu");
-                    while(getchar() != '\n');
-                    goto transaction;
-                 }
+            printf("Enter Book Title to Checkout (Case Sensitive)\n ->");
+            fgets(title, MAX_TITLE_LENGTH, stdin);
 
-                 else                                             // user has no issued book
-                 {
-                    FILE *fp = fopen("books.txt", "w+");
-                    //time_t sec = time(NULL);
-                    struct tm time_of_event = *(localtime(&sec));
-                    printf("Enter Book Title of the book to be issued:\n ->");
-                    int matches;
-                    char temp[512];
-    	            // used to store title which user enters
+            if(checkout(title) == 0)
+            {
+                printf("Your Book has been successfully issued\n");
+                printf("Press Enter to return to User Menu\n");
+                while(getchar() != '\n');
 
-    	            while(fgets(temp, 512, fp) != NULL)
-    	            {
-    		            if((strstr(temp, )) != NULL)           //book title entered matched
-    		            {
+                goto userchoice;
 
-    		                UserHead -> user.u_issued == 1
-    		                strcpy(UserHead -> user.u_book_ID, temp);
-    		                // Change u_date_issue to current date
+            }
 
-    		                UserHead -> user.u_date_issue.tm_sec = time_of_event.tm_sec;
-                            UserHead -> user.u_date_issue.tm_min = time_of_event.tm_min;
-                            UserHead -> user.u_date_issue.tm_hour = time_of_event.tm_hour;
-                            UserHead -> user.u_date_issue.tm_mday = time_of_event.tm_mday;
-                            UserHead -> user.u_date_issue.tm_mon = time_of_event.tm_mon;
-                            UserHead -> user.u_date_issue.tm_year = time_of_event.tm_year;
-                            UserHead -> user.u_date_issue.tm_wday = time_of_event.tm_wday;
-                            UserHead -> user.u_date_issue.tm_yday = time_of_event.tm_yday;
-                            UserHead -> user.u_date_issue.tm_isdst = time_of_event.tm_isdst;
+            else if(checkout(title) == 1)
+            {
+                printf("No such Book Title\n");
+                printf("Press Enter to return to Transaction Menu\n");
+                while(getchar() != '\n');
 
-                            UserHead -> user.u_issued = 1;
+                goto transaction;
 
-                            // to change book details of search found
+            }
 
+            else                        // user asked to to notify if him or not
+            {
+                printf("Press Enter to return to Transaction Menu\n");
+                while(getchar() != '\n');
 
+                goto transaction;
 
-
-                            // to save Library and User List
-
-
-
-
-
-
-    			            matches++;
-    		            }
-    	            }
-
-    	            if(matches == 0)           // no ID found
-    	            {
-    		            printf("\nSorry, no match found.\n");
-    		            printf("Press Enter to return to the Book Transaction Menu");
-                        while(getchar() != '\n');
-                        goto transaction;
-    	            }
-
-                 }
-
-
-
+            }
 
             break;
+
+
 
             case 2:
                 //return book
@@ -385,7 +355,7 @@ int menu(USERNODE *UserHead)
 
             default:
                 printf("\n\n\t\t\t\tINVALID OPTION");
-                printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+                printf("\n\n\t\t\tPress Enter to Return to Transaction Menu");
                 if(getchar() == '\n')
                 goto transaction;
         }
@@ -396,10 +366,18 @@ int menu(USERNODE *UserHead)
             {
                 adminMenu(user);
             }
+            else
+            {
+                printf("NOT AN ADMIN!\n");
+                printf("Press Enter to return to the User menu");
+                while (getchar() != '\n');
+                goto userchoice;
+            }
             break;
 
         case 0:
             return 0;
+            break;
 
         default:
             printf("\n\n\t\t\t\tINVALID OPTION");
@@ -410,6 +388,100 @@ int menu(USERNODE *UserHead)
 
     }
     return 1;
+}
+
+// checkout handles checking out given a book title string, it also handles saving book title to notify on next login
+// title is the name of the book passed by the user
+int checkout(char *title)
+{
+
+    int status = 1; // 0 means book found, available, and assigned successfully,
+                    // 1 is no book title found,
+                    // 2 is book title found, but not available, option given to set as alert for this book.
+
+    BOOKNODE *current = head;
+
+    while(current->next != NULL)
+    {
+        current = current->next;
+
+        if(strcmp(current->book.b_book_title, title) == 0)
+        {
+            if((current->book.b_status == 'A'))
+            {
+            // generate and assign issueID
+            unsigned long issue_id =  generateIssueID();
+            current->book.b_issue_ID = issue_id;
+            Current_User.u_issue_ID = issue_ID;
+
+            //change, u_book_ID,     b_user_ID,  and  b_book_status;
+            Current_User.u_book_ID = current->book.b_book_ID;
+            current->book.b_user_ID = Current_USer.u_user_ID;
+            current->book.b_user_ID = 'I';
+
+            // Assign Dates
+            time_t sec = time(NULL);
+            struct tm time_of_event = *(localtime(&sec));
+            //u_date_issue
+            Current_User.u_date_issue.tm_sec = time_of_event.tm_sec;
+            Current_User.u_date_issue.tm_min = time_of_event.tm_min;
+            Current_User.u_date_issue.tm_hour = time_of_event.tm_hour;
+            Current_User.u_date_issue.tm_mday = time_of_event.tm_mday;
+            Current_User.u_date_issue.tm_mon = time_of_event.tm_mon;
+            Current_User.u_date_issue.tm_year = time_of_event.tm_year;
+            Current_User.u_date_issue.tm_wday = time_of_event.tm_wday;
+            Current_User.u_date_issue.tm_yday = time_of_event.tm_yday;
+            Current_User.u_date_issue.tm_isdst = time_of_event.tm_isdst;
+            //b_date_issue
+            current->book.b_date_issue.tm_sec = time_of_event.tm_sec;
+            current->book.b_date_issue.tm_min = time_of_event.tm_min;
+            current->book.b_date_issue.tm_hour = time_of_event.tm_hour;
+            current->book.b_date_issue.tm_mday = time_of_event.tm_mday;
+            current->book.b_date_issue.tm_mon = time_of_event.tm_mon;
+            current->book.b_date_issue.tm_year = time_of_event.tm_year;
+            current->book.b_date_issue.tm_wday = time_of_event.tm_wday;
+            current->book.b_date_issue.tm_yday = time_of_event.tm_yday;
+            current->book.b_date_issue.tm_isdst = time_of_event.tm_isdst;
+
+
+            saveLibrary();
+            saveUserList();
+            status = 0;
+            }
+
+            else
+            {
+                status = 2;
+                char choice;
+
+                do
+                {
+                    printf("The book you've requested is currently issues by another library member!\n");
+                    printf("Would you like to be notified if the book becomes available? (Y/N) (notified on login when book is available once, only 1 book can be notified at a time)\n");
+                    scanf(" %c", choice);
+                    while(getchar() != '\n');
+                    choice = toUpper(choice);
+                    switch (choice)
+                        {
+                        case 'Y':
+                            strcpy(Current_User.b_requested, title);
+                            saveUserList();
+                            printf("OK, you'll be notified if the book is available next time you log in");
+                            break;
+
+                        case 'N':
+                            printf("Ok, you won't be notified\n");
+                            break;
+
+                        default:
+                            printf("INVALID RESPONSE\n");
+                            break;
+                    }
+                }while(!(choice == 'Y' || choice == 'N'));
+            }
+        }
+    }
+    return status;
 }
 
 
@@ -484,22 +556,18 @@ void adminMenu(USER *user)
         case 1:
         addUser();
 
-        //printf("\nPress enter to return to the Admin menu");
-        //char ch2 = scanf("%c",&ch2);
-        //if(ch2 == '0')
-        //while(getchar() != '\n');
-        //goto ADMIN;
-        return;
+        printf("\nPress enter to return to the Admin menu");
+        while(getchar() != '\n');
+        goto ADMIN;
+
         break;
 
         case 2:
         deleteUser(user);
-        //printf("\nPress enter to return to the Admin menu");
-        //char ch9 = scanf("%c",&ch9);
-        //if(ch9 == '0')
-        //while(getchar() != '\n');
-        //goto ADMIN;
-        return;
+        printf("\nPress enter to return to the Admin menu");
+        while(getchar() != '\n');
+        goto ADMIN;
+
         break;
 
         case 3:
