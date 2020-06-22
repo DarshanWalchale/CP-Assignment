@@ -78,7 +78,7 @@ BOOKNODE * loadLibrary(BOOKNODE *);
 USERNODE * loadUsers(USERNODE *);
 void loadCounters();
 void welcomeScreen();
-void menu(USERNODE *user);
+void menu(USERNODE *UserHead);
 void adminMenu(/*USER *user*/);
 void booksearchMenu(/*BOOKNODE *head*/);
 void addUser(void);
@@ -124,7 +124,7 @@ int main(void)
 
     welcomeScreen();
     notifications(BookHead, UserHead);
-    
+
     while(menu (UserHead));
 
 
@@ -205,8 +205,7 @@ void welcomeScreen()
                         //notifications(BookHead, UserHead); // also better to be done in main (beter program layout, rather than somewhere further down in the program)
                         //printf("\n\n");
 
-                        //menu(pUser); // call this in main and put it in a do while loop
-                    }
+                        // menu(pUser);
                 }
             }
 
@@ -263,7 +262,7 @@ void welcomeScreen()
     }
 }
 
-int menu(USERNODE *user)
+int menu(USERNODE *UserHead)
 {
     printf("Welcome User\n");
 
@@ -309,9 +308,8 @@ int menu(USERNODE *user)
             case 1:
             //checkout book
 
-                //displayAllBooks(BookHead); What? Why are displaying the whole booklist, just ask for the correct title and the program should handle the BookID by itself, Shreyas made the book search function, I had also made a function
 
-                if(user -> u_issued == 1)                      // user already issued a book
+                if(UserHead -> user.u_issued == 1)                      // user already issued a book
                  {
                     printf("\nPlease return issued book first.\n");
                     printf("Press Enter to return to the Book Transaction Menu");
@@ -324,31 +322,37 @@ int menu(USERNODE *user)
                     FILE *fp = fopen("books.txt", "w+");
                     //time_t sec = time(NULL);
                     struct tm time_of_event = *(localtime(&sec));
-                    printf("Enter Book ID of the book to be issued:\n ->");
+                    printf("Enter Book Title of the book to be issued:\n ->");
                     int matches;
-
-    	            char temp[512]; // used to store id which user enters
+                    char temp[512];
+    	            // used to store title which user enters
 
     	            while(fgets(temp, 512, fp) != NULL)
     	            {
-    		            if((strstr(temp, str)) != NULL)           //book id entered matched
+    		            if((strstr(temp, )) != NULL)           //book title entered matched
     		            {
-    		                strcpy(user -> u_book_ID, temp);
+
+    		                UserHead -> user.u_issued == 1
+    		                strcpy(UserHead -> user.u_book_ID, temp);
     		                // Change u_date_issue to current date
 
-    		                user ->u_date_issue.tm_sec = time_of_event.tm_sec;
-                            user ->u_date_issue.tm_min = time_of_event.tm_min;
-                            user ->u_date_issue.tm_hour = time_of_event.tm_hour;
-                            user ->u_date_issue.tm_mday = time_of_event.tm_mday;
-                            user ->u_date_issue.tm_mon = time_of_event.tm_mon;
-                            user ->u_date_issue.tm_year = time_of_event.tm_year;
-                            user ->u_date_issue.tm_wday = time_of_event.tm_wday;
-                            user ->u_date_issue.tm_yday = time_of_event.tm_yday;
-                            user ->u_date_issue.tm_isdst = time_of_event.tm_isdst;
+    		                UserHead -> user.u_date_issue.tm_sec = time_of_event.tm_sec;
+                            UserHead -> user.u_date_issue.tm_min = time_of_event.tm_min;
+                            UserHead -> user.u_date_issue.tm_hour = time_of_event.tm_hour;
+                            UserHead -> user.u_date_issue.tm_mday = time_of_event.tm_mday;
+                            UserHead -> user.u_date_issue.tm_mon = time_of_event.tm_mon;
+                            UserHead -> user.u_date_issue.tm_year = time_of_event.tm_year;
+                            UserHead -> user.u_date_issue.tm_wday = time_of_event.tm_wday;
+                            UserHead -> user.u_date_issue.tm_yday = time_of_event.tm_yday;
+                            UserHead -> user.u_date_issue.tm_isdst = time_of_event.tm_isdst;
 
-                            user ->u_issued = 1;
+                            UserHead -> user.u_issued = 1;
 
                             // to change book details of search found
+
+
+
+
                             // to save Library and User List
 
 
@@ -379,7 +383,7 @@ int menu(USERNODE *user)
                 //return book
                 break;
 
-                default:
+            default:
                 printf("\n\n\t\t\t\tINVALID OPTION");
                 printf("\n\n\t\t\tPress Enter to re-Enter the choice");
                 if(getchar() == '\n')
@@ -400,14 +404,15 @@ int menu(USERNODE *user)
         default:
             printf("\n\n\t\t\t\tINVALID OPTION");
             printf("\n\n\t\t\tPress Enter to re-Enter the choice");
-                //char ch4 = scanf("%c",&ch4);
-            //if(ch4 == '\n')
+
             while(getchar() != '\n');
             goto userchoice;
-            break;
+
     }
     return 1;
 }
+
+
 
 
 
