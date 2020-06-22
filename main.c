@@ -50,7 +50,7 @@ typedef struct USER{
     bool u_admin; // 1 if admin
     struct tm u_date_issue;    //
     char u_requested[MAX_TITLE_LENGTH];
-    bool u_issued; // 0 if no book issued by user, 1 if user has 1 book issued
+    
 } USER;
 
 typedef struct BOOKNODE         // this is used to load the library into memory
@@ -309,7 +309,7 @@ int menu(USERNODE *UserHead)
             //checkout book
 
 
-                if(UserHead -> user.u_issued == 1)                      // user already issued a book
+                if(UserHead -> user.u_book_ID != 0)                      // user already issued a book
                  {
                     printf("\nPlease return issued book first.\n");
                     printf("Press Enter to return to the Book Transaction Menu");
