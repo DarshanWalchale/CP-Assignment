@@ -46,6 +46,7 @@ typedef struct USER{
     char user_name[30]; //
     unsigned long u_book_ID; //10 digit ID
     unsigned long u_issue_ID; //10 digit ID
+    char u_book_title[MAX_TITLE_LENGTH]; //title of book already issued
     char u_user_pwd[30]; //User password
     bool u_admin; // 1 if admin
     struct tm u_date_issue;    //
@@ -80,6 +81,7 @@ void loadCounters();
 void welcomeScreen();
 int menu(USERNODE *UserHead);
 int checkout(char *title);
+void returnBook();
 void adminMenu(USER *user);
 void booksearchMenu(BOOKNODE *head);
 void addUser(void);
@@ -210,9 +212,9 @@ void welcomeScreen()
                         //printf("\n\n");
 
                         // menu(pUser);
+                    }
                 }
             }
-
         break;
 
         case 2222: // our hack to add members for now lol
@@ -351,6 +353,12 @@ int menu(USERNODE *UserHead)
 
             case 2:
                 //return book
+
+                returnBook();
+                printf("\nPress Enter to return to Transaction Menu\n");
+                while(getchar() != '\n');
+
+                goto transaction;
                 break;
 
             default:
@@ -362,7 +370,7 @@ int menu(USERNODE *UserHead)
 
         case 3:
                                                    // not accessable to non-admins
-            if(user->u_admin)
+            if(Current_User.u_admin == 1)
             {
                 adminMenu(user);
             }
@@ -407,17 +415,18 @@ int checkout(char *title)
 
         if(strcmp(current->book.b_book_title, title) == 0)
         {
-            if((current->book.b_status == 'A'))
+            if((current->book.b_book_status == 'A'))
             {
             // generate and assign issueID
             unsigned long issue_id =  generateIssueID();
             current->book.b_issue_ID = issue_id;
             Current_User.u_issue_ID = issue_ID;
 
-            //change, u_book_ID,     b_user_ID,  and  b_book_status;
+            //change, u_book_ID,     b_user_ID, updating issued title to user  and  b_book_status;
             Current_User.u_book_ID = current->book.b_book_ID;
-            current->book.b_user_ID = Current_USer.u_user_ID;
-            current->book.b_user_ID = 'I';
+            current->book.b_user_ID = Current_User.u_user_ID;
+            strcpy(Current_User.u_book_title, title);
+            current->book.b_book_status = 'I';
 
             // Assign Dates
             time_t sec = time(NULL);
@@ -456,15 +465,21 @@ int checkout(char *title)
 
                 do
                 {
-                    printf("The book you've requested is currently issues by another library member!\n");
+                    printf("The book you've requested is currently issued by another library member!\n");
                     printf("Would you like to be notified if the book becomes available? (Y/N) (notified on login when book is available once, only 1 book can be notified at a time)\n");
-                    scanf(" %c", choice);
+                    scanf(" %c", &choice);
                     while(getchar() != '\n');
-                    choice = toUpper(choice);
+
                     switch (choice)
                         {
                         case 'Y':
-                            strcpy(Current_User.b_requested, title);
+                            strcpy(Current_User.u_requested, title);
+                            saveUserList();
+                            printf("OK, you'll be notified if the book is available next time you log in");
+                            break;
+
+                        case 'y':
+                            strcpy(Current_User.u_requested, title);
                             saveUserList();
                             printf("OK, you'll be notified if the book is available next time you log in");
                             break;
@@ -484,9 +499,78 @@ int checkout(char *title)
     return status;
 }
 
+void returnBook()
+{
+    printf("Currently Issued Book\n -> %s\n", Current_User.u_book_title);
+    printf("Press Y to return currently issued book\n");
+    char choice;
+
+    scanf(" %c", &choice);
+    while(getchar() != '\n');
+    switch (choice)
+    {
+        case 'Y' :                                                          //return
+
+        Current_User.u_book_ID = 0;
+        Current_User.u_issue_ID = 0;
+
+        BOOKNODE *current = head;
+
+        while(current->next != NULL)
+        {
+            current = current->next;
+
+            if(strcmp(current->book.b_book_title, Current_User.u_book_title ) == 0)
+            {
+                 if((current->book.b_book_status == 'I'))
+                 {
+                     current->book.b_issue_ID = 0;
+                     current->book.b_user_ID = 0;
+                     current->book.b_book_status = 'A';
+                     saveLibrary();
+                     saveUserList();
+                     return;
+                 }
+            }
+        }
+
+        case 'y':
+
+        Current_User.u_book_ID = 0;
+        Current_User.u_issue_ID = 0;
+
+        BOOKNODE *current = head;
+
+        while(current->next != NULL)
+        {
+            current = current->next;
+
+            if(strcmp(current->book.b_book_title, Current_User.u_book_title ) == 0)
+            {
+                 if((current->book.b_book_status == 'I'))
+                 {
+                     current->book.b_issue_ID = 0;
+                     current->book.b_user_ID = 0;
+                     current->book.b_book_status == 'A';
+                     saveLibrary();
+                     saveUserList();
+                     return;
+                 }
+            }
+        }
 
 
+        break;
 
+        default:
+        printf("Press Enter to return to Menu\n");
+        while(getchar() != '\n');
+        return;
+
+
+    }
+
+}
 
 void booksearchMenu()
 {
