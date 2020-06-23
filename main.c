@@ -415,7 +415,7 @@ int checkout(char *title)
 
         if(strcmp(current->book.b_book_title, title) == 0)
         {
-            if((current->book.b_book_status == 'A'))
+            if(current->book.b_book_status == 'A')
             {
             // generate and assign issueID
             unsigned long issue_id =  generateIssueID();
@@ -522,7 +522,7 @@ void returnBook()
 
             if(strcmp(current->book.b_book_title, Current_User.u_book_title ) == 0)
             {
-                 if((current->book.b_book_status == 'I'))
+                 if(current->book.b_book_status == 'I')
                  {
                      current->book.b_issue_ID = 0;
                      current->book.b_user_ID = 0;
@@ -547,11 +547,11 @@ void returnBook()
 
             if(strcmp(current->book.b_book_title, Current_User.u_book_title ) == 0)
             {
-                 if((current->book.b_book_status == 'I'))
+                 if(current->book.b_book_status == 'I')
                  {
                      current->book.b_issue_ID = 0;
                      current->book.b_user_ID = 0;
-                     current->book.b_book_status == 'A';
+                     current->book.b_book_status = 'A';
                      saveLibrary();
                      saveUserList();
                      return;
