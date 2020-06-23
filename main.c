@@ -533,6 +533,7 @@ void returnBook()
                  }
             }
         }
+        break;
 
         case 'y':
 
