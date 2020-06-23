@@ -492,7 +492,7 @@ int checkout(char *title)
                             printf("INVALID RESPONSE\n");
                             break;
                     }
-                }while(!(choice == 'Y' || choice == 'N'));
+                }while(!(choice == 'Y' || choice == 'N' || choice == 'y'));
             }
         }
     }
