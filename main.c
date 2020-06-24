@@ -1142,7 +1142,8 @@ void searchBookbyTitle(BOOKNODE *head)
     char closest_search[MAX_CLOSE_TITLE_SEARCH][MAX_TITLE_LENGTH+30]; //To store MAX_CLOSE_TITLE_SEARCH closest matching title searches
     LAB1: //a label to return if <=3 chars entered
     printf("Search by title: ");
-    fgets(title_search,MAX_TITLE_LENGTH,stdin);
+    scanf(" %60[^\n]", title_search);
+    while(getchar() != '\n');
 
     //Restart search if less than three characters entered
     if(strlen(title_search)<4)
@@ -1288,7 +1289,8 @@ void searchBookbyAuthor(BOOKNODE *head){
     LAB2: //a label to return if <=3 chars entered
 
     printf("Search by author: ");
-    fgets(author_search,30,stdin);
+    scanf(" %30[^\n]", author_search);
+    while(getchar() != '\n');
 
         //Restart search if less than three characters entered
      if(strlen(author_search)<4){
@@ -1393,7 +1395,8 @@ void searchBookbyID(BOOKNODE *head){
     char closest_search[MAX_CLOSE_ID][11]; //To store MAX_CLOSE_ID closest matching searches of ID
     LAB3: //Label to return if invalid (not 10 digits)
     printf("Search by ID: ");
-    fgets(ID_search,11,stdin);
+    scanf(" %11[^\n]", ID_search);
+    while(getchar() != '\n');
     printf("%ld",strlen(ID_search));
     if((strlen(ID_search))!=10){
     printf("Invalid ID entered! (ID is 10 digits)\n");
