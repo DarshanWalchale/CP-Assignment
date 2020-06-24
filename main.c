@@ -104,7 +104,7 @@ void notifications(BOOKNODE *head, USER *user);
 void setCurrentUser(USER *);
 void saveLibrary(BOOKNODE *head);
 void freeLibrary(BOOKNODE *head);
-void saveCurrentUser(USERNODE, USER *);
+void saveCurrentUser(USERNODE *, USER *);
 void saveUserList(USERNODE *head);
 void freeUserList(USERNODE *head);
 
@@ -137,7 +137,7 @@ int main(void)
 
     saveLibrary(BookHead);
     freeLibrary(BookHead);
-    saveCurrentUser(UserHead, Current_User);
+    saveCurrentUser(UserHead, &Current_User);
     saveUserList(UserHead);
     freeUserList(UserHead);
     return 0;
@@ -457,7 +457,7 @@ int checkout(char *title)
 
 
             saveLibrary(BookHead);
-            saveCurrentUser(UserHead, Current_User);
+            saveCurrentUser(UserHead, &Current_User);
             saveUserList(UserHead);
             status = 0;
             }
@@ -479,7 +479,7 @@ int checkout(char *title)
                         {
                         case 'Y':
                             strcpy(Current_User.u_requested, title);
-                            saveCurrentUser(UserHead, Current_User);
+                            saveCurrentUser(UserHead, &Current_User);
                             saveUserList(UserHead);
                             printf("OK, you'll be notified if the book is available next time you log in");
                             break;
@@ -529,7 +529,7 @@ void returnBook()
                      current->book.b_user_ID = 0;
                      current->book.b_book_status = 'A';
                      saveLibrary(BookHead);
-                     saveCurrentUser(UserHead, Current_User);
+                     saveCurrentUser(UserHead, &Current_User);
                      saveUserList(UserHead);
                      return;
                  }
@@ -1026,7 +1026,7 @@ void deleteUser(USER *user)
     fclose(fp);
 
     // saves userlist in memory to file
-    saveCurrentUser(UserHead, Current_User);
+    saveCurrentUser(UserHead, &Current_User);
     saveUserList(head);
 
     // frees dynamically allocated linked list of users' data from memory
@@ -1040,12 +1040,12 @@ void deleteUser(USER *user)
 
 void saveCurrentUser(USERNODE *head, USER *CurrentUser)
 {
-    FIEL *fp = fopen("userdata.txt", "w");
+    FILE *fp = fopen("userdata.txt", "w");
     USERNODE *current = head;
     while(current->next == NULL)
     {
         current = current->next;
-        if(current->user.u_user_id == CurrentUser->u_user_ID)
+        if(current->user.u_user_ID == CurrentUser->u_user_ID)
         {
             current->user.u_user_ID = CurrentUser->u_user_ID;
             strcpy(current->user.user_name, CurrentUser->user_name);
