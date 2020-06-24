@@ -79,11 +79,11 @@ BOOKNODE * loadLibrary(BOOKNODE *);
 USERNODE * loadUsers(USERNODE *);
 void loadCounters();
 void welcomeScreen();
-int menu(USERNODE *UserHead);
+int menu();
 int checkout(char *title);
 void returnBook();
-void adminMenu(USER *user);
-void booksearchMenu(BOOKNODE *head);
+void adminMenu();
+void booksearchMenu();
 void addUser(void);
 void deleteUser(USER *user);
 //void addNewBook(BOOK *book);
@@ -100,10 +100,11 @@ void searchBookbyTitle(BOOKNODE *head);
 void searchBookbyAuthor(BOOKNODE *head);
 void searchBookbyID(BOOKNODE *head);
 void newlyAddedBooks(BOOKNODE *head);
-void notifications(BOOKNODE *head, USERNODE *user);
+void notifications(BOOKNODE *head, USER *user);
 void setCurrentUser(USER *);
 void saveLibrary(BOOKNODE *head);
 void freeLibrary(BOOKNODE *head);
+void saveCurrentUser(USERNODE, USER *);
 void saveUserList(USERNODE *head);
 void freeUserList(USERNODE *head);
 
@@ -114,7 +115,7 @@ int main(void)
 {
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //makeFile();
-    do{
+    //do{ whatcha doin' m8
     BookHead = calloc(1, sizeof(BOOKNODE));
     BookHead = loadLibrary(BookHead);
 
@@ -127,8 +128,8 @@ int main(void)
     //printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID());
 
     welcomeScreen();
-    notifications(BookHead, UserHead);
-    }while(menu(UserHead));
+    notifications(BookHead, &Current_User);
+    while(menu(UserHead) != 0);
 
 
 
@@ -136,6 +137,7 @@ int main(void)
 
     saveLibrary(BookHead);
     freeLibrary(BookHead);
+    saveCurrentUser(UserHead, Current_User);
     saveUserList(UserHead);
     freeUserList(UserHead);
     return 0;
@@ -267,7 +269,7 @@ void welcomeScreen()
     }
 }
 
-int menu(USERNODE *UserHead)
+int menu()
 {
     printf("Welcome User\n");
 
@@ -372,7 +374,7 @@ int menu(USERNODE *UserHead)
                                                    // not accessable to non-admins
             if(Current_User.u_admin == 1)
             {
-                adminMenu(user);
+                adminMenu();
             }
             else
             {
@@ -406,8 +408,9 @@ int checkout(char *title)
     int status = 1; // 0 means book found, available, and assigned successfully,
                     // 1 is no book title found,
                     // 2 is book title found, but not available, option given to set as alert for this book.
-
-    BOOKNODE *current = head;
+    
+    
+    BOOKNODE *current = BookHead;
 
     while(current->next != NULL)
     {
@@ -420,7 +423,7 @@ int checkout(char *title)
             // generate and assign issueID
             unsigned long issue_id =  generateIssueID();
             current->book.b_issue_ID = issue_id;
-            Current_User.u_issue_ID = issue_ID;
+            Current_User.u_issue_ID = issue_id;
 
             //change, u_book_ID,     b_user_ID, updating issued title to user  and  b_book_status;
             Current_User.u_book_ID = current->book.b_book_ID;
@@ -453,8 +456,9 @@ int checkout(char *title)
             current->book.b_date_issue.tm_isdst = time_of_event.tm_isdst;
 
 
-            saveLibrary();
-            saveUserList();
+            saveLibrary(BookHead);
+            saveCurrentUser(UserHead, Current_User);
+            saveUserList(UserHead);
             status = 0;
             }
 
@@ -469,18 +473,14 @@ int checkout(char *title)
                     printf("Would you like to be notified if the book becomes available? (Y/N) (notified on login when book is available once, only 1 book can be notified at a time)\n");
                     scanf(" %c", &choice);
                     while(getchar() != '\n');
+                    choice = toupper(choice);
 
                     switch (choice)
                         {
                         case 'Y':
                             strcpy(Current_User.u_requested, title);
-                            saveUserList();
-                            printf("OK, you'll be notified if the book is available next time you log in");
-                            break;
-
-                        case 'y':
-                            strcpy(Current_User.u_requested, title);
-                            saveUserList();
+                            saveCurrentUser(UserHead, Current_User);
+                            saveUserList(UserHead);
                             printf("OK, you'll be notified if the book is available next time you log in");
                             break;
 
@@ -507,6 +507,7 @@ void returnBook()
 
     scanf(" %c", &choice);
     while(getchar() != '\n');
+    choice = toupper(choice);
     switch (choice)
     {
         case 'Y' :                                                          //return
@@ -514,7 +515,7 @@ void returnBook()
         Current_User.u_book_ID = 0;
         Current_User.u_issue_ID = 0;
 
-        BOOKNODE *current = head;
+        BOOKNODE *current = BookHead;
 
         while(current->next != NULL)
         {
@@ -527,40 +528,13 @@ void returnBook()
                      current->book.b_issue_ID = 0;
                      current->book.b_user_ID = 0;
                      current->book.b_book_status = 'A';
-                     saveLibrary();
-                     saveUserList();
+                     saveLibrary(BookHead);
+                     saveCurrentUser(UserHead, Current_User);
+                     saveUserList(UserHead);
                      return;
                  }
             }
         }
-        break;
-
-        case 'y':
-
-        Current_User.u_book_ID = 0;
-        Current_User.u_issue_ID = 0;
-
-        BOOKNODE *current = head;
-
-        while(current->next != NULL)
-        {
-            current = current->next;
-
-            if(strcmp(current->book.b_book_title, Current_User.u_book_title ) == 0)
-            {
-                 if(current->book.b_book_status == 'I')
-                 {
-                     current->book.b_issue_ID = 0;
-                     current->book.b_user_ID = 0;
-                     current->book.b_book_status = 'A';
-                     saveLibrary();
-                     saveUserList();
-                     return;
-                 }
-            }
-        }
-
-
         break;
 
         default:
@@ -620,7 +594,7 @@ void booksearchMenu()
    }
 }
 
-void adminMenu(USER *user)
+void adminMenu()
 {
     printf("Welcome Admin\n");
 
@@ -648,7 +622,7 @@ void adminMenu(USER *user)
         break;
 
         case 2:
-        deleteUser(user);
+        deleteUser(&Current_User);
         printf("\nPress enter to return to the Admin menu");
         while(getchar() != '\n');
         goto ADMIN;
@@ -659,11 +633,11 @@ void adminMenu(USER *user)
         //searchBookbyTitle(BookHead); //Bruh
 
         printf("Enter title: ");
-        char title;
+        char title[MAX_TITLE_LENGTH];
         scanf(" %60[^\n]", title); //MAX_TITLE_LENGTH
         while(getchar() != '\n');
 
-        printf("Number of books by the title \"%s\" = %d", titleCount(title));
+        printf("Number of books by the title \"%s\" = %d", title, titleCount(title));
 
         //printf("\nPress enter to return to the Admin menu");
         //char ch7 = scanf("%c",&ch7);
@@ -1052,6 +1026,7 @@ void deleteUser(USER *user)
     fclose(fp);
 
     // saves userlist in memory to file
+    saveCurrentUser(UserHead, Current_User);
     saveUserList(head);
 
     // frees dynamically allocated linked list of users' data from memory
@@ -1060,6 +1035,40 @@ void deleteUser(USER *user)
     freeUserList(UserHead);
     loadUsers(UserHead);
 
+    return;
+}
+
+void saveCurrentUser(USERNODE *head, USER *CurrentUser)
+{
+    FIEL *fp = fopen("userdata.txt", "w");
+    USERNODE *current = head;
+    while(current->next == NULL)
+    {
+        current = current->next;
+        if(current->user.u_user_id == CurrentUser->u_user_ID)
+        {
+            current->user.u_user_ID = CurrentUser->u_user_ID;
+            strcpy(current->user.user_name, CurrentUser->user_name);
+            current->user.u_book_ID = CurrentUser->u_book_ID;
+            current->user.u_issue_ID = CurrentUser->u_issue_ID;
+            strcpy(current->user.u_user_pwd, CurrentUser->u_user_pwd);
+            current->user.u_admin = CurrentUser->u_admin;
+    
+            //date of issue struct tm part
+            current->user.u_date_issue.tm_sec = CurrentUser->u_date_issue.tm_sec;
+            current->user.u_date_issue.tm_min = CurrentUser->u_date_issue.tm_min;
+            current->user.u_date_issue.tm_hour = CurrentUser->u_date_issue.tm_hour;
+            current->user.u_date_issue.tm_mday = CurrentUser->u_date_issue.tm_mday;
+            current->user.u_date_issue.tm_mon = CurrentUser->u_date_issue.tm_mon; 
+            current->user.u_date_issue.tm_year = CurrentUser->u_date_issue.tm_year;   
+            current->user.u_date_issue.tm_wday = CurrentUser->u_date_issue.tm_wday;
+            current->user.u_date_issue.tm_yday = CurrentUser->u_date_issue.tm_yday;
+            current->user.u_date_issue.tm_isdst = CurrentUser->u_date_issue.tm_isdst;
+        }
+    }
+    
+    saveUserList(head);
+    
     return;
 }
 
