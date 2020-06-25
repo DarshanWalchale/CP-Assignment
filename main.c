@@ -237,6 +237,7 @@ void welcomeScreen()
 
                 else
                 {
+                    USER user;
                     printf("Choose A Username: ");
                     scanf("%29s",pUser -> user_name);
                     while(getchar() != '\n');
@@ -245,15 +246,55 @@ void welcomeScreen()
                     scanf("%29s",pUser -> u_user_pwd);
                     while(getchar() != '\n');
 
-                    //fwrite (pUser, sizeof(struct USER), 1, fp); Don't write to file, add to the linked list and saveUserList
+                    int adminornot;
+                    printf("Press 0 to add a non-Admin, 1 to add an Admin\n");
+                    scanf(" %d", &adminornot);
+
+                     printf("Choose A Username: ");
+                     scanf(" %30[^\n]", user.user_name);
+                    while(getchar() != '\n');
+
+                    printf("Choose A Password: ");
+                    scanf(" %29s",user.u_user_pwd);
+                    while(getchar() != '\n');
+
+                 //Assigning values 0 because no book issued yet
+                     user.u_user_ID = 0;
+                     user.u_book_ID = 0;
+                     user.u_issue_ID = 0;
+                     user.u_date_issue.tm_sec = 0;
+                     user.u_date_issue.tm_min = 0;
+                     user.u_date_issue.tm_hour = 0;
+                     user.u_date_issue.tm_mday = 0;
+                     user.u_date_issue.tm_mon = 0;
+                     user.u_date_issue.tm_year = 0;
+                     user.u_date_issue.tm_wday = 0;
+                     user.u_date_issue.tm_yday = 0;
+                     user.u_date_issue.tm_isdst = 0;
+                     if(adminornot == 0)
+                     {
+                             user.u_admin = 0;
+                     }
+                     else
+                     {
+                             user.u_admin = 1;
+                     }
+
+
+                    fwrite(&user, sizeof(USER), 1, fp);
+                    saveUserList(UserHead);
 
 
                     printf("Add another account? (Y/N): ");
                     scanf(" %c", &c);
                     while(getchar() != '\n');
-                }
 
-            }while(c == 'Y'|| c == 'y');
+                }
+            }
+        while(c == 'Y'|| c == 'y');
+
+        fclose(fp);
+
         break;
 
 
@@ -278,7 +319,7 @@ void welcomeScreen()
 
 int menu()
 {
-    
+
 
     int choice;
 
@@ -613,6 +654,7 @@ void adminMenu()
     printf("2. Delete Library members\n");
     printf("3. Count books of a particular title\n");
     printf("4. Vendor / Library requests\n");
+    printf("0. Return to User Menu\n");
 
 
     printf("\n\nEnter your choice: ");
@@ -638,7 +680,7 @@ void adminMenu()
         break;
 
         case 3:
-        
+
         printf("Enter title: ");
         char title[MAX_TITLE_LENGTH];
         scanf(" %60[^\n]", title); //MAX_TITLE_LENGTH
@@ -646,29 +688,28 @@ void adminMenu()
 
         printf("Number of books by the title \"%s\" = %d", title, titleCount(title));
 
-        //printf("\nPress enter to return to the Admin menu");
-        //char ch7 = scanf("%c",&ch7);
-        //if(ch7 == '0')
-        //while(getchar() != '\n');
-        //goto ADMIN;
+        printf("\nPress enter to return to the Admin menu");
+
+        while(getchar() != '\n');
+        goto ADMIN;
         return;
         break;
 
         case 4:
         vendorManagement();
-        //printf("\nPress enter to return to the Admin menu");
-        //char ch6 = scanf("%c",&ch6);
-        //if(ch6 == '0')
-        //while(getchar() != '\n');
-        //goto ADMIN;
+        printf("\nPress enter to return to the Admin menu");
+
+        while(getchar() != '\n');
+        goto ADMIN;
+        break;
+
+        case 0:
+        return;
         break;
 
         default:
         printf("\n\n\t\t\t\tINVALID OPTION");
         printf("\n\n\t\t\tPress Enter to re-Enter the choice");
-
-        //char ch5 = scanf("%c",&ch5);
-        //if(ch5 == '\n')
         while(getchar() != '\n');
         goto ADMIN;
 
@@ -680,7 +721,7 @@ void addUser(void)
 {
     FILE *fp;
     char c;
-    USER *pUser = (USER *)malloc(sizeof(USER));
+    USER user;
     do
     {
         if (( fp = fopen("userdata.txt", "a+")) == NULL)
@@ -688,15 +729,45 @@ void addUser(void)
             printf ("Could not open file\n");
         }
 
+    int adminornot;
+    printf("Press 0 to add a non-Admin, 1 to add an Admin\n");
+    scanf(" %d", &adminornot);
+
     printf("Choose A Username: ");
-    scanf("%29s",pUser -> user_name);
+    scanf(" %30[^\n]", user.user_name);
     while(getchar() != '\n');
 
     printf("Choose A Password: ");
-    scanf("%29s",pUser -> u_user_pwd);
+    scanf(" %29s",user.u_user_pwd);
     while(getchar() != '\n');
 
-    fwrite (pUser, sizeof(struct USER), 1, fp);
+    //Assigning values 0 because no book issued yet
+    user.u_user_ID = 0;
+    user.u_book_ID = 0;
+    user.u_issue_ID = 0;
+    user.u_date_issue.tm_sec = 0;
+    user.u_date_issue.tm_min = 0;
+    user.u_date_issue.tm_hour = 0;
+    user.u_date_issue.tm_mday = 0;
+    user.u_date_issue.tm_mon = 0;
+    user.u_date_issue.tm_year = 0;
+    user.u_date_issue.tm_wday = 0;
+    user.u_date_issue.tm_yday = 0;
+    user.u_date_issue.tm_isdst = 0;
+
+    if(adminornot == 0)
+    {
+        user.u_admin = 0;
+    }
+    else
+    {
+        user.u_admin = 1;
+    }
+
+
+    fwrite(&user, sizeof(USER), 1, fp);
+    saveUserList(UserHead);
+
 
     printf("Add another account? (Y/N): ");
     scanf(" %c", &c);
@@ -704,7 +775,7 @@ void addUser(void)
 
     }
     while(c == 'Y'|| c == 'y');
-    free (pUser);//free allocated memory
+
     fclose(fp);
 
 }
@@ -766,7 +837,7 @@ void makeFile()
 
         fwrite(&book, sizeof(BOOK), 1, fp);
 
-        printf("again?(y/n): ");
+        printf("Again?(y/n): ");
         scanf(" %c", &choice);
         while(getchar() != '\n');
         if(choice == 'n' || choice == 'N')
