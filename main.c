@@ -31,26 +31,26 @@
 
 //Structure variables starting with single characters will be used in different functions
 typedef struct BOOK{
-    char b_book_title[MAX_TITLE_LENGTH];
-    char b_book_author[30];
-    unsigned long b_book_ID; //10 digit ID
-    unsigned long b_issue_ID; //10 digit ID
-    unsigned long b_user_ID; //10 digit ID
-    char b_book_status;             // 'A' - Available, 'I' - issued, 'R' - reserved
-    struct tm book_date_of_arrival;    //
-    struct tm b_date_issue;            //
+    char b_book_title[MAX_TITLE_LENGTH];    // Title of Book
+    char b_book_author[30];                 // Author of Book
+    unsigned long b_book_ID;                // Unique User ID
+    unsigned long b_issue_ID;               // Unique Book ID
+    unsigned long b_user_ID;                // Unique Issue ID
+    char b_book_status;                     // 'A' - Available, 'I' - issued, 'R' - reserved
+    struct tm book_date_of_arrival;         // Time of book being added to database
+    struct tm b_date_issue;                 // Time of issuing book
 } BOOK;
 
 typedef struct USER{
-    unsigned long u_user_ID; //10 digit ID
-    char user_name[30]; //
-    unsigned long u_book_ID; //10 digit ID
-    unsigned long u_issue_ID; //10 digit ID
-    char u_book_title[MAX_TITLE_LENGTH]; //title of book already issued
-    char u_user_pwd[30]; //User password
-    bool u_admin; // 1 if admin
-    struct tm u_date_issue;    //
-    char u_requested[MAX_TITLE_LENGTH];
+    unsigned long u_user_ID;                // Unique User ID
+    char user_name[30];                     // Username
+    unsigned long u_book_ID;                // Unique Book ID
+    unsigned long u_issue_ID;               // Unique Issue ID
+    char u_book_title[MAX_TITLE_LENGTH];    //title of book already issued
+    char u_user_pwd[30];                    //User password
+    bool u_admin;                           // true if admin
+    struct tm u_date_issue;                 // Time of book being added to database
+    char u_requested[MAX_TITLE_LENGTH];     // Title of book requested ot notify upon availability on login
 
 } USER;
 
@@ -60,7 +60,7 @@ typedef struct BOOKNODE         // this is used to load the library into memory
     struct BOOKNODE *next;
 } BOOKNODE;
 
-typedef struct USERNODE         // this is used to load all userdata into memory (for deleteUser)
+typedef struct USERNODE         // this is used to load all userdata into memory
 {
     USER user;
     struct USERNODE *next;
@@ -86,6 +86,7 @@ void adminMenu();
 void booksearchMenu();
 void addUser(void);
 void deleteUser(USER *user);
+void printUserInfo(USER *user);
 //void addNewBook(BOOK *book);
 //USER * loadNextUser(FILE *, USER*);
 //BOOK * loadNextBook(FILE *, BOOK*);
@@ -271,15 +272,18 @@ void welcomeScreen()
 
 int menu()
 {
-    printf("Welcome User\n");
+    printf("--------------------MENU--------------------\n");
 
     int choice;
 
     userchoice: // label to return to user menu
     printf("1. Search Books\n");
     printf("2. Book Transaction\n");
-    printf("3. Admin Menu\n");
-
+    printf("3. Account Info\n");
+    if(Current_User.u_admin)
+    {
+        printf("9. Admin Menu\n");
+    }
     printf("0. Exit from Library Portal\n");
 
     printf("\n\nEnter your choice: ");
@@ -359,7 +363,6 @@ int menu()
                 returnBook();
                 printf("\nPress Enter to return to Transaction Menu\n");
                 while(getchar() != '\n');
-
                 goto transaction;
                 break;
 
@@ -371,6 +374,10 @@ int menu()
         }
 
         case 3:
+            printUserInfo(&Current_User);
+            break;
+            
+        case 9:
                                                    // not accessable to non-admins
             if(Current_User.u_admin == 1)
             {
@@ -1123,7 +1130,38 @@ int titleCount(char *title)
 
 }
 
+void printUserInfo(USER *user)
+{
+    printf("--------------------ACCOUNT INFO--------------------\n");
+    printf("User ID: %lu\n", uesr->u_user_ID);
+    printf("Username: %s\n", user->user_name);
+    printf("Issued Book ID: %lu\n", user->u_book_ID);
+    printf("Issued Book Title: %s\n", u_book_title/*getBookName(user->u_book_ID)*/);
+    printf("Issue ID = %lu\n", user->u_Issue_ID);
+    char issueDate[128] = {};
+    strftime(issueDate, 128, "%d-%b-%Y %H:%M:%S", user->u_date_issue);
+    printf("Date Issued: %s\n", issueDate);
+    printf("Book Notify %s\n(You'll be notified once this book becomes available in the library opon login)\n", user->u_requested);
+    printf("Admin Privileges: %s\n", (user->u_admin)?"Yes":"No");
+    printf("----------------------------------------------------\n");
+    return;
+}
 
+char * getBookName(BOOKNODE *head, unsigned long bookID)
+{
+    char *title[MAX_TITLE_LENGTH] = "BOOK NOT FOUND";
+    BOOKNODE *current = head;
+    while(current->next != NULL)
+    {
+        current = current->next;
+        if(current->book.b_book_ID == bookID)
+        {
+            strcpy(title, current->book.b_book_title);
+            return title;
+        }
+    }
+    return title;
+}
 
 
 void searchBookbyTitle(BOOKNODE *head)
