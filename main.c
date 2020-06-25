@@ -116,7 +116,7 @@ int main(void)
 {
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //makeFile();
-    //do{ whatcha doin' m8
+
     BookHead = calloc(1, sizeof(BOOKNODE));
     BookHead = loadLibrary(BookHead);
 
@@ -126,11 +126,13 @@ int main(void)
 
     printf("Books database loaded into memory successfully\n");
     displayAllBooks(BookHead);
+    printf("Press Enter to Login");
+    while(getchar() != '\n');
     //printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID());
 
     welcomeScreen();
     notifications(BookHead, &Current_User);
-    while(menu(UserHead) != 0);
+    while(menu() != 0);
 
 
 
@@ -153,19 +155,19 @@ void welcomeScreen()
 
   printf("\n\t\t\t\t*************************");
 
-  printf("\n\n\n\n\t\t\t\tPress Enter to proceed");
+//   printf("\n\n\n\n\t\t\t\tPress Enter to proceed");
 
-  while(getchar() != '\n'); // Won't proceed till \n entered, wont leave remanents in input buffer
-  printf("\n\n\n\n\n\n\n\n\n\n\n\n");
+//   while(getchar() != '\n'); // Won't proceed till \n entered, wont leave remanents in input buffer
+  printf("\n\n");
 
 
   PQ: // just a label to come back to if we want to re-enter choice
 
-  printf("\n\n\n\t\t\t1. LOGIN\n\t\t\t2. REGISTER");
+  printf("\n\n\n\t\t\t\t\tLOGIN MENU\n\t\t\t (2222 TO REGISTER: REMOVE THIS LATER)");
 
-  printf("\n\n\n\t\t\t\tENTER YOUR CHOICE: ");
+  printf("\n\n\n\t\t\tPress 1 to enter Username and Password: ");
 
-  scanf("%d",&choice);
+  scanf(" %d",&choice);
   while(getchar() != '\n');
 
   static int count = 0; // if user can't register or login successfully in 5 attempts, just exit
@@ -228,30 +230,35 @@ void welcomeScreen()
 
         do
             {
-                if ( ( fp = fopen("userdata.txt", "a+")) == NULL)
+                if (( fp = fopen("userdata.txt", "a+")) == NULL)
                 {
-
-                printf ("Could not open file\n");
-                count++;
-
+                    printf ("Could not open file\n");
+                    count++;
                 }
-                printf("Choose A Username: ");
-                scanf("%29s",pUser -> user_name);
-                while(getchar() != '\n');
 
-                printf("Choose A Password: ");
-                scanf("%29s",pUser -> u_user_pwd);
-                while(getchar() != '\n');
+                else
+                {
+                    printf("Choose A Username: ");
+                    scanf("%29s",pUser -> user_name);
+                    while(getchar() != '\n');
 
-                //fwrite (pUser, sizeof(struct USER), 1, fp); Don't write to file, add to the linked list and saveUserList
+                    printf("Choose A Password: ");
+                    scanf("%29s",pUser -> u_user_pwd);
+                    while(getchar() != '\n');
+
+                    //fwrite (pUser, sizeof(struct USER), 1, fp); Don't write to file, add to the linked list and saveUserList
 
 
-                printf("Add another account? (Y/N): ");
-                scanf(" %c", &c);
-                while(getchar() != '\n');
-            }
-            while(c == 'Y'|| c == 'y');
+                    printf("Add another account? (Y/N): ");
+                    scanf(" %c", &c);
+                    while(getchar() != '\n');
+                }
+
+            }while(c == 'Y'|| c == 'y');
         break;
+
+
+
 
         default:
         printf("\n\n\t\t\t\tINVALID OPTION");
@@ -272,10 +279,8 @@ void welcomeScreen()
 
 int menu()
 {
-    printf("--------------------MENU--------------------\n");
-
+    printf("\n--------------------MENU--------------------\n");
     int choice;
-
     userchoice: // label to return to user menu
     printf("1. Search Books\n");
     printf("2. Book Transaction\n");
@@ -296,7 +301,7 @@ int menu()
         case 1:
         booksearchMenu(BookHead);
 
-        printf("Press Enter to return to the User menu");
+        printf("Press Enter to return to the User menu\n");
         while (getchar() != '\n');
         goto userchoice;
         break;
@@ -304,14 +309,14 @@ int menu()
         case 2:
 
         transaction:  // label to reach transaction menu
-        printf("Book Transaction Menu\n");
+        printf("\nBook Transaction Menu\n");
 
         printf("1. Checkout a Book\n");
         printf("2. Return Book\n");
-        printf("0. Return Back to Main Menu");
+        printf("0. Return Back to Main Menu\n");
 
         printf("Enter Choice: ");
-        scanf("%d",&option);
+        scanf("%d", &option);
 
         switch(option)
         {
@@ -321,7 +326,7 @@ int menu()
 
             char title[MAX_TITLE_LENGTH]; // to save title entered by user temporarily
 
-            printf("Enter Book Title to Checkout (Case Sensitive)\n ->");
+            printf("\nEnter Book Title to Checkout (Case Sensitive)\n ->");
             fgets(title, MAX_TITLE_LENGTH, stdin);
 
             if(checkout(title) == 0)
@@ -366,11 +371,6 @@ int menu()
                 goto transaction;
                 break;
 
-            default:
-                printf("\n\n\t\t\t\tINVALID OPTION");
-                printf("\n\n\t\t\tPress Enter to Return to Transaction Menu");
-                if(getchar() == '\n')
-                goto transaction;
         }
 
         case 3:
@@ -386,7 +386,7 @@ int menu()
             else
             {
                 printf("NOT AN ADMIN!\n");
-                printf("Press Enter to return to the User menu");
+                printf("Press Enter to return to the Main Menu");
                 while (getchar() != '\n');
                 goto userchoice;
             }
@@ -398,7 +398,7 @@ int menu()
 
         default:
             printf("\n\n\t\t\t\tINVALID OPTION");
-            printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+            printf("\n\n\t\t\tPress Enter\n");
 
             while(getchar() != '\n');
             goto userchoice;
@@ -415,8 +415,8 @@ int checkout(char *title)
     int status = 1; // 0 means book found, available, and assigned successfully,
                     // 1 is no book title found,
                     // 2 is book title found, but not available, option given to set as alert for this book.
-    
-    
+
+
     BOOKNODE *current = BookHead;
 
     while(current->next != NULL)
@@ -563,7 +563,8 @@ void booksearchMenu()
 
     printf("1. Search Book by Title\n");
     printf("2. Search Book by Author\n");
-    printf("2. Search Book by Book ID\n");
+    printf("3. Search Book by Book ID\n");
+    printf("0. Return to User Menu\n");
 
    printf("Enter choice: ");
    printf("\n");
@@ -591,6 +592,11 @@ void booksearchMenu()
         while(getchar() != '\n');
         goto booksearch;
         break;
+
+        case 0:
+        return;
+        break;
+
 
         default:
 
@@ -637,8 +643,7 @@ void adminMenu()
         break;
 
         case 3:
-        //searchBookbyTitle(BookHead); //Bruh
-
+        
         printf("Enter title: ");
         char title[MAX_TITLE_LENGTH];
         scanf(" %60[^\n]", title); //MAX_TITLE_LENGTH
@@ -1060,22 +1065,22 @@ void saveCurrentUser(USERNODE *head, USER *CurrentUser)
             current->user.u_issue_ID = CurrentUser->u_issue_ID;
             strcpy(current->user.u_user_pwd, CurrentUser->u_user_pwd);
             current->user.u_admin = CurrentUser->u_admin;
-    
+
             //date of issue struct tm part
             current->user.u_date_issue.tm_sec = CurrentUser->u_date_issue.tm_sec;
             current->user.u_date_issue.tm_min = CurrentUser->u_date_issue.tm_min;
             current->user.u_date_issue.tm_hour = CurrentUser->u_date_issue.tm_hour;
             current->user.u_date_issue.tm_mday = CurrentUser->u_date_issue.tm_mday;
-            current->user.u_date_issue.tm_mon = CurrentUser->u_date_issue.tm_mon; 
-            current->user.u_date_issue.tm_year = CurrentUser->u_date_issue.tm_year;   
+            current->user.u_date_issue.tm_mon = CurrentUser->u_date_issue.tm_mon;
+            current->user.u_date_issue.tm_year = CurrentUser->u_date_issue.tm_year;
             current->user.u_date_issue.tm_wday = CurrentUser->u_date_issue.tm_wday;
             current->user.u_date_issue.tm_yday = CurrentUser->u_date_issue.tm_yday;
             current->user.u_date_issue.tm_isdst = CurrentUser->u_date_issue.tm_isdst;
         }
     }
-    
+
     saveUserList(head);
-    
+
     return;
 }
 
@@ -1173,12 +1178,13 @@ void searchBookbyTitle(BOOKNODE *head)
     char closest_search[MAX_CLOSE_TITLE_SEARCH][MAX_TITLE_LENGTH+30]; //To store MAX_CLOSE_TITLE_SEARCH closest matching title searches
     LAB1: //a label to return if <=3 chars entered
     printf("Search by title: ");
-    fgets(title_search,MAX_TITLE_LENGTH,stdin);
+    scanf(" %60[^\n]", title_search);
+    while(getchar() != '\n');
 
     //Restart search if less than three characters entered
     if(strlen(title_search)<4)
     {
-        printf("Enter at least three characters to search");
+        printf("Enter at least three characters to search\n");
         goto LAB1;
     }
 
@@ -1206,13 +1212,13 @@ void searchBookbyTitle(BOOKNODE *head)
                 strcat(closest_search[cs_count],curr_ID);
                 strcat(closest_search[cs_count],"\n\tStatus: ");
                     if(current->book.b_book_status=='A')
-                        strcat(closest_search[cs_count], "Available");
+                        strcat(closest_search[cs_count], "Available ");
                     else if(current->book.b_book_status=='R')
-                        strcat(closest_search[cs_count], "Reserved");
+                        strcat(closest_search[cs_count], "Reserved ");
                     else if(current->book.b_book_status=='I')
-                        strcat(closest_search[cs_count], "Not available (Issued");
+                        strcat(closest_search[cs_count], "Not available (Issued ");
                     else
-                        strcat(closest_search[cs_count], "Undefined");
+                        strcat(closest_search[cs_count], "Undefined ");
 
                 cs_count++;
             }
@@ -1319,7 +1325,8 @@ void searchBookbyAuthor(BOOKNODE *head){
     LAB2: //a label to return if <=3 chars entered
 
     printf("Search by author: ");
-    fgets(author_search,30,stdin);
+    scanf(" %30[^\n]", author_search);
+    while(getchar() != '\n');
 
         //Restart search if less than three characters entered
      if(strlen(author_search)<4){
@@ -1424,7 +1431,8 @@ void searchBookbyID(BOOKNODE *head){
     char closest_search[MAX_CLOSE_ID][11]; //To store MAX_CLOSE_ID closest matching searches of ID
     LAB3: //Label to return if invalid (not 10 digits)
     printf("Search by ID: ");
-    fgets(ID_search,11,stdin);
+    scanf(" %11[^\n]", ID_search);
+    while(getchar() != '\n');
     printf("%ld",strlen(ID_search));
     if((strlen(ID_search))!=10){
     printf("Invalid ID entered! (ID is 10 digits)\n");
