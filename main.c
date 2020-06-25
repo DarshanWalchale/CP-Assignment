@@ -825,14 +825,14 @@ void makeFile()
         book.book_date_of_arrival.tm_isdst = time_of_event.tm_isdst;
         //date_issue struct tm
         book.b_date_issue.tm_sec = 0;
-        book.b_date_issue.tm_sec = 0;
-        book.b_date_issue.tm_sec = 0;
-        book.b_date_issue.tm_sec = 0;
-        book.b_date_issue.tm_sec = 0;
-        book.b_date_issue.tm_sec = 0;
-        book.b_date_issue.tm_sec = 0;
-        book.b_date_issue.tm_sec = 0;
-        book.b_date_issue.tm_sec = 0;
+        book.b_date_issue.tm_min = 0;
+        book.b_date_issue.tm_hour = 0;
+        book.b_date_issue.tm_mday = 0;
+        book.b_date_issue.tm_mon = 0;
+        book.b_date_issue.tm_year = 0;
+        book.b_date_issue.tm_wday = 0;
+        book.b_date_issue.tm_yday = 0;
+        book.b_date_issue.tm_isdst = 0;
 
 
         fwrite(&book, sizeof(BOOK), 1, fp);
