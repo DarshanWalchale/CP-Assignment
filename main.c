@@ -410,7 +410,7 @@ int menu()
 
                 goto transaction;
                 break;
-                
+
             default:
                 printf("\n\n\t\t\t\tINVALID OPTION");
                 printf("\n\n\t\t\tPress Enter to re-Enter the choice");
@@ -749,6 +749,22 @@ void addUser(void)
     scanf(" %29s",user.u_user_pwd);
     while(getchar() != '\n');
 
+
+    //Assigning values to admin/non admin
+    if(adminornot == 0)
+    {
+        user.u_admin = 0;
+    }
+    else if(adminornot == 1)
+    {
+        user.u_admin = 1;
+    }
+    else
+    {
+        printf("Error, no User added. Try again.\n");
+        return;
+    }
+
     //Assigning values 0 because no book issued yet
     user.u_user_ID = generateUserID();
     user.u_book_ID = 0;
@@ -763,14 +779,7 @@ void addUser(void)
     user.u_date_issue.tm_yday = 0;
     user.u_date_issue.tm_isdst = 0;
 
-    if(adminornot == 0)
-    {
-        user.u_admin = 0;
-    }
-    else
-    {
-        user.u_admin = 1;
-    }
+
 
 
     fwrite(&user, sizeof(USER), 1, fp);
