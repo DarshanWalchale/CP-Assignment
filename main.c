@@ -328,38 +328,36 @@ int menu()
 
             printf("\nEnter Book Title to Checkout (Case Sensitive)\n ->");
             fgets(title, MAX_TITLE_LENGTH, stdin);
-
-            if(checkout(title) == 0)
+            
+            int result = checkout(title);
+            if(result == 0)
             {
                 printf("Your Book has been successfully issued\n");
                 printf("Press Enter to return to User Menu\n");
                 while(getchar() != '\n');
 
                 goto userchoice;
-
+                
             }
-
-            else if(checkout(title) == 1)
+            else if(result == 1)       //(checkout(title) == 1) Bruhh
             {
                 printf("No such Book Title\n");
                 printf("Press Enter to return to Transaction Menu\n");
                 while(getchar() != '\n');
 
                 goto transaction;
-
+                
             }
-
             else                        // user asked to to notify if him or not
             {
                 printf("Press Enter to return to Transaction Menu\n");
                 while(getchar() != '\n');
 
                 goto transaction;
-
+                
             }
 
             break;
-
 
 
             case 2:
@@ -618,11 +616,13 @@ void adminMenu()
     printf("2. Delete Library members\n");
     printf("3. Count books of a particular title\n");
     printf("4. Vendor / Library requests\n");
-
+    printf("5. Review Admin Privileges\n");
+    printf("0. Exit to Main Menu\n");
 
     printf("\n\nEnter your choice: ");
     scanf("%d", &choice);
-
+    while(getchar() != '\n');
+    
     switch(choice)
     {
         case 1:
@@ -655,8 +655,8 @@ void adminMenu()
         //char ch7 = scanf("%c",&ch7);
         //if(ch7 == '0')
         //while(getchar() != '\n');
-        //goto ADMIN;
-        return;
+        goto ADMIN;
+        //return;
         break;
 
         case 4:
@@ -665,12 +665,20 @@ void adminMenu()
         //char ch6 = scanf("%c",&ch6);
         //if(ch6 == '0')
         //while(getchar() != '\n');
-        //goto ADMIN;
+        goto ADMIN;
         break;
-
+        
+        case 5:
+            reviewAdminPrivileges();
+            goto ADMIN;
+            break;
+        
+        case 0:
+            break;
+        
         default:
         printf("\n\n\t\t\t\tINVALID OPTION");
-        printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+        printf("\n\n\t\t\tPress Enter");
 
         //char ch5 = scanf("%c",&ch5);
         //if(ch5 == '\n')
@@ -678,6 +686,7 @@ void adminMenu()
         goto ADMIN;
 
     }
+    return;
 }
 
 
