@@ -1474,7 +1474,9 @@ void searchBookbyTitle(BOOKNODE *head)
     char title_search[MAX_TITLE_LENGTH];
     short cs_count=0; //To count number of closest searches
     short flag=0; //To end searching on finding the exact book or when no results
-    char closest_search[MAX_CLOSE_TITLE_SEARCH][MAX_TITLE_LENGTH+30]; //To store MAX_CLOSE_TITLE_SEARCH closest matching title searches
+    char closest_search[MAX_CLOSE_TITLE_SEARCH][MAX_TITLE_LENGTH+50]; //To store MAX_CLOSE_TITLE_SEARCH closest matching title searches
+    char same_title_found[MAX_SAME_TITLE][MAX_TITLE_LENGTH+50];
+    short title_found=0;
     LAB1: //a label to return if <=3 chars entered
     printf("Search by title: ");
     scanf(" %60[^\n]", title_search);
@@ -1531,19 +1533,25 @@ void searchBookbyTitle(BOOKNODE *head)
         }
                 //If the search matches exactly, stop searching
         else{
-                //printf("\n Found");
-                printf("Book found: %s ",current->book.b_book_title);
-                if(current->book.b_book_status=='A')
-                printf("(Available)\n");
-                else if(current->book.b_book_status=='R')
-                printf("(Reserved)\n");
-                else if(current->book.b_book_status=='I')
-                printf("(Not available (Issued))\n");
-                else
-                printf("Undefined)\n"); //To account for faulty/incomplete entry of status of book
 
-                printf("\tAuthor: %s\n",current->book.b_book_author);
-                printf("\tBook ID: %ld\n",current->book.b_book_ID);
+
+                strcpy(same_title_found[title_found],current->book.b_book_title);
+                char curr_ID[11];
+                sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
+                strcat(same_title_found[title_found],"\n\tID: ");
+                strcat(same_title_found[title_found],curr_ID);
+                strcat(same_title_found[title_found],"\n\tStatus: ");
+                    if(current->book.b_book_status=='A')
+                        strcat(same_title_found[title_found], "Available ");
+                    else if(current->book.b_book_status=='R')
+                        strcat(same_title_found[title_found], "Reserved ");
+                    else if(current->book.b_book_status=='I')
+                        strcat(same_title_found[title_found], "Not available (Issued ");
+                    else
+                        strcat(same_title_found[title_found], "Undefined ");
+
+                title_found++;
+
                 }
             }
 
@@ -1553,7 +1561,7 @@ void searchBookbyTitle(BOOKNODE *head)
         printf("No results found");
 
         //To print all closest searches (upto MAX_CLOSE_TITLE_SEARCH) when book is not found
-        if(cs_count>0&&flag!=3)
+        if(cs_count>0&&title_found==0)
         {
         cs_count=0;
         printf("Closest searches:\n");
@@ -1565,10 +1573,20 @@ void searchBookbyTitle(BOOKNODE *head)
             break; //Stop on reaching MAX_CLOSE_TITLE_SEARCH closest search
         }
         }
+        //To print all books found of same title (if any)
+        if(title_found>0){
+            title_found=0;
+            while(strlen(same_title_found[cs_count])!=0)
+        {
+            printf("%hi. %s",(short)(title_found+1),same_title_found[title_found]);
+            title_found++;
+            if(title_found==MAX_SAME_TITLE)
+            break; //Stop on reaching MAX_SAME_TITLE books of same title
+        }
+        }
 
 
 }
-
 
 void displayAllBooks(BOOKNODE *head)
 {
