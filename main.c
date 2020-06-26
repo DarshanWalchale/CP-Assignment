@@ -13,6 +13,7 @@
 #define MAX_CLOSE_AUTH_SEARCH 20 //Maximum number of closest seraches of authors to display
 #define MAX_SAME_AUTHOR 100 //Maximum number of books of same author to display
 #define MAX_CLOSE_ID 20 //Maximum number of closest seraches of ID to display
+#define MAX_SAME_TITLE 15
 
 // STRUCTURES
 /*
@@ -78,20 +79,13 @@ USERNODE *UserHead;
 BOOKNODE * loadLibrary(BOOKNODE *);
 USERNODE * loadUsers(USERNODE *);
 void loadCounters();
-void welcomeScreen();
-int menu();
-int checkout(char *title);
 void returnBook();
 void adminMenu();
 void booksearchMenu();
 void addNewUser(USERNODE *head);
-void deleteUser(USER *user);
 void printUserInfo(USER *user);
-int titleCount(char *);
 void addNewBook(BOOKNODE *head);
-unsigned long generateBookID();
-unsigned long generateIssueID();
-unsigned long generateUserID();
+void saveCounters();
 void vendorManagement();
 void displayAllBooks(BOOKNODE *head);
 void searchBookbyTitle(BOOKNODE *head);
@@ -109,8 +103,16 @@ void reviewAdminPrivileges(USERNODE *head);
 void displayAdmins(USERNODE *head);
 void displayNonAdmins(USERNODE *head);
 void displayAdminView(USERNODE *head);
+int deleteUser(USERNODE *head, unsigned long id);
 int makeAdmin(USERNODE *head);
 int removeAdmin(USERNODE *head);
+int welcomeScreen(USERNODE *head);
+int menu();
+int checkout(char *title);
+int titleCount(BOOKNODE *head, char *);
+unsigned long generateBookID();
+unsigned long generateIssueID();
+unsigned long generateUserID();
 //void addNewBook(BOOK *book);
 //USER * loadNextUser(FILE *, USER*);
 //BOOK * loadNextBook(FILE *, BOOK*);
@@ -121,10 +123,13 @@ int removeAdmin(USERNODE *head);
 int main(void)
 {
     BookHead = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
+    //printf("BookHead->next = %p\n", BookHead->next);
     UserHead = (USERNODE *)calloc(1, sizeof(USERNODE));
-    //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
+    //printf("UserHead->next = %p\n", UserHead->next);
+    loadCounters();
     //addNewBook(BookHead);
-    addNewUser(UserHead);
+    //addNewUser(UserHead);
+    
     
     printf("Program start\n");
     BookHead = loadLibrary(BookHead);
@@ -132,204 +137,93 @@ int main(void)
     UserHead = loadUsers(UserHead);
     printf("Users successfully loaded\n");
     displayAllBooks(BookHead);
-    printf("Press Enter to Login");
-    while(getchar() != '\n');
+    //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
+
+
+
+    //printf("Press Enter to Login"); Bruh
+    //while(getchar() != '\n');
     //printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID());
 
-    welcomeScreen();
-    notifications(BookHead, &Current_User);
-    while(menu() != 0);
-
-
-
-
+    if(welcomeScreen(UserHead) == 0)
+    {
+        notifications(BookHead, &Current_User);
+        while(menu() != 0);
+    }
+    
+    
 
     saveBookList(BookHead);
     freeLibrary(BookHead);
-    saveCurrentUser(UserHead, &Current_User);
     saveUserList(UserHead);
     freeUserList(UserHead);
     return 0;
 }
 
-void welcomeScreen()
+int welcomeScreen(USERNODE *head)
 {
-  int choice;
+    int choice;
+    printf("\n\n\n\n\n\t\t\tLIBRARY MANAGEMENT SYSTEM");
+    printf("\n\t\t\t*************************\n");
 
+    USERNODE *current = head;
 
-  printf("\n\n\n\n\n\t\t\t\tLIBRARY MANAGEMENT SYSTEM");
+    printf("\n\n\t\t\tPress Enter to login");
+    while(getchar() != '\n');
 
-  printf("\n\t\t\t\t*************************");
+    static int loginerrorcount = 0; // if user can't register or login successfully in 5 attempts, just exit
+    char c;
+    char uName[30];
+    char pwd[30]; // local char arrays to store details just as entered
 
-//   printf("\n\n\n\n\t\t\t\tPress Enter to proceed");
-
-//   while(getchar() != '\n'); // Won't proceed till \n entered, wont leave remanents in input buffer
-  printf("\n\n");
-
-
-  PQ: // just a label to come back to if we want to re-enter choice
-
-  printf("\n\n\n\t\t\t\t\tLOGIN MENU\n\t\t\t (2222 TO REGISTER: REMOVE THIS LATER)");
-
-  printf("\n\n\n\t\t\tPress 1 to enter Username and Password: ");
-
-  scanf(" %d",&choice);
-  while(getchar() != '\n');
-
-  static int count = 0; // if user can't register or login successfully in 5 attempts, just exit
-  char c;
-  USER *pUser = (USER *)malloc(sizeof(USER));
-  FILE *fp;
-  char uName[30];
-  char pwd[30]; // local char arrays to store details just as entered
-
-  switch(choice)
+    do
     {
-
-        case 1:
-
-        // login();
-
-        if (( fp = fopen("userdata.txt", "r+")) == NULL)
-        {
-            printf ("Could not open file\n");
-            count++;
-        }
-
-
         printf("Username: ");
-        scanf("%29s",uName);
-        while(getchar() != '\n');
-
-
-        printf("Password: ");
-        scanf("%29s",pwd);
+        scanf(" %29s", uName);
         while(getchar() != '\n')
         ;
 
-
-            while (fread (pUser, sizeof(struct USER), 1, fp) == 1)
+        printf("Password: ");
+        scanf(" %29s", pwd);
+        while(getchar() != '\n')
+        ;
+        current = head;
+        while (current->next != NULL)
+        {
+            current = current->next;
+            if(strcmp(current->user.user_name, uName) == 0)
             {
-                if(strcmp (pUser -> user_name, uName) == 0)
+                printf("Username Matched\n");
+                if(strcmp(current->user.u_user_pwd, pwd) == 0)
                 {
-                    printf ("Username Matched\n");
-                    if(strcmp ( pUser -> u_user_pwd, pwd) == 0)
-                    {
-                        printf ("Password Matched\n");
-                        // particular user's account opened
-                        setCurrentUser(pUser);
-
-                        //notifications(BookHead, UserHead); // also better to be done in main (beter program layout, rather than somewhere further down in the program)
-                        //printf("\n\n");
-
-                        // menu(pUser);
-                    }
+                    printf ("Password Matched\n");
+                    setCurrentUser(&current->user);
+                    return 0;
                 }
-            }
-        break;
-
-        case 2222: // our hack to add members for now lol
-
-        // reg();
-        // REGISTER will be an admin action but let's keep it for now to add users conveniently :)
-
-
-        do
-            {
-                if (( fp = fopen("userdata.txt", "a+")) == NULL)
-                {
-                    printf ("Could not open file\n");
-                    count++;
-                }
-
                 else
                 {
-                    USER user;
-                    printf("Choose A Username: ");
-                    scanf("%29s",pUser -> user_name);
-                    while(getchar() != '\n');
-
-                    printf("Choose A Password: ");
-                    scanf("%29s",pUser -> u_user_pwd);
-                    while(getchar() != '\n');
-
-                    int adminornot;
-                    printf("Press 0 to add a non-Admin, 1 to add an Admin\n");
-                    scanf(" %d", &adminornot);
-
-                     printf("Choose A Username: ");
-                     scanf(" %30[^\n]", user.user_name);
-                    while(getchar() != '\n');
-
-                    printf("Choose A Password: ");
-                    scanf(" %29s",user.u_user_pwd);
-                    while(getchar() != '\n')
-                    ;
-
-                     //Assigning values 0 because no book issued yet
-                     user.u_user_ID = 0;
-                     user.u_book_ID = 0;
-                     user.u_issue_ID = 0;
-                     user.u_date_issue.tm_sec = 0;
-                     user.u_date_issue.tm_min = 0;
-                     user.u_date_issue.tm_hour = 0;
-                     user.u_date_issue.tm_mday = 0;
-                     user.u_date_issue.tm_mon = 0;
-                     user.u_date_issue.tm_year = 0;
-                     user.u_date_issue.tm_wday = 0;
-                     user.u_date_issue.tm_yday = 0;
-                     user.u_date_issue.tm_isdst = 0;
-                     if(adminornot == 0)
-                     {
-                             user.u_admin = 0;
-                     }
-                     else
-                     {
-                             user.u_admin = 1;
-                     }
-
-
-                    fwrite(&user, sizeof(USER), 1, fp);
-                    saveUserList(UserHead);
-
-
-                    printf("Add another account? (Y/N): ");
-                    scanf(" %c", &c);
-                    while(getchar() != '\n');
-
+                    loginerrorcount++;
                 }
             }
-        while(c == 'Y'|| c == 'y');
-
-        fclose(fp);
-
-        break;
-
-
-
-
-        default:
-        printf("\n\n\t\t\t\tINVALID OPTION");
-        count++;
-        if(count >= 5)
-        {
-            printf("Sorry, too many unsuccessful attempts!\n");
-            return;
+            else
+            {
+                loginerrorcount++;
+            }
         }
+        current = head;
+        printf("\n\t\t\tIncorrect Credentials\n\t\t\tPress Enter to retry");
+        while(getchar() != '\n')
+        ;
+    }while(loginerrorcount <= 5);
 
-        printf("\n\n\t\t\tPress Enter to re-Enter the choice");
-
-        while(getchar() != '\n');
-        goto PQ;
-
-    }
+    printf("Too many unsuccessful logins\n");
+    return 1;
 }
 
-int menu()
-{
-    printf("\n--------------------MENU--------------------\n");
+int menu(){
     int choice;
     userchoice: // label to return to user menu
+    printf("\n--------------------MENU--------------------\n");
     printf("1. Search Books\n");
     printf("2. Book Transaction\n");
     printf("3. Account Info\n");
@@ -339,7 +233,7 @@ int menu()
     }
     printf("0. Exit from Library Portal\n");
 
-    printf("\n\nEnter your choice: ");
+    printf("Enter your choice: ");
     scanf(" %d", &choice);
     while(getchar() != '\n');
     int option;
@@ -357,8 +251,7 @@ int menu()
         case 2:
 
         transaction:  // label to reach transaction menu
-        printf("\nBook Transaction Menu\n");
-
+        printf("\n----------Book Transaction Menu----------\n");
         printf("1. Checkout a Book\n");
         printf("2. Return Book\n");
         printf("0. Return Back to Main Menu\n");
@@ -418,9 +311,12 @@ int menu()
                 break;
 
         }
+            break;
 
         case 3:
             printUserInfo(&Current_User);
+            printf("Press Enter to return to the Main Menu");
+            while (getchar() != '\n');
             break;
 
         case 9:
@@ -450,6 +346,7 @@ int menu()
             goto userchoice;
 
     }
+    goto userchoice;
     return 1;
 }
 
@@ -458,9 +355,9 @@ int menu()
 int checkout(char *title)
 {
 
-    int status = 1; // 0 means book found, available, and assigned successfully,
-                    // 1 is no book title found,
-                    // 2 is book title found, but not available, option given to set as alert for this book.
+    int status = 1; // 0: book found, available, and assigned successfully,
+                    // 1: no book title found,
+                    // 2: book title found, but not available, option given to set as alert for this book.
 
 
     BOOKNODE *current = BookHead;
@@ -473,81 +370,80 @@ int checkout(char *title)
         {
             if(current->book.b_book_status == 'A')
             {
-            // generate and assign issueID
-            unsigned long issue_id =  generateIssueID();
-            current->book.b_issue_ID = issue_id;
-            Current_User.u_issue_ID = issue_id;
+                // generate and assign issueID
+                unsigned long issue_id =  generateIssueID();
+                current->book.b_issue_ID = issue_id;
+                Current_User.u_issue_ID = issue_id;
 
-            //change, u_book_ID,     b_user_ID, updating issued title to user  and  b_book_status;
-            Current_User.u_book_ID = current->book.b_book_ID;
-            current->book.b_user_ID = Current_User.u_user_ID;
-            strcpy(Current_User.u_book_title, title);
-            current->book.b_book_status = 'I';
+                //change, u_book_ID,     b_user_ID, updating issued title to user  and  b_book_status;
+                Current_User.u_book_ID = current->book.b_book_ID;
+                current->book.b_user_ID = Current_User.u_user_ID;
+                strcpy(Current_User.u_book_title, title);
+                current->book.b_book_status = 'I';
 
-            // Assign Dates
-            time_t sec = time(NULL);
-            struct tm time_of_event = *(localtime(&sec));
-            //u_date_issue
-            Current_User.u_date_issue.tm_sec = time_of_event.tm_sec;
-            Current_User.u_date_issue.tm_min = time_of_event.tm_min;
-            Current_User.u_date_issue.tm_hour = time_of_event.tm_hour;
-            Current_User.u_date_issue.tm_mday = time_of_event.tm_mday;
-            Current_User.u_date_issue.tm_mon = time_of_event.tm_mon;
-            Current_User.u_date_issue.tm_year = time_of_event.tm_year;
-            Current_User.u_date_issue.tm_wday = time_of_event.tm_wday;
-            Current_User.u_date_issue.tm_yday = time_of_event.tm_yday;
-            Current_User.u_date_issue.tm_isdst = time_of_event.tm_isdst;
-            //b_date_issue
-            current->book.b_date_issue.tm_sec = time_of_event.tm_sec;
-            current->book.b_date_issue.tm_min = time_of_event.tm_min;
-            current->book.b_date_issue.tm_hour = time_of_event.tm_hour;
-            current->book.b_date_issue.tm_mday = time_of_event.tm_mday;
-            current->book.b_date_issue.tm_mon = time_of_event.tm_mon;
-            current->book.b_date_issue.tm_year = time_of_event.tm_year;
-            current->book.b_date_issue.tm_wday = time_of_event.tm_wday;
-            current->book.b_date_issue.tm_yday = time_of_event.tm_yday;
-            current->book.b_date_issue.tm_isdst = time_of_event.tm_isdst;
+                // Assign Dates
+                time_t sec = time(NULL);
+                struct tm time_of_event = *(localtime(&sec));
+                //u_date_issue
+                Current_User.u_date_issue.tm_sec = time_of_event.tm_sec;
+                Current_User.u_date_issue.tm_min = time_of_event.tm_min;
+                Current_User.u_date_issue.tm_hour = time_of_event.tm_hour;
+                Current_User.u_date_issue.tm_mday = time_of_event.tm_mday;
+                Current_User.u_date_issue.tm_mon = time_of_event.tm_mon;
+                Current_User.u_date_issue.tm_year = time_of_event.tm_year;
+                Current_User.u_date_issue.tm_wday = time_of_event.tm_wday;
+                Current_User.u_date_issue.tm_yday = time_of_event.tm_yday;
+                Current_User.u_date_issue.tm_isdst = time_of_event.tm_isdst;
+                //b_date_issue
+                current->book.b_date_issue.tm_sec = time_of_event.tm_sec;
+                current->book.b_date_issue.tm_min = time_of_event.tm_min;
+                current->book.b_date_issue.tm_hour = time_of_event.tm_hour;
+                current->book.b_date_issue.tm_mday = time_of_event.tm_mday;
+                current->book.b_date_issue.tm_mon = time_of_event.tm_mon;
+                current->book.b_date_issue.tm_year = time_of_event.tm_year;
+                current->book.b_date_issue.tm_wday = time_of_event.tm_wday;
+                current->book.b_date_issue.tm_yday = time_of_event.tm_yday;
+                current->book.b_date_issue.tm_isdst = time_of_event.tm_isdst;
 
-
-            saveBookList(BookHead);
-            saveCurrentUser(UserHead, &Current_User);
-            saveUserList(UserHead);
-            status = 0;
-            }
-
-            else
-            {
-                status = 2;
-                char choice;
-
-                do
-                {
-                    printf("The book you've requested is currently issued by another library member!\n");
-                    printf("Would you like to be notified if the book becomes available? (Y/N) (notified on login when book is available once, only 1 book can be notified at a time)\n");
-                    scanf(" %c", &choice);
-                    while(getchar() != '\n');
-                    choice = toupper(choice);
-
-                    switch (choice)
-                        {
-                        case 'Y':
-                            strcpy(Current_User.u_requested, title);
-                            saveCurrentUser(UserHead, &Current_User);
-                            saveUserList(UserHead);
-                            printf("OK, you'll be notified if the book is available next time you log in");
-                            break;
-
-                        case 'N':
-                            printf("Ok, you won't be notified\n");
-                            break;
-
-                        default:
-                            printf("INVALID RESPONSE\n");
-                            break;
-                    }
-                }while(!(choice == 'Y' || choice == 'N' || choice == 'y'));
+                saveBookList(BookHead);
+                saveCurrentUser(UserHead, &Current_User);
+                saveUserList(UserHead);
+                status = 0;
             }
         }
+    }
+    if(status == 2)
+    {
+        status = 2;
+        char choice;
+        do
+        {
+            printf("All copies of the book you've requested are currently issued by other library members!\n");
+            printf("Would you like to be notified if the book becomes available? (Y/N) (notified on login when book is available once, only 1 book can be notified at a time)\n");
+            scanf(" %c", &choice);
+            while(getchar() != '\n');
+            choice = toupper(choice);
+            switch (choice)
+            {
+                case 'Y':
+                    strcpy(Current_User.u_requested, title);
+                    saveCurrentUser(UserHead, &Current_User);
+                    saveUserList(UserHead);
+                    printf("OK, you'll be notified if the book is available next time you log in");
+                    break;
+
+                case 'N':
+                    printf("Ok, you won't be notified\n");
+                    break;
+
+                default:
+                    printf("INVALID RESPONSE\t\t");
+                    printf("Press Enter\n");
+                    while(getchar() != '\n')
+                    ;
+                    break;
+            }
+        }while(!(choice == 'Y' || choice == 'N' || choice == 'y'));
     }
     return status;
 }
@@ -605,60 +501,67 @@ void booksearchMenu()
     int choice;
 
     booksearch:
-    printf("\nBook Search Menu\n");
+    printf("\n----------Book Search Menu----------\n");
 
     printf("1. Search Book by Title\n");
     printf("2. Search Book by Author\n");
     printf("3. Search Book by Book ID\n");
+    printf("4. Display All Books\n");
     printf("0. Return to User Menu\n");
 
    printf("Enter choice: ");
-   printf("\n");
    scanf("%d", &choice);
 
    switch(choice)
    {
        case 1:
-       searchBookbyTitle(BookHead);
-        printf("\nPress Enter to return to the Search menu");
-        while(getchar() != '\n');
-        goto booksearch;
-        break;
+            searchBookbyTitle(BookHead);
+            printf("\nPress Enter to return to the Search menu");
+            while(getchar() != '\n');
+            goto booksearch;
+            break;
 
         case 2:
-        searchBookbyAuthor(BookHead);
-        printf("\nPress Enter to return to the Search menu");
-        while(getchar() != '\n');
-        goto booksearch;
-        break;
+            searchBookbyAuthor(BookHead);
+            printf("\nPress Enter to return to the Search menu");
+            while(getchar() != '\n');
+            goto booksearch;
+            break;
 
         case 3:
-        searchBookbyID(BookHead);
-        printf("Press Enter to return to the Search menu");
-        while(getchar() != '\n');
-        goto booksearch;
-        break;
+            searchBookbyID(BookHead);
+            printf("Press Enter to return to the Search menu");
+            while(getchar() != '\n');
+            goto booksearch;
+            break;
+
+        case 4:
+            displayAllBooks(BookHead);
+            printf("Press Enter to return to the Search menu");
+            while(getchar() != '\n');
+            goto booksearch;
+            break;
 
         case 0:
-        return;
-        break;
+            return;
+            break;
 
 
         default:
-
-        printf("\n\n\t\t\t\tINVALID OPTION");
-        printf("\n\n\t\t\tPress Enter to re-Enter the choice");
-        while(getchar() != '\n');
-        goto booksearch;
+            printf("\n\n\t\t\t\tINVALID OPTION");
+            printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+            while(getchar() != '\n');
+            goto booksearch;
+            break;
    }
+   return;
 }
 
 void adminMenu()
 {
-    printf("--------------------ADMIN MENU--------------------\n");
     int choice;
-
-    ADMIN: // in case we need to retun here again
+    ADMIN:
+    printf("\n\n--------------------ADMIN MENU--------------------\n");
     printf("1. Add New Books to Library\n");
     printf("2. Add Library members\n");
     printf("3. Delete Library members\n");
@@ -667,7 +570,7 @@ void adminMenu()
     printf("6. Review Admin Privileges\n");
     printf("0. Return to Main Menu\n");
 
-    printf("\n\nEnter your choice: ");
+    printf("Enter your choice: ");
     scanf("%d", &choice);
     while(getchar() != '\n');
 
@@ -683,16 +586,21 @@ void adminMenu()
             printf("\nPress enter to return to the Admin menu");
             while(getchar() != '\n');
             goto ADMIN;
-
             break;
 
         case 3:
-            deleteUser(&Current_User);
+            displayAdminView(UserHead);
+            printf("Enter user_id of the user you want to remove: ");
+            unsigned long id;
+            scanf(" %lu", &id);
+            while(getchar() != '\n')
+            ;
+            deleteUser(UserHead, id);
+            
             printf("\nPress enter to return to the Admin menu");
             while(getchar() != '\n');
             goto ADMIN;
-
-        break;
+            break;
 
         case 4:
             printf("Enter title: ");
@@ -700,12 +608,11 @@ void adminMenu()
             scanf(" %60[^\n]", title); //MAX_TITLE_LENGTH
             while(getchar() != '\n');
 
-            printf("Number of books by the title \"%s\" = %d", title, titleCount(title));
+            printf("Number of books by the title \"%s\" = %d", title, titleCount(BookHead, title));
 
             printf("\nPress enter to return to the Admin menu");
             while(getchar() != '\n');
             goto ADMIN;
-            return;
             break;
 
         case 5:
@@ -738,7 +645,7 @@ void adminMenu()
 void reviewAdminPrivileges(USERNODE *head)
 {
     reviewAdminPrivilegesFlag:
-    printf("SubMenu: Review Admin Privileges----------\n");
+    printf("\n----------SubMenu: Review Admin Privileges----------\n");
     printf("1. View Admins\n");
     printf("2. View non-Admins\n");
     printf("3. View All\n");
@@ -754,26 +661,42 @@ void reviewAdminPrivileges(USERNODE *head)
     {
         case 1:
             displayAdmins(UserHead);
+            printf("Press Enter\n");
+            while(getchar() != '\n')
+            ;
             break;
 
         case 2:
             displayNonAdmins(UserHead);
+            printf("Press Enter\n");
+            while(getchar() != '\n')
+            ;
             break;
 
         case 3:
             displayAdminView(UserHead);
+            printf("Press Enter\n");
+            while(getchar() != '\n')
+            ;
             break;
 
         case 4:
             makeAdmin(UserHead);
+            printf("Press Enter\n");
+            while(getchar() != '\n')
+            ;
             break;
 
         case 5:
             removeAdmin(UserHead);
+            printf("Press Enter\n");
+            while(getchar() != '\n')
+            ;
             break;
 
         case 0:
             return;
+            
             break;
 
         default:
@@ -790,14 +713,14 @@ void displayAdmins(USERNODE *head)
 {
     printf("--------------------ADMINS--------------------\n");
 
-    printf("USER ID\tUSERNAME\t\tADMIN STATUS\n");
+    printf("USER ID\t\tUSERNAME\t\tADMIN STATUS\n");
     USERNODE *current = head;
     while(current->next != NULL)
     {
         current = current->next;
         if(current->user.u_admin)
         {
-            printf("%lu\t%s\t\t%s\n", current->user.u_user_ID, current->user.user_name, (current->user.u_admin)?"YES":"NO");
+            printf("%lu\t%s\t\t\t\t%s\n", current->user.u_user_ID, current->user.user_name, (current->user.u_admin)?"YES":"NO");
         }
     }
     printf("----------------------------------------------\n");
@@ -934,6 +857,7 @@ void addNewUser(USERNODE *head)
     USERNODE *current = head;
     do
     {
+        // choosing a username
         do{
             exists = false;
             printf("Choose A Username: ");
@@ -941,30 +865,35 @@ void addNewUser(USERNODE *head)
             while(getchar() != '\n')
             ;
             //checking if username exists or not
+            current = head;
             while(current->next != NULL)
             {
+                current = current->next;
                 if(strcmp(current->user.user_name, uname) == 0)
                 {
-                    exists == true;
+                    exists = true;
+                    printf("\t*Username Already Exists!*\n");
+                    break;
                 }
             }
             current = head;
         }while(exists);
-        
+
         // reaching end of linked list
+        current = head;
         while(current->next != NULL)
         {
             current = current->next;
         }
-        current->next = (USERNODE *)calloc(1, sizeof(BOOKNODE));
+        current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
         current = current->next;
-    
+
         strcpy(current->user.user_name, uname);
-    
+
         printf("Choose A Password: ");
         scanf(" %29s", current->user.u_user_pwd);
         while(getchar() != '\n');
-    
+
         printf("Enter Y/y to make user admin: ");
         char adminrights = 'N';
         scanf(" %c", &adminrights);
@@ -977,9 +906,10 @@ void addNewUser(USERNODE *head)
         {
             current->user.u_admin = false;
         }
-    
-    
-    
+        printf("---admin parameter assigned---\n");
+        
+        current->user.u_user_ID = generateUserID();
+        /*
         //Assigning values 0 because no book issued yet
         current->user.u_user_ID = 0;
         current->user.u_book_ID = 0;
@@ -993,12 +923,12 @@ void addNewUser(USERNODE *head)
         current->user.u_date_issue.tm_wday = 0;
         current->user.u_date_issue.tm_yday = 0;
         current->user.u_date_issue.tm_isdst = 0;
-    
+        */
+        
         //fwrite(&user, sizeof(USER), 1, fp);
         saveUserList(UserHead);
-    
-    
-        printf("Press Y add another account\n");
+
+        printf("Press Y/y to add another account: ");
         scanf(" %c", &c);
         while(getchar() != '\n')
         ;
@@ -1011,24 +941,22 @@ void addNewBook(BOOKNODE *head)
 {
     printf("addnewbook called\n");
     BOOKNODE *current = head;
-    printf("1");
+
+    // moves to the end of the linked list
     while(current->next != NULL)
     {
         current = current->next;
     }
-    printf("1");
-    current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
-    printf("1");
-    current = current->next;
-    printf("1");
 
-    time_t sec = 0.9 * time(NULL);
+    time_t sec = 0.9 * time(NULL); // leave as 0.9 * ... for now, this allows us to add books so that date of issue is much earlier
     printf("sec = %lu \n", sec);
     printf("current time: %s\n", ctime(&sec));
     struct tm time_of_event = *(localtime(&sec));
     char choice;
     do
     {
+        current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
+        current = current->next;
         printf("DO\n");
         printf("Enter Book Title:\n->");
         scanf(" %60[^\n]", current->book.b_book_title); //MAX_TITLE_LENGTH
@@ -1085,28 +1013,31 @@ void addNewBook(BOOKNODE *head)
 unsigned long generateBookID()
 {
     Book_ID_Counter++;
-    FILE *fp = fopen("counterdata.txt", "w");
-    fprintf(fp, "%lu,%lu,%lu", Book_ID_Counter, Issue_ID_Counter, User_ID_Counter);
-    fclose(fp);
+    saveCounters();
     return (Book_ID_Counter);
 }
 
 unsigned long generateIssueID()
 {
     Issue_ID_Counter++;
-    FILE *fp = fopen("counterdata.txt", "w");
-    fprintf(fp, "%lu,%lu,%lu", Book_ID_Counter, Issue_ID_Counter, User_ID_Counter);
-    fclose(fp);
+    saveCounters();
     return (Issue_ID_Counter);
 }
 
 unsigned long generateUserID()
 {
     User_ID_Counter++;
+
+    saveCounters();
+    return (User_ID_Counter);
+}
+
+void saveCounters()
+{
     FILE *fp = fopen("counterdata.txt", "w");
     fprintf(fp, "%lu,%lu,%lu", Book_ID_Counter, Issue_ID_Counter, User_ID_Counter);
     fclose(fp);
-    return (User_ID_Counter);
+    return;
 }
 
 // Give pointer to head BOOKNODE (likely initialized in main)
@@ -1183,16 +1114,16 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
 
 void saveBookList(BOOKNODE *head)
 {
+    saveCounters();
     FILE *fp = fopen("books.txt", "w");
-    BOOKNODE *current, *temp;
-    current = head -> next;
+    BOOKNODE *current = head;
 
-    while(current != NULL)
+    while(current->next != NULL)
     {
-
-        fwrite(&(current->book), sizeof(BOOK), 1, fp);
         current = current->next;
+        fwrite(&(current->book), sizeof(BOOK), 1, fp);
     }
+    fclose(fp);
     return;
 }
 
@@ -1221,7 +1152,7 @@ void loadCounters()
     Book_ID_Counter = atol(pointer);
 
     pointer = strtok(NULL, ",");
-    //printf("%lu\n", atol(pointer));
+    //printf("%lu\t", atol(pointer));
     Issue_ID_Counter = atol(pointer);
 
     pointer = strtok(NULL, ",");
@@ -1284,67 +1215,37 @@ USERNODE * loadUsers(USERNODE *head)
     return head;
 }
 
-void deleteUser(USER *user)
+// RETURN 0: normal, 1: ID not found
+int deleteUser(USERNODE *head, unsigned long id)
 {
-    //loads all users into a linked list in memory except the user matching that passed into this function
-    FILE *fp = fopen("userdata.txt", "r");
-    USER *user_load = calloc(1, sizeof(USER));
-    fread(user_load, sizeof(USER), 1, fp);
-
-    USERNODE *current, *head = (USERNODE *)calloc(1, sizeof(USERNODE));
-    head->next = (USERNODE *)calloc(1, sizeof(USERNODE));
-    current = head->next;
-    current->next = NULL;
-    //printf("\t1\n");
-    while(1)
+    USERNODE *current = head, *temp;
+    
+    //In case first node matches
+    if(current->next->user.u_user_ID == id)
     {
-        if(user_load->u_user_ID == user->u_user_ID)
-        {
-            continue;
-        }
-        current->user.u_user_ID = user_load->u_user_ID;
-        strcpy(current->user.user_name, user_load->user_name);
-        current->user.u_book_ID = user_load->u_book_ID;
-        current->user.u_issue_ID = user_load->u_issue_ID;
-        strcpy(current->user.u_user_pwd, user_load->u_user_pwd);
-        current->user.u_admin = user_load->u_admin;
-
-        //date of issue struct tm part
-        current->user.u_date_issue.tm_sec = user_load->u_date_issue.tm_sec;
-        current->user.u_date_issue.tm_min = user_load->u_date_issue.tm_min;
-        current->user.u_date_issue.tm_hour = user_load->u_date_issue.tm_hour;
-        current->user.u_date_issue.tm_mday = user_load->u_date_issue.tm_mday;
-        current->user.u_date_issue.tm_mon = user_load->u_date_issue.tm_mon;
-        current->user.u_date_issue.tm_year = user_load->u_date_issue.tm_year;
-        current->user.u_date_issue.tm_wday = user_load->u_date_issue.tm_wday;
-        current->user.u_date_issue.tm_yday = user_load->u_date_issue.tm_yday;
-        current->user.u_date_issue.tm_isdst = user_load->u_date_issue.tm_isdst;
-        //printf("A");
-
-        if(feof(fp))
-        {
-            break;
-        }
-        else
-        {
-            current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
-            current = current->next;
-            fread(user_load, sizeof(USER), 1, fp);
-        }
+        temp = current->next;
+        current->next = current->next->next;
+        free(temp);
+        saveUserList(head);
+        return 0;
     }
-    fclose(fp);
-
+    
+    // in case after first node matches
+    while(current->next->next != NULL)
+    {
+        if(current->next->user.u_user_ID == id)
+        {
+            temp = current->next;
+            current->next = current->next->next;
+            free(temp);
+            saveUserList(head);
+            return 0;
+        }
+        current = current->next;
+    }
     // saves userlist in memory to file
-    saveCurrentUser(UserHead, &Current_User);
     saveUserList(head);
-
-    // frees dynamically allocated linked list of users' data from memory
-    freeUserList(head);
-
-    freeUserList(UserHead);
-    loadUsers(UserHead);
-
-    return;
+    return 1;
 }
 
 void saveCurrentUser(USERNODE *head, USER *CurrentUser)
@@ -1384,16 +1285,23 @@ void saveCurrentUser(USERNODE *head, USER *CurrentUser)
 // saves userlist in memory to file
 void saveUserList(USERNODE *head)
 {
+    //printf("entered saveUserList()\n");
+    saveCounters();
+    //printf("savecounters() done\n");
     FILE *fp = fopen("userdata.txt", "w");
-    USERNODE *current;
-    current = head -> next;
-
-    while(current != NULL)
+    if(fp == NULL)
     {
-
-        fwrite(&current->user, sizeof(USER), 1, fp);
-        current = current->next;
+        printf("file wasn't opened\n");
     }
+
+    USERNODE *current = head;
+
+    while(current->next != NULL)
+    {
+        current = current->next;
+        fwrite(&current->user, sizeof(USER), 1, fp);
+    }
+    fclose(fp);
     return;
 }
 
@@ -1412,24 +1320,20 @@ void freeUserList(USERNODE *head)
     return;
 }
 
-int titleCount(char *title)
+int titleCount(BOOKNODE *head, char *title)
 {
-    FILE *fp = fopen("books.txt", "r");
-    BOOK *book = calloc(1, sizeof(BOOK));
-    fread(book, sizeof(BOOK), 1, fp);
+    BOOKNODE *current = head;
     int count = 0;
 
-    while(book != NULL)
+    while(current->next != NULL)
     {
-        if(strcmp(book->b_book_title, title) == 0)
+        current = current->next;
+        if(strcmp(current->book.b_book_title, title) == 0)
         {
             count++;
         }
-        fread(book, sizeof(BOOK), 1, fp);
     }
-
     return count;
-
 }
 
 void printUserInfo(USER *user)
@@ -1597,7 +1501,7 @@ void displayAllBooks(BOOKNODE *head)
     }
 
     printf("------------------------------------------------------------\n");
-    printf("AVAILABILITY\tAUTHOR\t\tTITLE\n");
+    printf("AVAILABILITY\tBOOK ID\tAUTHOR\t\tTITLE\n");
     printf("------------------------------------------------------------\n");
     char availability[15] = {};
 
@@ -1620,10 +1524,9 @@ void displayAllBooks(BOOKNODE *head)
         {
             strcpy(availability, "Unknown");
         }
-        printf("%s\t%s\t\t%s\n", availability, current->book.b_book_author,current->book.b_book_title);
+        printf("%s\t%lu\t%s\t\t%s\n", availability, current->book.b_book_ID, current->book.b_book_author,current->book.b_book_title);
     }
     printf("------------------------------------------------------------\n");
-
     return;
 }
 
