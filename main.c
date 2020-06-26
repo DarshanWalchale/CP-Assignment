@@ -750,7 +750,7 @@ void addUser(void)
     while(getchar() != '\n');
 
     //Assigning values 0 because no book issued yet
-    user.u_user_ID = 0;
+    user.u_user_ID = generateUserID();
     user.u_book_ID = 0;
     user.u_issue_ID = 0;
     user.u_date_issue.tm_sec = 0;
