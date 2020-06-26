@@ -410,8 +410,16 @@ int menu()
 
                 goto transaction;
                 break;
+                
+            default:
+                printf("\n\n\t\t\t\tINVALID OPTION");
+                printf("\n\n\t\t\tPress Enter to re-Enter the choice");
+
+                while(getchar() != '\n');
+                goto transaction;
 
         }
+        break;
 
         case 3:
                                                    // not accessable to non-admins
