@@ -1057,14 +1057,19 @@ BOOKNODE * loadBookList(BOOKNODE *head)
     FILE *fp = fopen("books.txt", "r");
     BOOK *book_load = calloc(1, sizeof(BOOK));
     BOOKNODE *current = head;
-    //printf("\t1\n");
+    printf("\t1\n");
     while(1)
     {
-        //printf("1");
+        if(feof(fp))
+        {
+            break;
+        }
+        
+        printf("1\t");
         current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
         current = current->next;
         fread(book_load, sizeof(BOOK), 1, fp);
-    
+        printf("1\t");
         
         strcpy(current->book.b_book_title, book_load->b_book_title);
         strcpy(current->book.b_book_author, book_load->b_book_author);
@@ -1093,8 +1098,9 @@ BOOKNODE * loadBookList(BOOKNODE *head)
         current->book.b_date_issue.tm_wday = book_load->b_date_issue.tm_wday;
         current->book.b_date_issue.tm_yday = book_load->b_date_issue.tm_yday;
         current->book.b_date_issue.tm_isdst = book_load->b_date_issue.tm_isdst;
-        //printf("A");
-    }while(!(feof(fp)));
+        printf("A\n");
+    }
+    
     fclose(fp);
 
     return head;
@@ -1157,8 +1163,7 @@ USERNODE * loadUsers(USERNODE *head)
     printf("loadusers called");
     FILE *fp = fopen("userdata.txt", "r");
     USER *user_load = (USER *)calloc(1, sizeof(USER));
-    fread(user_load, sizeof(USER), 1, fp);
-
+    
     USERNODE *current = head;
     printf("\t1\n");
     do
@@ -1521,7 +1526,8 @@ void searchBookbyAuthor(BOOKNODE *head){
 
     printf("Search by author: ");
     scanf(" %30[^\n]", author_search);
-    while(getchar() != '\n');
+    while(getchar() != '\n')
+    ;
 
         //Restart search if less than three characters entered
      if(strlen(author_search)<4){
@@ -1824,7 +1830,6 @@ void notifications(BOOKNODE *head, USER *user)
                 {
                     no_books_due = false;
                     printf("%s\t\t%s\n", current->book.b_book_title, current->book.b_book_author);
-                    break;
                 }
             }
         }
@@ -1840,7 +1845,6 @@ void notifications(BOOKNODE *head, USER *user)
         printf("%s IS NOW AVAILABLE TO CHECKOUT!\n", user->u_requested);
         strcpy(user->u_requested, "\0");
     }
-
     return;
 }
 
