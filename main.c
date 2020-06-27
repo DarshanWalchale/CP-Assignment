@@ -13,6 +13,7 @@
 #define MAX_CLOSE_AUTH_SEARCH 20 //Maximum number of closest seraches of authors to display
 #define MAX_SAME_AUTHOR 100 //Maximum number of books of same author to display
 #define MAX_CLOSE_ID 20 //Maximum number of closest seraches of ID to display
+#define MAX_SAME_TITLE 15 //Maximum number of books of same title
 
 // STRUCTURES
 /*
@@ -125,7 +126,7 @@ int main(void)
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //addNewBook(BookHead);
     addNewUser(UserHead);
-    
+
     printf("Program start\n");
     BookHead = loadLibrary(BookHead);
     printf("Books database loaded into memory successfully\n");
@@ -950,7 +951,7 @@ void addNewUser(USERNODE *head)
             }
             current = head;
         }while(exists);
-        
+
         // reaching end of linked list
         while(current->next != NULL)
         {
@@ -958,13 +959,13 @@ void addNewUser(USERNODE *head)
         }
         current->next = (USERNODE *)calloc(1, sizeof(BOOKNODE));
         current = current->next;
-    
+
         strcpy(current->user.user_name, uname);
-    
+
         printf("Choose A Password: ");
         scanf(" %29s", current->user.u_user_pwd);
         while(getchar() != '\n');
-    
+
         printf("Enter Y/y to make user admin: ");
         char adminrights = 'N';
         scanf(" %c", &adminrights);
@@ -977,9 +978,9 @@ void addNewUser(USERNODE *head)
         {
             current->user.u_admin = false;
         }
-    
-    
-    
+
+
+
         //Assigning values 0 because no book issued yet
         current->user.u_user_ID = 0;
         current->user.u_book_ID = 0;
@@ -993,11 +994,11 @@ void addNewUser(USERNODE *head)
         current->user.u_date_issue.tm_wday = 0;
         current->user.u_date_issue.tm_yday = 0;
         current->user.u_date_issue.tm_isdst = 0;
-    
+
         //fwrite(&user, sizeof(USER), 1, fp);
         saveUserList(UserHead);
-    
-    
+
+
         printf("Press Y add another account\n");
         scanf(" %c", &c);
         while(getchar() != '\n')
