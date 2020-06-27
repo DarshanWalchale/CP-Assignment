@@ -944,7 +944,7 @@ void addNewUser(USERNODE *head)
             {
                 if(strcmp(current->user.user_name, uname) == 0)
                 {
-                    exists == true;
+                    exists = true;
                 }
             }
             current = head;
