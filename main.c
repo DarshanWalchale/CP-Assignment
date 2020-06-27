@@ -125,7 +125,7 @@ int main(void)
     UserHead = (USERNODE *)calloc(1, sizeof(USERNODE));
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //addNewBook(BookHead);
-    addNewUser(UserHead);
+    //addNewUser(UserHead);
 
     printf("Program start\n");
     BookHead = loadLibrary(BookHead);
@@ -417,6 +417,7 @@ int menu()
                 break;
 
         }
+        break;
 
         case 3:
             printUserInfo(&Current_User);
