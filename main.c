@@ -1431,31 +1431,28 @@ void searchBookbyTitle(BOOKNODE *head)
         }
                 //If the search matches exactly, stop searching
         else{
-
-
-                strcpy(same_title_found[title_found],current->book.b_book_title);
-                char curr_ID[11];
-                sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
-                strcat(same_title_found[title_found],"\n\tID: ");
-                strcat(same_title_found[title_found],curr_ID);
-                strcat(same_title_found[title_found],"\n\tStatus: ");
-                    if(current->book.b_book_status=='A')
-                        strcat(same_title_found[title_found], "Available ");
-                    else if(current->book.b_book_status=='R')
-                        strcat(same_title_found[title_found], "Reserved ");
-                    else if(current->book.b_book_status=='I')
-                        strcat(same_title_found[title_found], "Not available (Issued ");
-                    else
-                        strcat(same_title_found[title_found], "Undefined ");
-
-                title_found++;
-
+            strcpy(same_title_found[title_found],current->book.b_book_title);
+            char curr_ID[11];
+            sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
+            strcat(same_title_found[title_found],"\n\tID: ");
+            strcat(same_title_found[title_found],curr_ID);
+            strcat(same_title_found[title_found],"\n\tStatus: ");
+            if(current->book.b_book_status=='A')
+                strcat(same_title_found[title_found], "Available ");
+            else if(current->book.b_book_status=='R')
+                strcat(same_title_found[title_found], "Reserved ");
+            else if(current->book.b_book_status=='I')
+                strcat(same_title_found[title_found], "Not available (Issued ");
+            else
+                strcat(same_title_found[title_found], "Undefined ");
+            title_found++;
                 }
+                break;
             }
 
         }
 
-        if(cs_count==0){
+        if(cs_count==0&&title_found==0){
             printf("No results found\n");
         }
 
