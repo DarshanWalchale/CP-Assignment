@@ -117,6 +117,9 @@ int removeAdmin(USERNODE *head);
 //BOOK * loadNextBook(FILE *, BOOK*);
 
 
+char lib[30]="BITS Pilani, Pilani Campus"; //Storing this library name
+
+
 //--------------------------------------------------------------------------------------------------------------
 
 int main(void)
@@ -126,6 +129,7 @@ int main(void)
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
     //addNewBook(BookHead);
     //addNewUser(UserHead);
+
 
     printf("Program start\n");
     BookHead = loadLibrary(BookHead);
@@ -140,10 +144,6 @@ int main(void)
     welcomeScreen();
     notifications(BookHead, &Current_User);
     while(menu() != 0);
-
-
-
-
 
     saveBookList(BookHead);
     freeLibrary(BookHead);
@@ -1757,8 +1757,7 @@ void searchBookbyID(BOOKNODE *head){
     printf("Search by ID: ");
     scanf(" %11[^\n]", ID_search);
     while(getchar() != '\n');
-    printf("%ld",strlen(ID_search));
-    if((strlen(ID_search))!=10){
+`    if((strlen(ID_search))!=10){
     printf("Invalid ID entered! (ID is 10 digits)\n");
     goto LAB3;
     }
@@ -1832,7 +1831,7 @@ void searchBookbyID(BOOKNODE *head){
         }
 
         if(cs_count==0&&flag!=3)
-        printf("No results found");
+        printf("No results found\n");
 }
 
 void newlyAddedBooks(BOOKNODE *head)
@@ -1976,81 +1975,130 @@ void setCurrentUser(USER *user)
 
 
 void vendorManagement(){
-    FILE *fp1, *fp2;
+    FILE *fp1, *fp2, *fp3;
     char choice, req;
-    char lib[30]; //Store name of current library
-    char name[30];
+    char name[30]; //To store name of vendor/other library
     char title[30];
+    char auth[30];
     char buf[80];
     fp1=fopen("sentRequests.txt","a");
+    fp3=fopen("recvdRequests.txt","a");
     //fp2 is dynamic, to store 'recieved requests' for vendors/libraries
     LAB: //Label to return
     printf("Enter your choice: \n");
-    printf("1. Make new request\n");
-    printf("2. View sent or received requests\n");
+    printf("1. Make new request to other library\\vendor\n");
+    printf("2. Make new request to this library\n");
+    printf("3. View sent or received requests\n");
     scanf("%c",&choice);
     switch(choice){
         case '1':
             printf("\n1.Request Vendor\n");
             printf("2.Request Library\n");
             scanf(" %c",&req);
+            printf("Enter the title of the book: ");
+            scanf("%s",title);
+            printf("Enter author of the book: ");
+            scanf("%s",auth);
             if(req=='1'){
-                printf("\nEnter your library name: ");
-                scanf("%s",lib);
                 printf("Enter vendor name: ");
                 scanf("%s",name);
-                printf("Enter the title of the book: ");
-                scanf("%s",title);
-                if(strlen(name)==0||strlen(title)==0){
+                if(strlen(name)==0||strlen(title)==0||strlen(auth)==0){
                     printf("Error\n");
                     goto LAB;
                 }
-                //Updating sent requests
+                //Updating sentRequests.txt
                 fputs("\nVendor: ",fp1);
                 fputs(name,fp1);
                 fputs("\tBook requested: ",fp1);
                 fputs(title,fp1);
-                //Updating vendor's received requests
+                fputs("\tAuthor: ",fp1);
+                fputs(auth,fp1);
+                //Updating vendor's received requests in file created for that vendor
                 fp2=fopen(name,"w+");
-                fputs("\nLibrary: ",fp2);
+                fputs("\nLibrary: ",fp2); //Requesting library name updated
                 fputs(lib,fp2);
                 fputs("\tBook requested: ",fp2);
                 fputs(title,fp2);
+                fputs("\tAuthor: ",fp2);
+                fputs(auth,fp2);
             }
             else if(req=='2'){
-                printf("Enter name of the library to be requested: ");
+                //Requesting a library
+                printf("\nEnter the name of the library to be requested: ");
                 scanf("%s",name);
-                printf("Enter the title of the book: ");
-                scanf("%s",title);
-                if(fp1==NULL||strlen(name)==0||strlen(title)==0){
+                if(fp1==NULL||strlen(name)==0||strlen(title)==0||strlen(auth)==0){
                     printf("Error");
                     goto LAB;
                 }
+                //Updating sentRequests.txt
                 fputs("\nLibrary: ",fp1);
                 fputs(name,fp1);
                 fputs("\tBook requested: ",fp1);
                 fputs(title,fp1);
-                //Updating requested library's received requests
+                fputs("\tAuthor: ",fp1);
+                fputs(auth,fp1);
+                //Updating "requesting library's" sent requests
                 fp2=fopen(name,"w+");
                 fputs("\nRequesting Library: ",fp2);
                 fputs(lib,fp2);
                 fputs("\tBook requested: ",fp2);
                 fputs(title,fp2);
+                fputs("\tAuthor: ",fp2);
+                fputs(auth,fp2);
             }
             else{
-                printf("Error!");
+                printf("Invalid inputs!");
                 goto LAB;
             }
         break;
 
+        //Other library requesting this library
         case '2':
+            OTHER: ;//label to return if invalid inputs given
+            char c;
+            printf("Enter your library name: ");
+            scanf("%s",name);
+            printf("Would you like to search books in this library (Y\\N): ");
+            c=getchar();
+            if(c=='Y'||c=='y')
+            searchBookbyTitle(BookHead);
+            printf("Enter the title of the book you would like to request: ");
+            scanf("%s",title);
+            printf("Enter author of the book: ");
+            scanf("%s",auth);
+            if(strlen(name)==0||strlen(title)==0||strlen(auth)==0){
+                    printf("Error, please try again");
+                    goto OTHER;
+                }
+            //Updating recvdRequests
+            fputs("\nLibrary: ",fp3);
+            fputs(name,fp3);
+            fputs("\tBook requested: ",fp3);
+            fputs(title,fp3);
+            fputs("\tAuthor: ",fp3);
+            fputs(auth,fp3);
+            printf("Your request has benn successfully sent");
+        break;
+
+        case '3':
+            REQ: ;//label to return if invalid inputs given
+            char ch1;
             fp1=fopen("sentRequests.txt","r");
+            fp3=fopen("recvdRequests.txt","r");
             printf("\n1.Sent requests\n");
             printf("2.Received requests\n");
-            scanf(" %c",&req);
-            if(req=='1'){
+            ch1=getchar();
+            if(ch1=='1'){
                 while(fgets(buf, 80, fp1)!= NULL)
                 fputs(buf, stdout);
+            }
+            else if(ch1=='2'){
+                while(fgets(buf, 80, fp3)!= NULL)
+                fputs(buf, stdout);
+            }
+            else{
+                printf("Invalid choice!");
+                goto REQ;
             }
         break;
 
