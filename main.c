@@ -266,7 +266,7 @@ void welcomeScreen()
                     ;
 
                      //Assigning values 0 because no book issued yet
-                     user.u_user_ID = getUserID();
+                     user.u_user_ID = generateUserID();
                      user.u_book_ID = 0;
                      user.u_issue_ID = 0;
                      user.u_date_issue.tm_sec = 0;
@@ -980,7 +980,7 @@ void addNewUser(USERNODE *head)
 
 
         //Assigning values 0 because no book issued yet
-        current->user.u_user_ID = getUserID();
+        current->user.u_user_ID = generateUserID();
         current->user.u_book_ID = 0;
         current->user.u_issue_ID = 0;
         current->user.u_date_issue.tm_sec = 0;
