@@ -13,7 +13,7 @@
 #define MAX_CLOSE_AUTH_SEARCH 20 //Maximum number of closest seraches of authors to display
 #define MAX_SAME_AUTHOR 100 //Maximum number of books of same author to display
 #define MAX_CLOSE_ID 20 //Maximum number of closest seraches of ID to display
-#define MAX_SAME_TITLE 15
+#define MAX_SAME_TITLE 15 //Maximum number of books of same title
 
 // STRUCTURES
 /*
@@ -241,76 +241,71 @@ int menu(){
     switch(choice)
     {
         case 1:
-        booksearchMenu(BookHead);
-
-        printf("Press Enter to return to the User menu\n");
-        while (getchar() != '\n');
-        goto userchoice;
-        break;
-
-        case 2:
-
-        transaction:  // label to reach transaction menu
-        printf("\n----------Book Transaction Menu----------\n");
-        printf("1. Checkout a Book\n");
-        printf("2. Return Book\n");
-        printf("0. Return Back to Main Menu\n");
-
-        printf("Enter Choice: ");
-        scanf("%d", &option);
-
-        switch(option)
-        {
-            case 1:
-            //checkout book
-            searchBookbyTitle(BookHead);
-
-            char title[MAX_TITLE_LENGTH]; // to save title entered by user temporarily
-
-            printf("\nEnter Book Title to Checkout (Case Sensitive)\n ->");
-            fgets(title, MAX_TITLE_LENGTH, stdin);
-
-            int result = checkout(title);
-            if(result == 0)
-            {
-                printf("Your Book has been successfully issued\n");
-                printf("Press Enter to return to User Menu\n");
-                while(getchar() != '\n');
-
-                goto userchoice;
-
-            }
-            else if(result == 1)       //(checkout(title) == 1) Bruhh
-            {
-                printf("No such Book Title\n");
-                printf("Press Enter to return to Transaction Menu\n");
-                while(getchar() != '\n');
-
-                goto transaction;
-
-            }
-            else                        // user asked to to notify if him or not
-            {
-                printf("Press Enter to return to Transaction Menu\n");
-                while(getchar() != '\n');
-
-                goto transaction;
-
-            }
-
+            booksearchMenu(BookHead);
+    
+            printf("Press Enter to return to the User menu\n");
+            while (getchar() != '\n');
+            goto userchoice;
             break;
-
-
-            case 2:
-                //return book
-
-                returnBook();
-                printf("\nPress Enter to return to Transaction Menu\n");
-                while(getchar() != '\n');
-                goto transaction;
+    
+        case 2:
+    
+            transaction:  // label to reach transaction menu
+            printf("\n----------Book Transaction Menu----------\n");
+            printf("1. Checkout a Book\n");
+            printf("2. Return Book\n");
+            printf("0. Return Back to Main Menu\n");
+    
+            printf("Enter Choice: ");
+            scanf("%d", &option);
+    
+            switch(option)
+            {
+                case 1:
+                //checkout book
+                searchBookbyTitle(BookHead);
+        
+                char title[MAX_TITLE_LENGTH]; // to save title entered by user temporarily
+    
+                printf("\nEnter Book Title to Checkout (Case Sensitive)\n ->");
+                fgets(title, MAX_TITLE_LENGTH, stdin);
+    
+                int result = checkout(title);
+                if(result == 0)
+                {
+                    printf("Your Book has been successfully issued\n");
+                    printf("Press Enter to return to User Menu\n");
+                    while(getchar() != '\n');
+    
+                    goto userchoice;
+    
+                }
+                else if(result == 1)       //(checkout(title) == 1) Bruhh
+                {   
+                    printf("No such Book Title\n");
+                    printf("Press Enter to return to Transaction Menu\n");
+                    while(getchar() != '\n');
+    
+                    goto transaction;
+                }
+                else                        // user asked to to notify if him or not
+                {
+                    printf("Press Enter to return to Transaction Menu\n");
+                    while(getchar() != '\n');
+                    goto transaction;
+                }
                 break;
 
-        }
+                case 2:
+                    //return book
+    
+                    returnBook();
+                    printf("\nPress Enter to return to Transaction Menu\n");
+                    while(getchar() != '\n');
+                    goto transaction;
+                    break;
+    
+            }
             break;
 
         case 3:
@@ -911,7 +906,7 @@ void addNewUser(USERNODE *head)
         current->user.u_user_ID = generateUserID();
         /*
         //Assigning values 0 because no book issued yet
-        current->user.u_user_ID = 0;
+        current->user.u_user_ID = generateUserID();
         current->user.u_book_ID = 0;
         current->user.u_issue_ID = 0;
         current->user.u_date_issue.tm_sec = 0;
@@ -925,7 +920,6 @@ void addNewUser(USERNODE *head)
         current->user.u_date_issue.tm_isdst = 0;
         */
         
-        //fwrite(&user, sizeof(USER), 1, fp);
         saveUserList(UserHead);
 
         printf("Press Y/y to add another account: ");
@@ -1377,12 +1371,11 @@ void searchBookbyTitle(BOOKNODE *head)
     BOOKNODE *current = head;
     char title_search[MAX_TITLE_LENGTH];
     short cs_count=0; //To count number of closest searches
-    short flag=0; //To end searching on finding the exact book or when no results
     char closest_search[MAX_CLOSE_TITLE_SEARCH][MAX_TITLE_LENGTH+50]; //To store MAX_CLOSE_TITLE_SEARCH closest matching title searches
     char same_title_found[MAX_SAME_TITLE][MAX_TITLE_LENGTH+50];
     short title_found=0;
     LAB1: //a label to return if <=3 chars entered
-    printf("Search by title: ");
+    printf("\nSearch by title: ");
     scanf(" %60[^\n]", title_search);
     while(getchar() != '\n');
 
@@ -1393,7 +1386,7 @@ void searchBookbyTitle(BOOKNODE *head)
         goto LAB1;
     }
 
-    while(flag==0&&current->next != NULL)
+    while(current->next != NULL)
     {
         current=current->next;
         //Iterating through all characters of a single book title
@@ -1461,8 +1454,9 @@ void searchBookbyTitle(BOOKNODE *head)
 
         }
 
-        if(flag==0&&cs_count==0)
-        printf("No results found");
+        if(cs_count==0){
+            printf("No results found\n");
+        }
 
         //To print all closest searches (upto MAX_CLOSE_TITLE_SEARCH) when book is not found
         if(cs_count>0&&title_found==0)
@@ -1488,6 +1482,12 @@ void searchBookbyTitle(BOOKNODE *head)
             break; //Stop on reaching MAX_SAME_TITLE books of same title
         }
         }
+
+         char ch;
+            printf("Would you like to search again? (Y/N): ");
+            ch=getchar();
+            if(ch=='Y'||ch=='y') //To ask if the user wants to search again
+            goto LAB1;
 
 
 }
