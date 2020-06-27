@@ -1399,6 +1399,7 @@ void searchBookbyTitle(BOOKNODE *head)
                         strcat(closest_search[cs_count], "Not available (Issued)");
                     else
                         strcat(closest_search[cs_count], "Undefined ");
+                 strcat(closest_search[cs_count],"\n");
                 cs_count++;
             }
             break;
@@ -1425,6 +1426,7 @@ void searchBookbyTitle(BOOKNODE *head)
                         strcat(same_title_found[title_found], "Not available (Issued)");
                     else
                         strcat(same_title_found[title_found], "Undefined ");
+                strcat(same_title_found[title_found],"\n");
                 title_found++;
                 }
                 break;
@@ -1439,8 +1441,10 @@ void searchBookbyTitle(BOOKNODE *head)
         //To print all closest searches (upto MAX_CLOSE_TITLE_SEARCH) when book is not found
         if(cs_count>0&&title_found==0)
         {
-        cs_count=0;
+
         printf("Closest searches:\n");
+        /*
+        cs_count=0;
         while(strlen(closest_search[cs_count])!=0)
         {
             printf("%hi. %s\n",(short)(cs_count+1),closest_search[cs_count]);
@@ -1448,9 +1452,13 @@ void searchBookbyTitle(BOOKNODE *head)
             if(cs_count==MAX_CLOSE_TITLE_SEARCH)
             break; //Stop on reaching MAX_CLOSE_TITLE_SEARCH closest search
         }
+        */
+        for(int i=0;i<cs_count;i++)
+            printf("%d. %s",i+1,closest_search[i]);
         }
         //To print all books found of same title (if any)
         if(title_found>0){
+        /*
             title_found=0;
             while(strlen(same_title_found[cs_count])!=0)
         {
@@ -1459,13 +1467,17 @@ void searchBookbyTitle(BOOKNODE *head)
             if(title_found==MAX_SAME_TITLE)
             break; //Stop on reaching MAX_SAME_TITLE books of same title
         }
+        */
+        for(int i=0;i<title_found;i++)
+            printf("%d. %s",i+1,same_title_found[i]);
+
         }
 
          char ch;
-            printf("Would you like to search again? (Y/N): ");
+            printf("Would you like to search again by title? (Y/N): ");
             ch=getchar();
             if(ch=='Y'||ch=='y') //To ask if the user wants to search again
-            goto LAB1;
+            searchBookbyTitle(head);
 }
 
 void displayAllBooks(BOOKNODE *head)
@@ -1671,7 +1683,7 @@ void searchBookbyID(BOOKNODE *head){
             }
 
             //Continue if some (not all) characters match
-        else if(tolower(ID_search[j])==tolower(str_ID[j])&&j<strlen(str_ID)){
+        else if(tolower(ID_search[j])==tolower(str_ID[j])&&j<strlen(str_ID)-1){
              //printf("\n Almost"); //For ref only, to be removed before submission
                 continue;
         }
