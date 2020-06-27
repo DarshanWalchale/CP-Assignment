@@ -1474,12 +1474,11 @@ void searchBookbyTitle(BOOKNODE *head)
     BOOKNODE *current = head;
     char title_search[MAX_TITLE_LENGTH];
     short cs_count=0; //To count number of closest searches
-    short flag=0; //To end searching on finding the exact book or when no results
     char closest_search[MAX_CLOSE_TITLE_SEARCH][MAX_TITLE_LENGTH+50]; //To store MAX_CLOSE_TITLE_SEARCH closest matching title searches
     char same_title_found[MAX_SAME_TITLE][MAX_TITLE_LENGTH+50];
     short title_found=0;
     LAB1: //a label to return if <=3 chars entered
-    printf("Search by title: ");
+    printf("\nSearch by title: ");
     scanf(" %60[^\n]", title_search);
     while(getchar() != '\n');
 
@@ -1490,7 +1489,7 @@ void searchBookbyTitle(BOOKNODE *head)
         goto LAB1;
     }
 
-    while(flag==0&&current->next != NULL)
+    while(current->next != NULL)
     {
         current=current->next;
         //Iterating through all characters of a single book title
@@ -1558,8 +1557,9 @@ void searchBookbyTitle(BOOKNODE *head)
 
         }
 
-        if(flag==0&&cs_count==0)
-        printf("No results found");
+        if(cs_count==0){
+            printf("No results found\n");
+        }
 
         //To print all closest searches (upto MAX_CLOSE_TITLE_SEARCH) when book is not found
         if(cs_count>0&&title_found==0)
@@ -1585,6 +1585,12 @@ void searchBookbyTitle(BOOKNODE *head)
             break; //Stop on reaching MAX_SAME_TITLE books of same title
         }
         }
+
+         char ch;
+            printf("Would you like to search again? (Y/N): ");
+            ch=getchar();
+            if(ch=='Y'||ch=='y') //To ask if the user wants to search again after an unsuccesful search
+            goto LAB1;
 
 
 }
