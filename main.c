@@ -77,7 +77,7 @@ BOOKNODE *BookHead;
 USERNODE *UserHead;
 
 // PROTOTYPES
-BOOKNODE * loadLibrary(BOOKNODE *);
+BOOKNODE * loadBookList(BOOKNODE *);
 USERNODE * loadUsers(USERNODE *);
 void loadCounters();
 void returnBook();
@@ -133,7 +133,7 @@ int main(void)
 
     // /*
     printf("Program start\n");
-    BookHead = loadLibrary(BookHead);
+    BookHead = loadBookList(BookHead);
     printf("Books database loaded into memory successfully\n");
     UserHead = loadUsers(UserHead);
     printf("Users successfully loaded\n");
@@ -245,9 +245,6 @@ int menu(){
     {
         case 1:
             booksearchMenu(BookHead);
-
-            printf("Press Enter to return to the User menu\n");
-            while (getchar() != '\n');
             goto userchoice;
             break;
 
@@ -1039,28 +1036,25 @@ void saveCounters()
     return;
 }
 
-// Give pointer to head BOOKNODE (likely initialized in main)
+// Give pointer to head BOOKNODE (initialized in main)
 // Loads the entire library into memory using a dynamic linked list (utilizes higher reading speed of RAM and reduces file I/O process requirement)
-BOOKNODE * loadLibrary(BOOKNODE *head)
+BOOKNODE * loadBookList(BOOKNODE *head)
 {
-    printf("loadlibrary called\n");
+    printf("loadBookList() called\n");
     loadCounters();
     printf("loadcounters successful\n");
     FILE *fp = fopen("books.txt", "r");
-    printf("1");
     BOOK *book_load = calloc(1, sizeof(BOOK));
-    //loadNextBook(fp, book_load);
-    fread(book_load, sizeof(BOOK), 1, fp);
-    printf("1");
-
-    BOOKNODE *current;
-    head->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
-    current = head->next;
-    current->next = NULL;
-    printf("1");
+    BOOKNODE *current = head;
     //printf("\t1\n");
     while(1)
     {
+        //printf("1");
+        current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
+        current = current->next;
+        fread(book_load, sizeof(BOOK), 1, fp);
+    
+        
         strcpy(current->book.b_book_title, book_load->b_book_title);
         strcpy(current->book.b_book_author, book_load->b_book_author);
         current->book.b_book_ID = book_load->b_book_ID;
@@ -1089,23 +1083,7 @@ BOOKNODE * loadLibrary(BOOKNODE *head)
         current->book.b_date_issue.tm_yday = book_load->b_date_issue.tm_yday;
         current->book.b_date_issue.tm_isdst = book_load->b_date_issue.tm_isdst;
         //printf("A");
-
-
-        //printf("B");
-        if(feof(fp))
-        {
-            break;
-        }
-        else
-        {
-            printf("1");
-            current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
-            current = current->next;
-            //loadNextBook(fp, book_load);
-            fread(book_load, sizeof(BOOK), 1, fp);
-        }
-    }
-
+    }while(!(feof(fp)));
     fclose(fp);
 
     return head;
@@ -1170,18 +1148,18 @@ USERNODE * loadUsers(USERNODE *head)
     USER *user_load = (USER *)calloc(1, sizeof(USER));
     fread(user_load, sizeof(USER), 1, fp);
 
-    USERNODE *current;
-    //head = (USERNODE *)calloc(1, sizeof(USERNODE)); Already allocated in main
-    head->next = (USERNODE *)calloc(1, sizeof(USERNODE));
-    current = head->next;
-    current->next = NULL;
+    USERNODE *current = head;
     printf("\t1\n");
-    while(1)
+    do
     {
+        current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
+        current = current->next;
+        fread(user_load, sizeof(USER), 1, fp);
+        
         current->user.u_user_ID = user_load->u_user_ID;
         strcpy(current->user.user_name, user_load->user_name);
         current->user.u_book_ID = user_load->u_book_ID;
-        current->user.u_issue_ID = user_load->u_issue_ID;
+        current->user.u_issue_ID = user_load->u_issue_ID; 
         strcpy(current->user.u_book_title, user_load->u_book_title);
         strcpy(current->user.u_user_pwd, user_load->u_user_pwd);
         current->user.u_admin = user_load->u_admin;
@@ -1197,18 +1175,7 @@ USERNODE * loadUsers(USERNODE *head)
         current->user.u_date_issue.tm_yday = user_load->u_date_issue.tm_yday;
         current->user.u_date_issue.tm_isdst = user_load->u_date_issue.tm_isdst;
         //printf("A");
-
-        if(feof(fp))
-        {
-            break;
-        }
-        else
-        {
-            current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
-            current = current->next;
-            fread(user_load, sizeof(USER), 1, fp);
-        }
-    }
+    }while(!(feof(fp)));
     fclose(fp);
 
     return head;
@@ -1244,6 +1211,7 @@ int deleteUser(USERNODE *head, unsigned long id)
     }
     // saves userlist in memory to file
     saveUserList(head);
+    printf("\t---ERROR: ID not found\n");
     return 1;
 }
 
@@ -1334,7 +1302,7 @@ int titleCount(BOOKNODE *head, char *title)
 
 void printUserInfo(USER *user)
 {
-    printf("--------------------ACCOUNT INFO--------------------\n");
+    printf("\n--------------------ACCOUNT INFO--------------------\n");
     printf("User ID: %lu\n", user->u_user_ID);
     printf("Username: %s\n", user->user_name);
     printf("Issued Book ID: %lu\n", user->u_book_ID);
