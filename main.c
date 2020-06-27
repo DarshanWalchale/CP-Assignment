@@ -1898,10 +1898,16 @@ void vendorManagement(){
             if(req=='1'){
                 printf("\nEnter your library name: ");
                 scanf(" %60[^\n]",lib);
+                while(getchar() != '\n')
+                ;
                 printf("Enter vendor name: ");
                 scanf("%60[^\n]",name);
+                while(getchar() != '\n')
+                ;
                 printf("Enter the title of the book: ");
                 scanf("%30[^\n]",title);
+                while(getchar() != '\n')
+                ;
                 if(strlen(name)==0||strlen(title)==0){
                     printf("Error\n");
                     goto LAB;
@@ -1921,8 +1927,12 @@ void vendorManagement(){
             else if(req=='2'){
                 printf("Enter name of the library to be requested: ");
                 scanf("%60[^\n]",name);
+                while(getchar() != '\n')
+                ;
                 printf("Enter the title of the book: ");
                 scanf("%30[^\n]",title);
+                while(getchar() != '\n')
+                ;
                 if(fp1==NULL||strlen(name)==0||strlen(title)==0){
                     printf("Error");
                     goto LAB;
@@ -1949,6 +1959,8 @@ void vendorManagement(){
             printf("\n1.Sent requests\n");
             printf("2.Received requests\n");
             scanf(" %c",&req);
+            while(getchar() != '\n')
+                ;
             if(req=='1'){
                 while(fgets(buf,1024, fp1)!= NULL)
                 fputs(buf, stdout);
