@@ -148,7 +148,8 @@ int main(void)
     if(welcomeScreen(UserHead) == 0)
     {
         notifications(BookHead, &Current_User);
-        while(menu() != 0);
+        while(menu() != 0)
+        ;
     }
     // */
 
@@ -214,7 +215,7 @@ int welcomeScreen(USERNODE *head)
             }
         }
         current = head;
-        printf("\n\t\t\tIncorrect Credentials\n\t\t\tPress Enter to retry");
+        printf("\n\t\t---ERROR:Incorrect Credentials---\n\t\t\tPress Enter to retry");
         while(getchar() != '\n')
         ;
     }while(loginerrorcount <= 5);
@@ -226,7 +227,7 @@ int welcomeScreen(USERNODE *head)
 int menu(){
     int choice;
     userchoice: // label to return to Main menu
-    printf("\n--------------------MENU--------------------\n");
+    printf("\n--------------------MAIN MENU--------------------\n");
     printf("1. Search Books\n");
     printf("2. Book Transaction\n");
     printf("3. Account Info\n");
@@ -238,7 +239,8 @@ int menu(){
 
     printf("Enter your choice: ");
     scanf(" %d", &choice);
-    while(getchar() != '\n');
+    while(getchar() != '\n')
+    ;
     int option;
 
     switch(choice)
@@ -1058,17 +1060,12 @@ BOOKNODE * loadBookList(BOOKNODE *head)
     BOOK *book_load = calloc(1, sizeof(BOOK));
     BOOKNODE *current = head;
     printf("\t1\n");
-    while(1)
+    while(fread(book_load, sizeof(BOOK), 1, fp))
     {
-        if(feof(fp))
-        {
-            break;
-        }
         
         printf("1\t");
         current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
         current = current->next;
-        fread(book_load, sizeof(BOOK), 1, fp);
         printf("1\t");
         
         strcpy(current->book.b_book_title, book_load->b_book_title);
@@ -1166,11 +1163,10 @@ USERNODE * loadUsers(USERNODE *head)
     
     USERNODE *current = head;
     printf("\t1\n");
-    do
+    while(fread(user_load, sizeof(USER), 1, fp))
     {
         current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
         current = current->next;
-        fread(user_load, sizeof(USER), 1, fp);
         
         current->user.u_user_ID = user_load->u_user_ID;
         strcpy(current->user.user_name, user_load->user_name);
@@ -1191,7 +1187,7 @@ USERNODE * loadUsers(USERNODE *head)
         current->user.u_date_issue.tm_yday = user_load->u_date_issue.tm_yday;
         current->user.u_date_issue.tm_isdst = user_load->u_date_issue.tm_isdst;
         //printf("A");
-    }while(!(feof(fp)));
+    }
     fclose(fp);
 
     return head;
@@ -1844,6 +1840,7 @@ void notifications(BOOKNODE *head, USER *user)
     {
         printf("%s IS NOW AVAILABLE TO CHECKOUT!\n", user->u_requested);
         strcpy(user->u_requested, "\0");
+        saveBookList(head);
     }
     return;
 }
