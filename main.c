@@ -70,7 +70,7 @@ typedef struct USERNODE         // this is used to load all userdata into memory
 // GLOBAL VARIABLES
 unsigned long Book_ID_Counter;           // 3943
 unsigned long Issue_ID_Counter;          // 20195
-unsigned long User_ID_Counter;           // 1791
+unsigned long User_ID_Counter;           // 1791111000
 USER Current_User;                       //capitalized cuz global variable
 BOOKNODE *BookHead;
 USERNODE *UserHead;
@@ -127,10 +127,10 @@ int main(void)
     UserHead = (USERNODE *)calloc(1, sizeof(USERNODE));
     //printf("UserHead->next = %p\n", UserHead->next);
     loadCounters();
-    //addNewBook(BookHead);
-    //addNewUser(UserHead);
+    //addNewBook(BookHead); Don't uncomment
+    //addNewUser(UserHead); Don't unconnent
     
-    
+    // /*
     printf("Program start\n");
     BookHead = loadLibrary(BookHead);
     printf("Books database loaded into memory successfully\n");
@@ -138,25 +138,27 @@ int main(void)
     printf("Users successfully loaded\n");
     displayAllBooks(BookHead);
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
-
-
-
+    
     //printf("Press Enter to Login"); Bruh
     //while(getchar() != '\n');
     //printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID());
-
+    
+    
     if(welcomeScreen(UserHead) == 0)
     {
         notifications(BookHead, &Current_User);
         while(menu() != 0);
     }
+    // */
     
-    
-
     saveBookList(BookHead);
+    printf("---BookList Saved---\n");
     freeLibrary(BookHead);
+    printf("---BookList Freed---\n");
     saveUserList(UserHead);
+    printf("---UserList Saved---\n");
     freeUserList(UserHead);
+    printf("---BookList Freed---\n");
     return 0;
 }
 
@@ -222,7 +224,7 @@ int welcomeScreen(USERNODE *head)
 
 int menu(){
     int choice;
-    userchoice: // label to return to user menu
+    userchoice: // label to return to Main menu
     printf("\n--------------------MENU--------------------\n");
     printf("1. Search Books\n");
     printf("2. Book Transaction\n");
@@ -274,7 +276,7 @@ int menu(){
                 if(result == 0)
                 {
                     printf("Your Book has been successfully issued\n");
-                    printf("Press Enter to return to User Menu\n");
+                    printf("Press Enter to return to Main Menu\n");
                     while(getchar() != '\n');
     
                     goto userchoice;
@@ -502,7 +504,7 @@ void booksearchMenu()
     printf("2. Search Book by Author\n");
     printf("3. Search Book by Book ID\n");
     printf("4. Display All Books\n");
-    printf("0. Return to User Menu\n");
+    printf("0. Return to Main Menu\n");
 
    printf("Enter choice: ");
    scanf("%d", &choice);
@@ -532,7 +534,7 @@ void booksearchMenu()
 
         case 4:
             displayAllBooks(BookHead);
-            printf("Press Enter to return to the Search menu");
+            printf("Press Enter to return to the Search menu\n");
             while(getchar() != '\n');
             goto booksearch;
             break;
@@ -715,7 +717,7 @@ void displayAdmins(USERNODE *head)
         current = current->next;
         if(current->user.u_admin)
         {
-            printf("%lu\t%s\t\t\t\t%s\n", current->user.u_user_ID, current->user.user_name, (current->user.u_admin)?"YES":"NO");
+            printf("%lu\t\t%s\t\t\t%s\n", current->user.u_user_ID, current->user.user_name, (current->user.u_admin)?"YES":"NO");
         }
     }
     printf("----------------------------------------------\n");
@@ -846,7 +848,7 @@ int removeAdmin(USERNODE *head)
 
 void addNewUser(USERNODE *head)
 {
-    char c;
+    char c, adminrights = 'N';
     bool exists = false;
     char uname[60] = {};
     USERNODE *current = head;
@@ -890,7 +892,7 @@ void addNewUser(USERNODE *head)
         while(getchar() != '\n');
 
         printf("Enter Y/y to make user admin: ");
-        char adminrights = 'N';
+        adminrights = 'N';
         scanf(" %c", &adminrights);
         adminrights = toupper(adminrights);
         if(adminrights == 'Y')
@@ -993,14 +995,15 @@ void addNewBook(BOOKNODE *head)
 
 
         //fwrite(&book, sizeof(BOOK), 1, fp);
-        saveBookList(BookHead);
+        saveBookList(head);
 
         printf("Enter Y/y to enter another book: ");
         scanf(" %c", &choice);
         while(getchar() != '\n');
 
     }while((choice == 'Y') || (choice == 'y'));
-
+    
+    saveBookList(head);
     return;
 }
 
@@ -1244,7 +1247,6 @@ int deleteUser(USERNODE *head, unsigned long id)
 
 void saveCurrentUser(USERNODE *head, USER *CurrentUser)
 {
-    FILE *fp = fopen("userdata.txt", "w");
     USERNODE *current = head;
     while(current->next == NULL)
     {
@@ -1271,8 +1273,6 @@ void saveCurrentUser(USERNODE *head, USER *CurrentUser)
         }
     }
 
-    saveUserList(head);
-
     return;
 }
 
@@ -1285,7 +1285,7 @@ void saveUserList(USERNODE *head)
     FILE *fp = fopen("userdata.txt", "w");
     if(fp == NULL)
     {
-        printf("file wasn't opened\n");
+        printf("saveUserList couldn't open the file\n");
     }
 
     USERNODE *current = head;
@@ -1501,7 +1501,7 @@ void displayAllBooks(BOOKNODE *head)
     }
 
     printf("------------------------------------------------------------\n");
-    printf("AVAILABILITY\tBOOK ID\tAUTHOR\t\tTITLE\n");
+    printf("AVAILABILITY\tBOOK ID\t\tAUTHOR\t\tTITLE\n");
     printf("------------------------------------------------------------\n");
     char availability[15] = {};
 
@@ -1524,7 +1524,7 @@ void displayAllBooks(BOOKNODE *head)
         {
             strcpy(availability, "Unknown");
         }
-        printf("%s\t%lu\t%s\t\t%s\n", availability, current->book.b_book_ID, current->book.b_book_author,current->book.b_book_title);
+        printf("%s\t%lu\t\t%s\t\t%s\n", availability, current->book.b_book_ID, current->book.b_book_author,current->book.b_book_title);
     }
     printf("------------------------------------------------------------\n");
     return;
@@ -1622,7 +1622,7 @@ void searchBookbyAuthor(BOOKNODE *head){
         }
 
         if(flag==0&&cs_count==0)
-        printf("No results found");
+        printf("No results found\n");
 
         //To print all closest searches of authors when exact match is not found
         if(cs_count>0&&same_auth_count==0){
@@ -1656,8 +1656,8 @@ void searchBookbyID(BOOKNODE *head){
     while(getchar() != '\n');
     printf("%ld",strlen(ID_search));
     if((strlen(ID_search))!=10){
-    printf("Invalid ID entered! (ID is 10 digits)\n");
-    goto LAB3;
+        printf("Invalid ID entered! (ID is 10 digits)\n");
+        goto LAB3;
     }
     while(flag==0&&current->next != NULL){
         current=current->next;
@@ -1670,13 +1670,15 @@ void searchBookbyID(BOOKNODE *head){
         if((tolower(ID_search[j])!=tolower(str_ID[j]))&&j<6){
             //printf("\n First 6 not matching"); For ref only, to be removed before submission
             break;
-            }
+        }
 
             //If atleast one character does not match, store the closest matching search (author) and skip current iteration
-        else if(tolower(ID_search[j])!=tolower(str_ID[j])&&j<strlen(str_ID)&&j>5){
+        else if(tolower(ID_search[j])!=tolower(str_ID[j])&&j<strlen(str_ID)&&j>5)
+        {
                // printf("\n Close"); //For ref only, to be removed before submission
 
-            if(cs_count<MAX_CLOSE_ID){
+            if(cs_count<MAX_CLOSE_ID)
+            {
                 strcat(closest_search[cs_count],"Title: ");
                 strcat(closest_search[cs_count],current->book.b_book_title);
                 strcat(closest_search[cs_count],"\n\tID:");
@@ -1686,32 +1688,32 @@ void searchBookbyID(BOOKNODE *head){
                 cs_count++;
             }
             break;
-            }
+        }
 
             //Continue if some (not all) characters match
-        else if(tolower(ID_search[j])==tolower(str_ID[j])&&j<strlen(str_ID)){
+        else if(tolower(ID_search[j])==tolower(str_ID[j])&&j<strlen(str_ID))
+        {
              //printf("\n Almost"); //For ref only, to be removed before submission
                 continue;
         }
                 //If the search matches exactly, stop searching
-        else{
-               //printf("\n Found");
-                printf("Book found: %s ",current->book.b_book_title);
-                if(current->book.b_book_status=='A')
+        else
+        {
+            //printf("\n Found");
+            printf("Book found: %s ",current->book.b_book_title);
+            if(current->book.b_book_status=='A')
                 printf("(Available)\n");
-                else if(current->book.b_book_status=='R')
+            else if(current->book.b_book_status=='R')
                 printf("(Reserved)\n");
-                else if(current->book.b_book_status=='I')
+            else if(current->book.b_book_status=='I')
                 printf("(Not available (Issued))\n");
-                else
+            else
                 printf("Undefined)\n"); //To account for faulty/incomplete entry of status of book
-
                 printf("\tID: %s\n",str_ID);
                 printf("\tAuthor: %s\n",current->book.b_book_author);
-
-                flag=3;
-                break;
-                }
+            flag=3;
+            break;
+        }
             }
 
         }
@@ -1729,7 +1731,7 @@ void searchBookbyID(BOOKNODE *head){
         }
 
         if(cs_count==0&&flag!=3)
-        printf("No results found");
+        printf("No results found\n");
 }
 
 void newlyAddedBooks(BOOKNODE *head)
