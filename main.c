@@ -162,9 +162,7 @@ void welcomeScreen()
 
   printf("\n\t\t\t\t*************************");
 
-//   printf("\n\n\n\n\t\t\t\tPress Enter to proceed");
 
-//   while(getchar() != '\n'); // Won't proceed till \n entered, wont leave remanents in input buffer
   printf("\n\n");
 
 
@@ -268,7 +266,7 @@ void welcomeScreen()
                     ;
 
                      //Assigning values 0 because no book issued yet
-                     user.u_user_ID = 0;
+                     user.u_user_ID = getUserID();
                      user.u_book_ID = 0;
                      user.u_issue_ID = 0;
                      user.u_date_issue.tm_sec = 0;
@@ -982,7 +980,7 @@ void addNewUser(USERNODE *head)
 
 
         //Assigning values 0 because no book issued yet
-        current->user.u_user_ID = 0;
+        current->user.u_user_ID = getUserID();
         current->user.u_book_ID = 0;
         current->user.u_issue_ID = 0;
         current->user.u_date_issue.tm_sec = 0;
