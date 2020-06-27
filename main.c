@@ -274,7 +274,7 @@ int menu(){
                 fgets(title, MAX_TITLE_LENGTH, stdin);
 
                 int result = checkout(title);
-                if(result == 0)
+                if(result == 0)             //book checked out successfully
                 {
                     printf("Your Book has been successfully issued\n");
                     printf("Press Enter to return to Main Menu\n");
@@ -283,7 +283,7 @@ int menu(){
                     goto userchoice;
 
                 }
-                else if(result == 1)       //(checkout(title) == 1) Bruhh
+                else if(result == 1)          // book to checkout not found
                 {
                     printf("No such Book Title\n");
                     printf("Press Enter to return to Transaction Menu\n");
@@ -299,19 +299,30 @@ int menu(){
                 }
                 break;
 
-                case 2:
-                    //return book
-
+                case 2:                     //return book
+                
                     returnBook();
                     printf("\nPress Enter to return to Transaction Menu\n");
                     while(getchar() != '\n');
                     goto transaction;
                     break;
+                    
+                case 0:
+                    goto userchoice;
+                    break;
+                    
+                default:
+                printf("\n\n\t\t\t\tINVALID OPTION");
+                printf("\n\n\t\t\tPress Enter to return to the User Menu\n");
 
-            }
+                while(getchar() != '\n');
+                goto userchoice;
+             }       
+
+            
             break;
 
-        case 3:
+        case 3:                                     // provides current user information
             printUserInfo(&Current_User);
             printf("Press Enter to return to the Main Menu");
             while (getchar() != '\n');
@@ -338,7 +349,7 @@ int menu(){
 
         default:
             printf("\n\n\t\t\t\tINVALID OPTION");
-            printf("\n\n\t\t\tPress Enter\n");
+            printf("\n\n\t\t\tPress Enter to return to the User Menu\n");
 
             while(getchar() != '\n');
             goto userchoice;
