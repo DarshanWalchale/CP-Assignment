@@ -1522,7 +1522,8 @@ void searchBookbyAuthor(BOOKNODE *head){
 
     printf("Search by author: ");
     scanf(" %30[^\n]", author_search);
-    while(getchar() != '\n');
+    while(getchar() != '\n')
+    ;
 
         //Restart search if less than three characters entered
      if(strlen(author_search)<4){
@@ -1864,29 +1865,31 @@ void setCurrentUser(USER *user)
 void vendorManagement(){
     FILE *fp1, *fp2;
     char choice, req;
-    char lib[30]; //Store name of current library
-    char name[30];
+    char lib[60]; //Store name of current library
+    char name[60];
     char title[30];
-    char buf[80];
+    char buf[1024];
     fp1=fopen("sentRequests.txt","a");
     //fp2 is dynamic, to store 'recieved requests' for vendors/libraries
     LAB: //Label to return
+    printf("\n----------VENDOR MANAGEMENT----------\n");
     printf("Enter your choice: \n");
     printf("1. Make new request\n");
     printf("2. View sent or received requests\n");
     scanf("%c",&choice);
     switch(choice){
         case '1':
+            printf("SELECT\n");
             printf("\n1.Request Vendor\n");
             printf("2.Request Library\n");
             scanf(" %c",&req);
             if(req=='1'){
                 printf("\nEnter your library name: ");
-                scanf("%s",lib);
+                scanf(" %60[^\n]",lib);
                 printf("Enter vendor name: ");
-                scanf("%s",name);
+                scanf("%60[^\n]",name);
                 printf("Enter the title of the book: ");
-                scanf("%s",title);
+                scanf("%30[^\n]",title);
                 if(strlen(name)==0||strlen(title)==0){
                     printf("Error\n");
                     goto LAB;
@@ -1905,9 +1908,9 @@ void vendorManagement(){
             }
             else if(req=='2'){
                 printf("Enter name of the library to be requested: ");
-                scanf("%s",name);
+                scanf("%60[^\n]",name);
                 printf("Enter the title of the book: ");
-                scanf("%s",title);
+                scanf("%30[^\n]",title);
                 if(fp1==NULL||strlen(name)==0||strlen(title)==0){
                     printf("Error");
                     goto LAB;
@@ -1935,13 +1938,18 @@ void vendorManagement(){
             printf("2.Received requests\n");
             scanf(" %c",&req);
             if(req=='1'){
-                while(fgets(buf, 80, fp1)!= NULL)
+                while(fgets(buf,1024, fp1)!= NULL)
                 fputs(buf, stdout);
             }
+            printf("Press Enter\n");
+            while(getchar() != '\n')
+            ;
         break;
 
         default:
         printf("Invalid entry!\n");
+        while(getchar() != '\n')
+        ;
         goto LAB;
     }
 }
