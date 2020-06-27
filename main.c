@@ -128,8 +128,8 @@ int main(void)
     UserHead = (USERNODE *)calloc(1, sizeof(USERNODE));
     //printf("UserHead->next = %p\n", UserHead->next);
     loadCounters();
-    //addNewBook(BookHead); Don't uncomment
-    //addNewUser(UserHead); Don't unconnent
+    //addNewBook(BookHead); //Don't uncomment
+    //addNewUser(UserHead); //Don't unconnent
 
     // /*
     printf("Program start\n");
@@ -507,12 +507,14 @@ void booksearchMenu()
     printf("4. Display All Books\n");
     printf("0. Return to Main Menu\n");
 
-   printf("Enter choice: ");
-   scanf("%d", &choice);
+    printf("Enter choice: ");
+    scanf(" %d", &choice);
+    while(getchar() != '\n')
+    ;
 
-   switch(choice)
-   {
-       case 1:
+    switch(choice)
+    {
+        case 1:
             searchBookbyTitle(BookHead);
             printf("\nPress Enter to return to the Search menu");
             while(getchar() != '\n');
@@ -544,15 +546,14 @@ void booksearchMenu()
             return;
             break;
 
-
         default:
             printf("\n\n\t\t\t\tINVALID OPTION");
             printf("\n\n\t\t\tPress Enter to re-Enter the choice");
             while(getchar() != '\n');
             goto booksearch;
             break;
-   }
-   return;
+    }
+    return;
 }
 
 void adminMenu()
@@ -651,7 +652,7 @@ void reviewAdminPrivileges(USERNODE *head)
     printf("5. Remove an Admin\n");
     printf("0. Return to Admin Menu\n");
     int choice;
-    printf("\n\nEnter your choice: ");
+    printf("Enter your choice: ");
     scanf("%d", &choice);
     while(getchar() != '\n');
 
