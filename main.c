@@ -299,26 +299,26 @@ int menu(){
                 break;
 
                 case 2:                     //return book
-                
+
                     returnBook();
                     printf("\nPress Enter to return to Transaction Menu\n");
                     while(getchar() != '\n');
                     goto transaction;
                     break;
-                    
+
                 case 0:
                     goto userchoice;
                     break;
-                    
+
                 default:
                 printf("\n\n\t\t\t\tINVALID OPTION");
                 printf("\n\n\t\t\tPress Enter to return to the User Menu\n");
 
                 while(getchar() != '\n');
                 goto userchoice;
-             }       
+             }
 
-            
+
             break;
 
         case 3:                                     // provides current user information
@@ -1062,12 +1062,12 @@ BOOKNODE * loadBookList(BOOKNODE *head)
     printf("\t1\n");
     while(fread(book_load, sizeof(BOOK), 1, fp))
     {
-        
+
         printf("1\t");
         current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
         current = current->next;
         printf("1\t");
-        
+
         strcpy(current->book.b_book_title, book_load->b_book_title);
         strcpy(current->book.b_book_author, book_load->b_book_author);
         current->book.b_book_ID = book_load->b_book_ID;
@@ -1097,7 +1097,7 @@ BOOKNODE * loadBookList(BOOKNODE *head)
         current->book.b_date_issue.tm_isdst = book_load->b_date_issue.tm_isdst;
         printf("A\n");
     }
-    
+
     fclose(fp);
 
     return head;
@@ -1160,18 +1160,18 @@ USERNODE * loadUsers(USERNODE *head)
     printf("loadusers called");
     FILE *fp = fopen("userdata.txt", "r");
     USER *user_load = (USER *)calloc(1, sizeof(USER));
-    
+
     USERNODE *current = head;
     printf("\t1\n");
     while(fread(user_load, sizeof(USER), 1, fp))
     {
         current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
         current = current->next;
-        
+
         current->user.u_user_ID = user_load->u_user_ID;
         strcpy(current->user.user_name, user_load->user_name);
         current->user.u_book_ID = user_load->u_book_ID;
-        current->user.u_issue_ID = user_load->u_issue_ID; 
+        current->user.u_issue_ID = user_load->u_issue_ID;
         strcpy(current->user.u_book_title, user_load->u_book_title);
         strcpy(current->user.u_user_pwd, user_load->u_user_pwd);
         current->user.u_admin = user_load->u_admin;
@@ -1522,8 +1522,7 @@ void searchBookbyAuthor(BOOKNODE *head){
 
     printf("Search by author: ");
     scanf(" %30[^\n]", author_search);
-    while(getchar() != '\n')
-    ;
+    while(getchar() != '\n');
 
         //Restart search if less than three characters entered
      if(strlen(author_search)<4){
@@ -1544,7 +1543,7 @@ void searchBookbyAuthor(BOOKNODE *head){
             }
 
             //If atleast one character does not match, store the closest matching search (author) and skip current iteration
-        else if(tolower(author_search[j])!=tolower(current->book.b_book_author[j])&&j<strlen(current->book.b_book_author)&&j>2){
+        else if((tolower(author_search[j])!=tolower(current->book.b_book_author[j]))&&j<strlen(current->book.b_book_author)&&j>2){
                 //printf("\n Close"); For ref only, to be removed before submission
 
             short check_repeat=0;
@@ -1561,7 +1560,6 @@ void searchBookbyAuthor(BOOKNODE *head){
                 strcpy(closest_search[cs_count],current->book.b_book_author);
                 cs_count++;
             }
-            flag=2;
             break;
             }
 
@@ -1601,24 +1599,27 @@ void searchBookbyAuthor(BOOKNODE *head){
         printf("No results found");
 
         //To print all closest searches of authors when exact match is not found
+
         if(cs_count>0&&same_auth_count==0){
-        cs_count=0;
         printf("Did you mean?:\n");
-        while(strlen(closest_search[cs_count])!=0){
-            printf("%hi. %s\n",(short)(cs_count+1),closest_search[cs_count]);
-            cs_count++;
-            if(cs_count==MAX_CLOSE_AUTH_SEARCH)
-            break; //Stop on reaching MAX_CLOSE_AUTH_SEARCH closest search
-        }
+        for(int i=0;i<cs_count;i++)
+            printf("%d. %s\n",(i+1),closest_search[i]);
         }
 
         if(same_auth_count>0){
             for(int m=0;m<same_auth_count;m++)
-                printf("%hi. %s",(short)(m+1),all_same_auth[m]);
-            printf("Total of %hi books authored by %s",(short)same_auth_count,auth_found);
+                printf("%d. %s",(m+1),all_same_auth[m]);
+            printf("Total of %hi books authored by %s\n",(short)same_auth_count,auth_found);
         }
 
+        char ch;
+        printf("Do you want to search books by Author again (Y\\N): ");
+        ch=getchar();
+        if(ch=='Y'||ch=='y')
+        searchBookbyAuthor(head);
+
 }
+
 
 void searchBookbyID(BOOKNODE *head){
     LAB3: ;//Label to return if invalid (not 10 digits)
@@ -1698,16 +1699,7 @@ void searchBookbyID(BOOKNODE *head){
         }
 
         //To print all closest searches of authors when exact match is not found
-        /*if(cs_count>0&&flag!=3){
-        cs_count=0;
-        printf("Closest searches:\n");
-        while(strlen(closest_search[cs_count])!=0){
-            printf("%hi. %s",(short)(cs_count+1),closest_search[cs_count]);
-            cs_count++;
-            if(cs_count==MAX_CLOSE_ID)
-            break; //Stop on reaching MAX_CLOSE_ID closest search
-        }
-        }*/
+
         if(cs_count>0&&flag!=3){
         printf("Closest searches:\n");
         for(int i=0;i<cs_count;i++){
@@ -1721,11 +1713,12 @@ void searchBookbyID(BOOKNODE *head){
         printf("No results found\n");
 
         char ch;
-        printf("Do you want to search again (Y\\N): ");
+        printf("Do you want to search books by ID again (Y\\N): ");
         ch=getchar();
         if(ch=='Y'||ch=='y')
         searchBookbyID(head);
 }
+
 
 
 
