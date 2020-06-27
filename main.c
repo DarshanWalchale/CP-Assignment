@@ -129,7 +129,7 @@ int main(void)
     loadCounters();
     //addNewBook(BookHead); Don't uncomment
     //addNewUser(UserHead); Don't unconnent
-    
+
     // /*
     printf("Program start\n");
     BookHead = loadLibrary(BookHead);
@@ -138,19 +138,19 @@ int main(void)
     printf("Users successfully loaded\n");
     displayAllBooks(BookHead);
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
-    
+
     //printf("Press Enter to Login"); Bruh
     //while(getchar() != '\n');
     //printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID());
-    
-    
+
+
     if(welcomeScreen(UserHead) == 0)
     {
         notifications(BookHead, &Current_User);
         while(menu() != 0);
     }
     // */
-    
+
     saveBookList(BookHead);
     printf("---BookList Saved---\n");
     freeLibrary(BookHead);
@@ -244,50 +244,50 @@ int menu(){
     {
         case 1:
             booksearchMenu(BookHead);
-    
+
             printf("Press Enter to return to the User menu\n");
             while (getchar() != '\n');
             goto userchoice;
             break;
-    
+
         case 2:
-    
+
             transaction:  // label to reach transaction menu
             printf("\n----------Book Transaction Menu----------\n");
             printf("1. Checkout a Book\n");
             printf("2. Return Book\n");
             printf("0. Return Back to Main Menu\n");
-    
+
             printf("Enter Choice: ");
             scanf("%d", &option);
-    
+
             switch(option)
             {
                 case 1:
                 //checkout book
                 searchBookbyTitle(BookHead);
-        
+
                 char title[MAX_TITLE_LENGTH]; // to save title entered by user temporarily
-    
+
                 printf("\nEnter Book Title to Checkout (Case Sensitive)\n ->");
                 fgets(title, MAX_TITLE_LENGTH, stdin);
-    
+
                 int result = checkout(title);
                 if(result == 0)
                 {
                     printf("Your Book has been successfully issued\n");
                     printf("Press Enter to return to Main Menu\n");
                     while(getchar() != '\n');
-    
+
                     goto userchoice;
-    
+
                 }
                 else if(result == 1)       //(checkout(title) == 1) Bruhh
-                {   
+                {
                     printf("No such Book Title\n");
                     printf("Press Enter to return to Transaction Menu\n");
                     while(getchar() != '\n');
-    
+
                     goto transaction;
                 }
                 else                        // user asked to to notify if him or not
@@ -300,13 +300,13 @@ int menu(){
 
                 case 2:
                     //return book
-    
+
                     returnBook();
                     printf("\nPress Enter to return to Transaction Menu\n");
                     while(getchar() != '\n');
                     goto transaction;
                     break;
-    
+
             }
             break;
 
@@ -593,7 +593,7 @@ void adminMenu()
             while(getchar() != '\n')
             ;
             deleteUser(UserHead, id);
-            
+
             printf("\nPress enter to return to the Admin menu");
             while(getchar() != '\n');
             goto ADMIN;
@@ -693,7 +693,7 @@ void reviewAdminPrivileges(USERNODE *head)
 
         case 0:
             return;
-            
+
             break;
 
         default:
@@ -904,7 +904,7 @@ void addNewUser(USERNODE *head)
             current->user.u_admin = false;
         }
         printf("---admin parameter assigned---\n");
-        
+
         current->user.u_user_ID = generateUserID();
         /*
         //Assigning values 0 because no book issued yet
@@ -921,7 +921,7 @@ void addNewUser(USERNODE *head)
         current->user.u_date_issue.tm_yday = 0;
         current->user.u_date_issue.tm_isdst = 0;
         */
-        
+
         saveUserList(UserHead);
 
         printf("Press Y/y to add another account: ");
@@ -1002,7 +1002,7 @@ void addNewBook(BOOKNODE *head)
         while(getchar() != '\n');
 
     }while((choice == 'Y') || (choice == 'y'));
-    
+
     saveBookList(head);
     return;
 }
@@ -1216,7 +1216,7 @@ USERNODE * loadUsers(USERNODE *head)
 int deleteUser(USERNODE *head, unsigned long id)
 {
     USERNODE *current = head, *temp;
-    
+
     //In case first node matches
     if(current->next->user.u_user_ID == id)
     {
@@ -1226,7 +1226,7 @@ int deleteUser(USERNODE *head, unsigned long id)
         saveUserList(head);
         return 0;
     }
-    
+
     // in case after first node matches
     while(current->next->next != NULL)
     {
