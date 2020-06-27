@@ -1,4 +1,5 @@
 // Library management system
+//For BITS Pilani
 // HEADER FILES
 #include <stdio.h>
 #include <stdbool.h>
@@ -1757,7 +1758,7 @@ void searchBookbyID(BOOKNODE *head){
     printf("Search by ID: ");
     scanf(" %11[^\n]", ID_search);
     while(getchar() != '\n');
-`    if((strlen(ID_search))!=10){
+    if((strlen(ID_search))!=10){
     printf("Invalid ID entered! (ID is 10 digits)\n");
     goto LAB3;
     }
