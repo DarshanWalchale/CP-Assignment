@@ -1323,7 +1323,7 @@ void printUserInfo(USER *user)
     char issueDate[128] = {};
     strftime(issueDate, 128, "%d-%b-%Y %H:%M:%S", &(user->u_date_issue));
     printf("Date Issued: %s\n", issueDate);
-    printf("Book Notify %s\n(You'll be notified once this book becomes available in the library opon login)\n", user->u_requested);
+    printf("Book to be Notified of: %s\n\t(You'll be notified once this book becomes available in the library opon login)\n", user->u_requested);
     printf("Admin Privileges: %s\n", (user->u_admin)?"Yes":"No");
     printf("----------------------------------------------------\n");
     return;
