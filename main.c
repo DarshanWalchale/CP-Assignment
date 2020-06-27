@@ -1589,7 +1589,7 @@ void searchBookbyTitle(BOOKNODE *head)
          char ch;
             printf("Would you like to search again? (Y/N): ");
             ch=getchar();
-            if(ch=='Y'||ch=='y') //To ask if the user wants to search again after an unsuccesful search
+            if(ch=='Y'||ch=='y') //To ask if the user wants to search again
             goto LAB1;
 
 
