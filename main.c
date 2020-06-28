@@ -2063,7 +2063,7 @@ void vendor_inv_Management(){
             c=getchar();
             if(c=='Y'||c=='y')
             searchBookbyTitle(BookHead);
-            printf("Enter the title of the book you would like to request: ");
+            printf("Enter the title of the book you would like to request: \n\t(Please match case if requesting from this library)\n");
             scanf("%s",title);
             while(getchar()!= '\n');
             short if_lib=0; //If library is present in library
