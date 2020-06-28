@@ -2053,8 +2053,10 @@ void notifications(BOOKNODE *head, USER *user)
 
         if(no_books_due)
         {
+            // current book's registered user ID matches with the passed user's ID
             if(current->book.b_user_ID == user->u_user_ID)
             {
+                // if not less than 15 days since issue, mark to return;
                 if(((current->book.b_date_issue.tm_year == now.tm_year) && (now.tm_yday - current->book.b_date_issue.tm_yday < 15))
                     ||((now.tm_year - current->book.b_date_issue.tm_year == 1) && (365 + now.tm_wday - current->book.b_date_issue.tm_wday < 15)))
                 {
@@ -2064,26 +2066,30 @@ void notifications(BOOKNODE *head, USER *user)
                 else
                 {
                     no_books_due = false;
-                    printf("%s\t\t%s\n", current->book.b_book_title, current->book.b_book_author);
+                    printf("%s\t%s\n", current->book.b_book_title, current->book.b_book_author);
                 }
             }
         }
     }
+    // if no books are required to return yet
     if(no_books_due)
     {
         printf("No Book Returns Due\n");
     }
     printf("------------------------------------------------------------\n");
-
+    
+    // if the book tp be notified about is available to issue
     if(book_notify)
     {
         printf("%s IS NOW AVAILABLE TO ISSUE!\n", user->u_requested);
         strcpy(user->u_requested, "\0");
-        saveBookList(head);
+        saveCurrentUser(head);
+        saveUserList(head);
     }
     return;
 }
 
+// copies values corresponding to passed user pointer into global Current_User struct variable
 void setCurrentUser(USER *user)
 {
     Current_User.u_user_ID = user->u_user_ID;
