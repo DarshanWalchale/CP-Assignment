@@ -1914,7 +1914,7 @@ void newlyAddedBooks(BOOKNODE *head)
         current = current->next;
         if(current->book.book_date_of_arrival.tm_year == now.tm_year)
         {
-            if(now.tm_mon - current->book.book_date_of_arrival.tm_mon > 4)
+            if((now.tm_mon - current->book.book_date_of_arrival.tm_mon) > 4)
             {
                 continue;
             }
@@ -1925,6 +1925,10 @@ void newlyAddedBooks(BOOKNODE *head)
             {
                 continue;
             }
+        }
+        else if(current->book.book_date_of_arrival.tm_year < now.tm_year)
+        {
+            continue;
         }
 
 
