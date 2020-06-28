@@ -166,15 +166,20 @@ int main(void)
     return 0;
 }
 
+
+
 int welcomeScreen(USERNODE *head)
 {
     int choice;
     printf("\n\n\n\n\n\t\t\tLIBRARY MANAGEMENT SYSTEM");
     printf("\n\t\t\t*************************\n");
-
+    
+    // displays new additions to the library
+    newlyAddedBooks(BookHead);
+    
     USERNODE *current = head;
 
-    printf("\n\n\t\t\tPress Enter to login");
+    printf("\n\t\t\tPress Enter to login");
     while(getchar() != '\n');
 
     static int loginerrorcount = 0; // if user can't register or login successfully in 5 attempts, just exit
@@ -731,7 +736,7 @@ void displayAdmins(USERNODE *head)
         current = current->next;
         if(current->user.u_admin)
         {
-            printf("%lu\t\t%s\t\t\t%s\n", current->user.u_user_ID, current->user.user_name, (current->user.u_admin)?"YES":"NO");
+            printf("%lu\t%s\t\t\t%s\n", current->user.u_user_ID, current->user.user_name, (current->user.u_admin)?"YES":"NO");
         }
     }
     printf("----------------------------------------------\n");
@@ -1744,9 +1749,9 @@ void newlyAddedBooks(BOOKNODE *head)
         printf("--------------------NO BOOKS TO DISPLAY--------------------\n");
     }
 
-    printf("------------------------------------------------------------\n");
+    //printf("------------------------------------------------------------\n");
     printf("AVAILABILITY\tAUTHOR\t\tTITLE\n");
-    printf("------------------------------------------------------------\n");
+    //printf("------------------------------------------------------------\n");
     char availability[15] = {};
 
     while(current->next != NULL)
