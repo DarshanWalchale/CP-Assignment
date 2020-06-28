@@ -1,5 +1,5 @@
-
 Library: Hennepin	Book requested: County
 Vendor: County	Book requested: Library
-Vendor: À+Fü	Book requested: /Fü
+Vendor: ï¿½+ï¿½Fï¿½	Book requested: ï¿½/ï¿½Fï¿½
 Vendor: Hennepin Vendor	Book requested: Guardians of Ga'Hoole
+Vendor: abc	Book requested: Sherlock	Author: Holmes
