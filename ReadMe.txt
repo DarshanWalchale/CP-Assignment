@@ -28,17 +28,17 @@ Note: This program was developed in CS50's IDE using Git for version control bet
 Main Menu
 	1. Search Books (all search functions are case-insensitive)
 		1. Search Book by Title:
-			*	Atleast four characters to be entered search books by Title
+			*	Atleast four characters to be entered to search books by Title
 			*	If entire title of book(s) is matched, all book(s), and number of copies (defined to be at most MAX_SAME_TITLE)
 				of the book is displayed with their details (ID, Author and availability).
 			*	If search is not exactly matched with any book, atmost MAX_CLOSE_TITLE_SEARCH books matching atleast first four
 				characters are suggested with their details.
 		2. Search Book by Author
-			*	Atleast four characters to be entered search books by author
+			*	Atleast four characters to be entered to search books by Author
 			*	If entire author's name of book(s) is matched, all book(s), and number of books (defined to be at most MAX_SAME_AUTHOR)
 				by that author is displayed with their Title, ID, Author's name (correct case) and availability.
 			*	If search is not exactly matched with any author name in all books, atmost MAX_CLOSE_AUTH_SEARCH authors' are suggested,
-				where atleast four characters of their name matches
+				where atleast four characters of the author's name matches
 		3. Search Book by Book ID (ID is a 10 digit number)
 			*	Atleast 6 digits to be entered to search books by ID
 			*	If ID is exactly matched, the book's title, author and availability is displayed
@@ -77,9 +77,9 @@ Main Menu
 				All requests made by the library are stored in sentRequests.txt. Text files named the respective
 				vendor/library records all requests made to it along with the name of the requesting library (LIMITATION %)
 			*	Other libraries can make requests for books in this library (title, library name required).
-				Search option is given here to find books in the current library. All requests are stored in recvdRequests.txt.
+				Search option is given here to find books in the current library. 
 				If book with same title (case sensitive) is present, author is not asked; else request is still taken, and user
-				is informed about it
+				is informed about it. All requests are stored in recvdRequests.txt.
 			*	Option to display all sent requests and received requests for current library
 
 		6. Review Admin Privileges
