@@ -554,15 +554,17 @@ void returnBook()
                 // upon finding a matching title
                 if(strcmp(current->book.b_book_title, Current_User.u_book_title) == 0)
                 {
-                     
+                     // checking if user ID matches
                      if(current->book.b_user_ID == Current_User.u_user_ID)
                      {
+                         // Reassign parameters to defaults
                          current->book.b_issue_ID = 0;
                          current->book.b_user_ID = 0;
                          current->book.b_book_status = 'A';
                          Current_User.u_book_ID = 0;
                          Current_User.u_issue_ID = 0;
                          strcpy(Current_User.u_book_title, "\0");
+                         
                          saveBookList(BookHead);
                          saveCurrentUser(UserHead);
                          saveUserList(UserHead);
@@ -570,7 +572,7 @@ void returnBook()
                      }
                 }
             }
-
+            
             break;
 
         default:
@@ -581,6 +583,8 @@ void returnBook()
     return;
 }
 
+// Menu driven, options given to search books based on different parameters, title, author, and bookID,
+// also applies a basic autocorrect
 void booksearchMenu()
 {
     int choice;
@@ -643,6 +647,7 @@ void booksearchMenu()
     return;
 }
 
+// Menu for Admin Actions
 void adminMenu()
 {
     int choice;
@@ -690,6 +695,7 @@ void adminMenu()
             break;
 
         case 4:
+            // takes title string from user and searches in BookList
             printf("Enter title: ");
             char title[MAX_TITLE_LENGTH];
             scanf(" %60[^\n]", title); //MAX_TITLE_LENGTH
@@ -715,7 +721,7 @@ void adminMenu()
             break;
 
         case 7:
-            displayAdminView(UserHead);
+            // takes input for the ID of the book to remove
             printf("Enter Book ID of the book you want to remove: ");
             scanf(" %lu", &id);
             while(getchar() != '\n')//To empty Input Buffer
@@ -742,6 +748,7 @@ void adminMenu()
     return;
 }
 
+// To Change admin status of members
 void reviewAdminPrivileges(USERNODE *head)
 {
     reviewAdminPrivilegesFlag:
@@ -809,6 +816,8 @@ void reviewAdminPrivileges(USERNODE *head)
     return;
 }
 
+// Displays all users, User ID, Username, and Admin Status
+// who have admin privileges
 void displayAdmins(USERNODE *head)
 {
     printf("--------------------ADMINS--------------------\n");
@@ -827,6 +836,8 @@ void displayAdmins(USERNODE *head)
     return;
 }
 
+// Displays all users, User ID, Username, and Admin Status
+// who do not have admin privileges
 void displayNonAdmins(USERNODE *head)
 {
     printf("--------------------NON-ADMINS--------------------\n");
@@ -845,6 +856,7 @@ void displayNonAdmins(USERNODE *head)
     return;
 }
 
+// Displays all users, User ID, Username, and Admin Status
 void displayAdminView(USERNODE *head)
 {
     printf("--------------------ADMIN VIEW--------------------\n");
@@ -872,12 +884,14 @@ int makeAdmin(USERNODE *head)
     printf("Enter UserID of account to grant admin priveleges to\n->");
     scanf(" %lu", &id);
     while(getchar() != '\n');//To empty Input Buffer
-
+    
+    // traverses UserList
     while(current->next != NULL)
     {
         current = current->next;
         if(current->user.u_user_ID == id)
         {
+            // if the user is already an admin
             if(current->user.u_admin)
             {
                 printf("This user is already an admin");
@@ -902,7 +916,10 @@ int makeAdmin(USERNODE *head)
     return status;
 }
 
-//
+// removes admin privileges from a given user ID
+// Returns   0: No errors, works as expected
+//          1: User Not Found
+//          2: User Not Admin
 int removeAdmin(USERNODE *head)
 {
     int status = 1;     //Returns   0: No errors, works as expected
@@ -917,12 +934,14 @@ int removeAdmin(USERNODE *head)
     printf("Enter UserID of account to remove admin priveleges from\n->");
     scanf(" %lu", &id);
     while(getchar() != '\n');//To empty Input Buffer
-
+    
+    // travserses UserList
     while(current->next != NULL)
     {
         current = current->next;
         if(current->user.u_user_ID == id)
         {
+            // In case the user is already not an admin
             if(current->user.u_admin == false)
             {
                 printf("This user is already not an admin");
@@ -947,6 +966,8 @@ int removeAdmin(USERNODE *head)
     return status;
 }
 
+// Gets necessary details from uesr, assigns rest of the details automatically
+// Adds new node to UserList and then saves the list to userdata.txt
 void addNewUser(USERNODE *head)
 {
     char c, adminrights = 'N';
@@ -962,6 +983,7 @@ void addNewUser(USERNODE *head)
             scanf(" %30[^\n]", uname);
             while(getchar() != '\n')//To empty Input Buffer
             ;
+            
             //checking if username exists or not
             current = head;
             while(current->next != NULL)
@@ -985,7 +1007,8 @@ void addNewUser(USERNODE *head)
         }
         current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
         current = current->next;
-
+        
+        // assigning username
         strcpy(current->user.user_name, uname);
 
         printf("Choose A Password: ");
@@ -1005,7 +1028,8 @@ void addNewUser(USERNODE *head)
             current->user.u_admin = false;
         }
         printf("---admin parameter assigned---\n");
-
+        
+        // generating and assigning a User ID
         current->user.u_user_ID = generateUserID();
 
         //Assigning values 0 because no book issued yet

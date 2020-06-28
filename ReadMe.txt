@@ -106,6 +106,9 @@ Main Menu
 				returns an error if userID not found
 			0. Return to Admin Menu
 
+		7. Delete a Book from the Library
+				Deletes book of a user given Book ID
+
 		0. Return to Main Menu
 
 	0. Exit from Library Portal
