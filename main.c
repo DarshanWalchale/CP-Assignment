@@ -446,7 +446,7 @@ int checkout(char *title)
                 //change, u_book_ID,     b_user_ID, updating issued title to user  and  b_book_status;
                 Current_User.u_book_ID = current->book.b_book_ID;
                 current->book.b_user_ID = Current_User.u_user_ID;
-                strcpy(Current_User.u_book_title, title);
+                strcpy(Current_User.u_book_title, current->book.b_book_title);
                 current->book.b_book_status = 'I';
 
                 // Assign Dates
@@ -530,9 +530,11 @@ void returnBook()
         saveUserList(UserHead);
         return;
     }
+    
     printf("Currently Issued Book\n -> %s\n", Current_User.u_book_title);
     printf("Press Y to return currently issued book\n");
     char choice;
+    BOOKNODE *current = BookHead;
 
     scanf(" %c", &choice);
     while(getchar() != '\n');//To empty Input Buffer
@@ -540,41 +542,35 @@ void returnBook()
     switch (choice)
     {
         case 'Y' :                                                          //return
-
-        Current_User.u_book_ID = 0;
-        Current_User.u_issue_ID = 0;
-
-        saveCurrentUser(UserHead);
-        saveUserList(UserHead);
-
-        BOOKNODE *current = BookHead;
-
-        while(current->next != NULL)
-        {
-            current = current->next;
-
-            if(strcmp(current->book.b_book_title, Current_User.u_book_title ) == 0)
+        
+            while(current->next != NULL)
             {
-                 if(current->book.b_book_status == 'I')
-                 {
-                     current->book.b_issue_ID = 0;
-                     current->book.b_user_ID = 0;
-                     current->book.b_book_status = 'A';
-                     saveBookList(BookHead);
-                     saveCurrentUser(UserHead);
-                     saveUserList(UserHead);
-                     return;
-                 }
+                current = current->next;
+    
+                if(strcmp(current->book.b_book_title, Current_User.u_book_title) == 0)
+                {
+                     if(current->book.b_book_status == 'I')
+                     {
+                         current->book.b_issue_ID = 0;
+                         current->book.b_user_ID = 0;
+                         current->book.b_book_status = 'A';
+                         Current_User.u_book_ID = 0;
+                         Current_User.u_issue_ID = 0;
+                         strcpy(Current_User.u_book_title, "\0");
+                         saveBookList(BookHead);
+                         saveCurrentUser(UserHead);
+                         saveUserList(UserHead);
+                         return;
+                     }
+                }
             }
-        }
-        break;
-
+            
+            break;
+    
         default:
-        printf("Press Enter to return to Menu\n");
-        while(getchar() != '\n');//To empty Input Buffer
+            printf("Press Enter to return to Menu\n");
+            while(getchar() != '\n');//To empty Input Buffer
         return;
-
-
     }
     return;
 }
@@ -1355,7 +1351,7 @@ int deleteUser(USERNODE *head, unsigned long id)
 void saveCurrentUser(USERNODE *head)
 {
     USERNODE *current = head;
-    while(current->next == NULL)
+    while(current->next != NULL)
     {
         current = current->next;
         if(current->user.u_user_ID == Current_User.u_user_ID)
@@ -1381,7 +1377,7 @@ void saveCurrentUser(USERNODE *head)
             current->user.u_date_issue.tm_isdst = Current_User.u_date_issue.tm_isdst;
         }
     }
-    saveUserList(head);
+    //saveUserList(head);
     return;
 }
 
@@ -1452,7 +1448,7 @@ void printUserInfo(USER *user)
     {
         printf("No Book Issued\n");
         printf("Issued Book Title:\tNo Book Issued\n");
-        printf("Issue ID =\t\tNo Book Issued\n");
+        printf("Issue ID:\t\tNo Book Issued\n");
         char issueDate[128] = {};
         strftime(issueDate, 128, "%d-%b-%Y %H:%M:%S", &(user->u_date_issue));
         if(strcmp(issueDate, "00-Jan-1900 00:00:00") == 0)
@@ -1468,7 +1464,7 @@ void printUserInfo(USER *user)
     {
         printf("%lu\n", user->u_book_ID);
         printf("Issued Book Title:\t%s\n", user->u_book_title/*getBookName(user->u_book_ID)*/);
-        printf("Issue ID =\t\t%lu\n", user->u_issue_ID);
+        printf("Issue ID:\t\t%lu\n", user->u_issue_ID);
         char issueDate[128] = {};
         strftime(issueDate, 128, "%d-%b-%Y %H:%M:%S", &(user->u_date_issue));
         printf("Date Issued:\t\t%s\n", issueDate);
@@ -1479,7 +1475,7 @@ void printUserInfo(USER *user)
     }
     else
     {
-        printf("Book Notify %s\n(You'll be notified once this book becomes available in the library opon login)\n", user->u_requested);
+        printf("Book Notify:\t\t%s\n\t\t\t(You'll be notified once this book becomes available in the library opon login)\n", user->u_requested);
     }
     printf("Admin Privileges:\t%s\n", (user->u_admin)?"Yes":"No");
     printf("----------------------------------------------------\n");
@@ -2019,6 +2015,7 @@ void setCurrentUser(USER *user)
     strcpy(Current_User.user_name, user->user_name);
     Current_User.u_book_ID = user->u_book_ID;
     Current_User.u_issue_ID = user->u_issue_ID;
+    strcpy(Current_User.u_book_title, user->u_book_title);
     strcpy(Current_User.u_user_pwd, user->u_user_pwd);
     Current_User.u_admin = user->u_admin;
     strcpy(Current_User.u_requested, user->u_requested);
