@@ -173,10 +173,10 @@ int welcomeScreen(USERNODE *head)
     int choice;
     printf("\n\n\n\n\n\t\t\tLIBRARY MANAGEMENT SYSTEM");
     printf("\n\t\t\t*************************\n");
-    
+
     // displays new additions to the library
     newlyAddedBooks(BookHead);
-    
+
     USERNODE *current = head;
 
     printf("\n\t\t\tPress Enter to login");
@@ -1606,7 +1606,7 @@ void searchBookbyAuthor(BOOKNODE *head){
         }
 
         if(flag==0&&cs_count==0)
-        printf("No results found");
+        printf("No results found\n");
 
         //To print all closest searches of authors when exact match is not found
 
