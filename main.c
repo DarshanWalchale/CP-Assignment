@@ -315,7 +315,7 @@ int menu(){
             switch(option)
             {
                 case 1:                     //checkout book
-                
+
                 printf("First Search for the book with our Search Feature\n");
                 // Lists book titles and closest book titles for user to see and make sure of spelling and case before entering
                 searchBookbyTitle(BookHead);
@@ -530,7 +530,7 @@ void returnBook()
         saveUserList(UserHead);
         return;
     }
-    
+
     printf("Currently Issued Book\n -> %s\n", Current_User.u_book_title);
     printf("Press Y to return currently issued book\n");
     char choice;
@@ -542,11 +542,11 @@ void returnBook()
     switch (choice)
     {
         case 'Y' :                                                          //return
-        
+
             while(current->next != NULL)
             {
                 current = current->next;
-    
+
                 if(strcmp(current->book.b_book_title, Current_User.u_book_title) == 0)
                 {
                      if(current->book.b_book_status == 'I')
@@ -564,9 +564,9 @@ void returnBook()
                      }
                 }
             }
-            
+
             break;
-    
+
         default:
             printf("Press Enter to return to Menu\n");
             while(getchar() != '\n');//To empty Input Buffer

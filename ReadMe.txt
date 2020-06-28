@@ -114,5 +114,6 @@ Known limitations of the code:
 % Text files for vendors\libraries storing requests sent to them cannot be accessed by the program, has to be opened manually
 #############################################################
 Contributions of the team members:
-Shreyas did searchBookbyTitle, searchBookbyAuthor, searchBookbyID, vendorManagement
+Shreyas did searchBookbyTitle, searchBookbyAuthor, searchBookbyID, vendorManagement.
+Aditya did the user login, addNewUser, menus, book transaction.
 #############################################################
