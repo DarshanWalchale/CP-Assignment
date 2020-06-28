@@ -2076,6 +2076,7 @@ void vendor_inv_Management(){
                     if(strcmp(current->book.b_book_title, title) == 0){
                         strcpy(auth,current->book.b_book_author);
                         if_lib=1;
+                        break;
                     }
                 }
 

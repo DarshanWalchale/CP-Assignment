@@ -78,7 +78,7 @@ Main Menu
 				vendor/library records all requests made to it along with the name of the requesting library (LIMITATION %)
 			*	Other libraries can make requests for books in this library (title, library name required).
 				Search option is given here to find books in the current library. All requests are stored in recvdRequests.txt. 
-				I
+				If book with same title (case sensitive) is present
 			*	Option to display all sent requests and received requests for current library
 
 		6. Review Admin Privileges
