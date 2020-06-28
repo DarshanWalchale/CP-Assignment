@@ -105,7 +105,7 @@ void newlyAddedBooks(BOOKNODE *head);
 void notifications(BOOKNODE *head, USER *user);
 void setCurrentUser(USER *);
 void saveBookList(BOOKNODE *head);
-void freeLibrary(BOOKNODE *head);
+void freeBookList(BOOKNODE *head);
 void saveCurrentUser(USERNODE *);
 void saveUserList(USERNODE *head);
 void freeUserList(USERNODE *head);
@@ -181,7 +181,7 @@ int main(void)
     printf("---BookList Saved---\n");
 
     // frees dynamically allocated linked list of books, BookList, from memory
-    freeLibrary(BookHead);
+    freeBookList(BookHead);
     printf("---BookList Freed---\n");
 
     //saves list of users to userdata.txt
@@ -1059,7 +1059,8 @@ void addNewUser(USERNODE *head)
     return;
 }
 
-// Gets
+// Gets necessary details from user, assigns rest of the details automatically
+// Adds new node to BookList and then saves the list to books.txt
 void addNewBook(BOOKNODE *head)
 {
     BOOKNODE *current = head;
@@ -1073,13 +1074,15 @@ void addNewBook(BOOKNODE *head)
     time_t sec = time(NULL);
     printf("sec = %lu \n", sec);
     printf("current time: %s\n", ctime(&sec));
-    struct tm time_of_event = *(localtime(&sec));
+    struct tm time_of_event = *(localtime(&sec)); // For assigning date of arrival to the library
     char choice;
     do
     {
+        // creates a new node
         current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
         current = current->next;
-        printf("DO\n");
+        
+        // getting and assigning details
         printf("Enter Book Title:\n->");
         scanf(" %60[^\n]", current->book.b_book_title); //MAX_TITLE_LENGTH
         while(getchar() != '\n');//To empty Input Buffer
@@ -1088,6 +1091,7 @@ void addNewBook(BOOKNODE *head)
         scanf(" %30[^\n]", current->book.b_book_author);
         while(getchar() != '\n');//To empty Input Buffer
 
+        // generates and assigns a unique Book ID
         current->book.b_book_ID = generateBookID();
         current->book.b_issue_ID = 0;
         current->book.b_user_ID = 0;
@@ -1098,7 +1102,7 @@ void addNewBook(BOOKNODE *head)
         printf("current time: %s\n", ctime(&sec));
         time_of_event = *(localtime(&sec));
 
-        //date of arrival struct tm
+        // date of arrival struct tm
         current->book.book_date_of_arrival.tm_sec = time_of_event.tm_sec;
         current->book.book_date_of_arrival.tm_min = time_of_event.tm_min;
         current->book.book_date_of_arrival.tm_hour = time_of_event.tm_hour;
@@ -1108,7 +1112,7 @@ void addNewBook(BOOKNODE *head)
         current->book.book_date_of_arrival.tm_wday = time_of_event.tm_wday;
         current->book.book_date_of_arrival.tm_yday = time_of_event.tm_yday;
         current->book.book_date_of_arrival.tm_isdst = time_of_event.tm_isdst;
-        //date_issue struct tm
+        // date_issue struct tm
         current->book.b_date_issue.tm_sec = 0;
         current->book.b_date_issue.tm_min = 0;
         current->book.b_date_issue.tm_hour = 0;
@@ -1118,8 +1122,8 @@ void addNewBook(BOOKNODE *head)
         current->book.b_date_issue.tm_wday = 0;
         current->book.b_date_issue.tm_yday = 0;
         current->book.b_date_issue.tm_isdst = 0;
-
-
+        
+        
         saveBookList(head);
 
         printf("Enter Y/y to enter another book: ");
@@ -1132,6 +1136,7 @@ void addNewBook(BOOKNODE *head)
     return;
 }
 
+// increments Book ID counter and saves couners, then returns the ID to the calling function
 unsigned long generateBookID()
 {
     Book_ID_Counter++;
@@ -1139,6 +1144,7 @@ unsigned long generateBookID()
     return (Book_ID_Counter);
 }
 
+// increments Issue ID counter and saves couners, then returns the ID to the calling function
 unsigned long generateIssueID()
 {
     Issue_ID_Counter++;
@@ -1146,6 +1152,7 @@ unsigned long generateIssueID()
     return (Issue_ID_Counter);
 }
 
+// increments User ID counter and saves couners, then returns the ID to the calling function
 unsigned long generateUserID()
 {
     User_ID_Counter++;
@@ -1154,6 +1161,7 @@ unsigned long generateUserID()
     return (User_ID_Counter);
 }
 
+// Saves all 3 counter variables to a file calles counterdata.txt
 void saveCounters()
 {
     FILE *fp = fopen("counterdata.txt", "w");
@@ -1164,25 +1172,27 @@ void saveCounters()
 
 // Give pointer to head BOOKNODE (initialized in main)
 // Loads the entire library into memory using a dynamic linked list (utilizes higher reading speed of RAM and reduces file I/O process requirement)
+// Returns head pointer to the Linked List BookList created
 BOOKNODE * loadBookList(BOOKNODE *head)
 {
-    loadCounters();
     FILE *fp = fopen("books.txt", "r");
-    BOOK *book_load = calloc(1, sizeof(BOOK));
+    BOOK *book_load = calloc(1, sizeof(BOOK)); // tmeporary object pointer for storing each book read
     BOOKNODE *current = head;
-    printf("\t1\n");
+    
+    // loop ends when no more books can be read
     while(fread(book_load, sizeof(BOOK), 1, fp))
     {
+        // creates a new node in BookList
         current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
         current = current->next;
-
+        
+        // copies info into the new node
         strcpy(current->book.b_book_title, book_load->b_book_title);
         strcpy(current->book.b_book_author, book_load->b_book_author);
         current->book.b_book_ID = book_load->b_book_ID;
         current->book.b_issue_ID = book_load->b_issue_ID;
         current->book.b_user_ID = book_load->b_user_ID;
         current->book.b_book_status = book_load->b_book_status;
-
         //time struct tm part
         current->book.book_date_of_arrival.tm_sec = book_load->book_date_of_arrival.tm_sec;
         current->book.book_date_of_arrival.tm_min = book_load->book_date_of_arrival.tm_min;
@@ -1206,10 +1216,12 @@ BOOKNODE * loadBookList(BOOKNODE *head)
     }
 
     fclose(fp);
+    free(book_load);
 
     return head;
 }
 
+// Saves book in each node to the file from head to last node
 void saveBookList(BOOKNODE *head)
 {
     saveCounters();
@@ -1218,6 +1230,7 @@ void saveBookList(BOOKNODE *head)
 
     while(current->next != NULL)
     {
+        // saves each node's book struct
         current = current->next;
         fwrite(&(current->book), sizeof(BOOK), 1, fp);
     }
@@ -1225,7 +1238,8 @@ void saveBookList(BOOKNODE *head)
     return;
 }
 
-void freeLibrary(BOOKNODE *head)
+// Recursive function to free the entire linked list BookList
+void freeBookList(BOOKNODE *head)
 {
     if(head->next == NULL)
     {
@@ -1234,11 +1248,12 @@ void freeLibrary(BOOKNODE *head)
     }
     else
     {
-        freeLibrary(head->next);
+        freeBookList(head->next);
     }
     return;
 }
 
+// reads the counter variables from counterdata.txt
 void loadCounters()
 {
     FILE *fp = fopen("counterdata.txt", "r");
@@ -1262,17 +1277,23 @@ void loadCounters()
     return;
 }
 
+// Give pointer to head USERNODE (initialized in main)
+// Loads the entire list of users into memory using a dynamic linked list (utilizes higher reading speed of RAM and reduces file I/O process requirement)
+// Returns head pointer to the Linked List UserList created
 USERNODE * loadUsers(USERNODE *head)
 {
     FILE *fp = fopen("userdata.txt", "r");
-    USER *user_load = (USER *)calloc(1, sizeof(USER));
-
+    USER *user_load = (USER *)calloc(1, sizeof(USER)); // tmeporary object pointer for storing each user read
     USERNODE *current = head;
+    
+    // loop ends when no more users can be read
     while(fread(user_load, sizeof(USER), 1, fp))
     {
+        // creates a new node in UserList
         current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
         current = current->next;
-
+        
+        // copies details
         current->user.u_user_ID = user_load->u_user_ID;
         strcpy(current->user.user_name, user_load->user_name);
         current->user.u_book_ID = user_load->u_book_ID;
@@ -1281,7 +1302,6 @@ USERNODE * loadUsers(USERNODE *head)
         strcpy(current->user.u_user_pwd, user_load->u_user_pwd);
         current->user.u_admin = user_load->u_admin;
         strcpy(current->user.u_requested, user_load->u_requested);
-
         //date of issue struct tm part
         current->user.u_date_issue.tm_sec = user_load->u_date_issue.tm_sec;
         current->user.u_date_issue.tm_min = user_load->u_date_issue.tm_min;
@@ -1299,7 +1319,9 @@ USERNODE * loadUsers(USERNODE *head)
     return head;
 }
 
-// RETURN 0: normal, 1: ID not found
+// links the node previous to the node to delete to the node after the node to delete, and then frees that node memory
+// Return Value     0: normal, no errors
+//                  1: ID not found
 int deleteBook(BOOKNODE *head, unsigned long id)
 {
     BOOKNODE *current = head, *temp;
@@ -1317,6 +1339,7 @@ int deleteBook(BOOKNODE *head, unsigned long id)
     // in case After first node matches
     while(current->next->next != NULL)
     {
+        // removes matching node from list and frees its memory
         if(current->next->book.b_book_ID == id)
         {
             temp = current->next;
@@ -1329,11 +1352,14 @@ int deleteBook(BOOKNODE *head, unsigned long id)
     }
     // saves booklist in memory to file
     saveBookList(head);
+    // execution only reaches here if ID not found
     printf("\t---ERROR: ID not found\n");
     return 1;
 }
 
-// RETURN 0: normal, 1: ID not found
+// links the node previous to the node to delete to the node after the node to delete, and then frees that node memory
+// Return Value     0: normal, no errors
+//                  1: ID not found
 int deleteUser(USERNODE *head, unsigned long id)
 {
     USERNODE *current = head, *temp;
@@ -1341,6 +1367,7 @@ int deleteUser(USERNODE *head, unsigned long id)
     //In case first node matches
     if(current->next->user.u_user_ID == id)
     {
+        // removes matching node from list and frees its memory
         temp = current->next;
         current->next = current->next->next;
         free(temp);
@@ -1353,6 +1380,7 @@ int deleteUser(USERNODE *head, unsigned long id)
     {
         if(current->next->user.u_user_ID == id)
         {
+            // removes matching node from list and frees its memory
             temp = current->next;
             current->next = current->next->next;
             free(temp);
@@ -1363,16 +1391,22 @@ int deleteUser(USERNODE *head, unsigned long id)
     }
     // saves userlist in memory to file
     saveUserList(head);
+    // execution only reaches here if ID not found
     printf("\t---ERROR: ID not found\n");
     return 1;
 }
 
+// Copies data from global struct cariable Current_User to the appropriate place in the UserList
 void saveCurrentUser(USERNODE *head)
 {
     USERNODE *current = head;
+    
+    // traverses UserList
     while(current->next != NULL)
     {
         current = current->next;
+        
+        // if ID matches Current_User ID
         if(current->user.u_user_ID == Current_User.u_user_ID)
         {
             current->user.u_user_ID = Current_User.u_user_ID;
@@ -1396,27 +1430,20 @@ void saveCurrentUser(USERNODE *head)
             current->user.u_date_issue.tm_isdst = Current_User.u_date_issue.tm_isdst;
         }
     }
-    //saveUserList(head);
+    saveUserList(head);
     return;
 }
 
-// saves userlist in memory to file
+// Saves book in each node to the file from head to last node
 void saveUserList(USERNODE *head)
 {
-    //printf("entered saveUserList()\n");
-    saveCounters();
-    //printf("savecounters() done\n");
-
     FILE *fp = fopen("userdata.txt", "w");
-    if(fp == NULL)
-    {
-        printf("saveUserList couldn't open the file\n");
-    }
 
     USERNODE *current = head;
 
     while(current->next != NULL)
     {
+        // saves each node's user struct
         current = current->next;
         fwrite(&current->user, sizeof(USER), 1, fp);
     }
@@ -1426,6 +1453,7 @@ void saveUserList(USERNODE *head)
 }
 
 // frees dynamically allocated linked list of users' data from memory
+// Recursive function to free the entire linked list UserList
 void freeUserList(USERNODE *head)
 {
     if(head->next == NULL)
@@ -1440,14 +1468,17 @@ void freeUserList(USERNODE *head)
     return;
 }
 
+// returns number of nodes in BookList having the title as passed
 int titleCount(BOOKNODE *head, char *title)
 {
     BOOKNODE *current = head;
     int count = 0;
-
+    
+    // traverses BookList
     while(current->next != NULL)
     {
         current = current->next;
+        // if title matches
         if(strcmp(current->book.b_book_title, title) == 0)
         {
             count++;
@@ -1456,6 +1487,7 @@ int titleCount(BOOKNODE *head, char *title)
     return count;
 }
 
+// Displays All Information about the Current_User
 void printUserInfo(USER *user)
 {
     printf("\n--------------------ACCOUNT INFO--------------------\n");
@@ -1463,6 +1495,8 @@ void printUserInfo(USER *user)
     printf("Username:\t\t%s\n", user->user_name);
 
     printf("Issued Book ID:\t\t");
+    
+    // If no book issued
     if(user->u_book_ID == 0)
     {
         printf("No Book Issued\n");
@@ -1479,6 +1513,7 @@ void printUserInfo(USER *user)
             printf("Date Last Issued:\t%s\n", issueDate);
         }
     }
+    // if book is issued
     else
     {
         printf("%lu\n", user->u_book_ID);
@@ -1488,10 +1523,12 @@ void printUserInfo(USER *user)
         strftime(issueDate, 128, "%d-%b-%Y %H:%M:%S", &(user->u_date_issue));
         printf("Date Issued:\t\t%s\n", issueDate);
     }
+    // if no book requested
     if(strcmp(user->u_requested, "\0") == 0)
     {
         printf("Book Notify:\t\tNo Book to Notify\n");
     }
+    // if book is requested
     else
     {
         printf("Book Notify:\t\t%s\n\t\t\t(You'll be notified once this book becomes available in the library opon login)\n", user->u_requested);
@@ -1519,7 +1556,7 @@ char * getBookName(BOOKNODE *head, unsigned long bookID)
 }
 */
 
-
+// 
 void searchBookbyTitle(BOOKNODE *head)
 {
     BOOKNODE *current = head; //Initialising head pointer of linked list of all books to BOOKNODE type pointer current
