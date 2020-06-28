@@ -411,13 +411,14 @@ int menu(){
 
 // checkout handles checking out given a book title string, it also handles saving book title to notify on next login
 // title is the name of the book passed by the user
+// Return Value     0: book found, available, and assigned successfully,
+//                  1: no book title found,
+//                  2: book title found, but not available, option given to set as alert for this book.
+//                  3: User already has a book issued
 int checkout(char *title)
 {
 
-    int status = 1; // 0: book found, available, and assigned successfully,
-                    // 1: no book title found,
-                    // 2: book title found, but not available, option given to set as alert for this book.
-                    // 3: User already has a book issued
+    int status = 1;
 
     if(Current_User.u_book_ID != 0)
     {
@@ -426,11 +427,13 @@ int checkout(char *title)
     }
 
     BOOKNODE *current = BookHead;
-
+    
+    // traversing BookList
     while(current->next != NULL)
     {
         current = current->next;
-
+        
+        // if title in current book matches given title
         if(strcmp(current->book.b_book_title, title) == 0)
         {
             if(current->book.b_book_status == 'A')
@@ -482,9 +485,9 @@ int checkout(char *title)
             }
         }
     }
+    //if book title was found but not available
     if(status == 2)
     {
-        status = 2;
         char choice;
         do
         {
@@ -518,8 +521,10 @@ int checkout(char *title)
     return status;
 }
 
+// for Returning a book
 void returnBook()
 {
+    // case if no book is issued by the Current User
     if(Current_User.u_book_ID == 0)
     {
         printf("No Book Issued currently!\n");
@@ -527,26 +532,30 @@ void returnBook()
         saveUserList(UserHead);
         return;
     }
-
+    
+    // prints currently issued book title and asks for confirmation to return
     printf("Currently Issued Book\n -> %s\n", Current_User.u_book_title);
     printf("Press Y to return currently issued book\n");
     char choice;
     BOOKNODE *current = BookHead;
-
+    
+    
     scanf(" %c", &choice);
-    while(getchar() != '\n');//To empty Input Buffer
+    while(getchar() != '\n');// To empty Input Buffer
     choice = toupper(choice);
     switch (choice)
     {
         case 'Y' :                                                          //return
-
+            // traverses through the Booklist
             while(current->next != NULL)
             {
                 current = current->next;
-
+                
+                // upon finding a matching title
                 if(strcmp(current->book.b_book_title, Current_User.u_book_title) == 0)
                 {
-                     if(current->book.b_book_status == 'I')
+                     
+                     if(current->book.b_user_ID == Current_User.u_user_ID)
                      {
                          current->book.b_issue_ID = 0;
                          current->book.b_user_ID = 0;
