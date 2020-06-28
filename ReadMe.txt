@@ -27,11 +27,20 @@ Note: This program was developed in CS50's IDE using Git for version control bet
 4. Once logged in, the Main Menu is displayed. Below is a map of all menu and their options, descriptions of the options are given
 Main Menu
 	1. Search Books (all search functions are case-insensitive)
-		1. Search Book by Title
+		1. Search Book by Title:
+			*	Atleast four characters to be entered search books by Title
+			*	If entire title of book(s) is matched, all book(s), and number of copies (defined to be at most MAX_SAME_TITLE) of the book is displayed with their details (ID, Author and availability).
+			*	If search is not exactly matched with any book, atmost MAX_CLOSE_TITLE_SEARCH books matching atleast first four characters are displayed with their details.
 		2. Search Book by Author
-		3. Search Book by Book ID
+			*	Atleast four characters to be entered search books by author
+			*	If entire author's name of book(s) is matched, all book(s), and number of books (defined to be at most MAX_SAME_AUTHOR) by that author is displayed with their Title, ID, Author's name (correct case) and availability.
+			*	If search is not exactly matched with any author name in all books, atmost MAX_CLOSE_AUTH_SEARCH authors' are suggested, where atleast four characters of their name matches
+		3. Search Book by Book ID (ID is a 10 digit number)
+			*	Atleast 6 digits to be entered to search books by ID
+			*	If ID is exactly matched, the book's title, author and availability is displayed
+			*	If search is not exactly matched,
 		4. Display All Books
-			Displays Availability, Title, Author, and
+			Displays Availability, Title, Author, and ID
 		0. Return to Main Menu
 
 	2. Book Transaction

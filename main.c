@@ -1761,8 +1761,6 @@ void searchBookbyID(BOOKNODE *head){
                 printf("(Not available (Issued))\n");
                 else
                 printf("Undefined)\n"); //To account for faulty/incomplete entry of status of book
-
-                printf("\tID: %s\n",str_ID);
                 printf("\tAuthor: %s\n",current->book.b_book_author);
 
                 flag=3;
