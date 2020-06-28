@@ -324,7 +324,7 @@ int menu(){
 
                 printf("\nEnter Book Title to Checkout (Case Sensitive)\n ->");
                 //fgets(title, MAX_TITLE_LENGTH, stdin);
-                scanf(" %30[^\n]", title);      //MAX_TITLE_LENGTH
+                scanf(" %60[^\n]", title);      //MAX_TITLE_LENGTH
                 while(getchar() != '\n') // To empty input buffer
                 ;
 
