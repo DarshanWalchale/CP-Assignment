@@ -136,10 +136,8 @@ int main(void)
 {
     // Allocating memory for Head variables for BookList and UserList
     BookHead = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
-    printf("BookHead->next = %p\n", BookHead->next);
     UserHead = (USERNODE *)calloc(1, sizeof(USERNODE));
-    printf("UserHead->next = %p\n", UserHead->next);
-
+    
     // Loading Counters for generating BookID, UserID, and IssueID
     loadCounters();
     printf("loadcounters done in main\n");
@@ -323,7 +321,6 @@ int menu(){
                 char title[MAX_TITLE_LENGTH]; // to save title entered by user temporarily
 
                 printf("\nEnter Book Title to Checkout (Case Sensitive)\n ->");
-                //fgets(title, MAX_TITLE_LENGTH, stdin);
                 scanf(" %60[^\n]", title);      //MAX_TITLE_LENGTH
                 while(getchar() != '\n') // To empty input buffer
                 ;
@@ -346,7 +343,7 @@ int menu(){
 
                     goto transaction;
                 }
-                else                        // user asked to to notify if him or not
+                else                        // user asked to to notify or book already issued prior
                 {
                     printf("Press Enter to return to Transaction Menu\n");
                     while(getchar() != '\n');//To empty Input Buffer
@@ -854,14 +851,12 @@ void displayAdminView(USERNODE *head)
     return;
 }
 
+//Returns   0: No errors, works as expected
+//          1: User Not Found
+//          2: User Already Admin
 int makeAdmin(USERNODE *head)
 {
-    int status = 1;     //Returns   0: No errors, works as expected
-                        //          1: User Not Found
-                        //          2: User Already Admin
-
-
-
+    int status = 1;     
     USERNODE *current = head;
     displayAdmins(head);
     unsigned long id = 0;
@@ -1032,7 +1027,6 @@ void addNewUser(USERNODE *head)
 
 void addNewBook(BOOKNODE *head)
 {
-    printf("addnewbook called\n");
     BOOKNODE *current = head;
 
     // moves to the end of the linked list
@@ -1041,7 +1035,7 @@ void addNewBook(BOOKNODE *head)
         current = current->next;
     }
 
-    time_t sec = 0.9 * time(NULL); // leave as 0.9 * ... for now, this allows us to add books so that date of issue is much earlier
+    time_t sec = time(NULL);
     printf("sec = %lu \n", sec);
     printf("current time: %s\n", ctime(&sec));
     struct tm time_of_event = *(localtime(&sec));
@@ -1064,7 +1058,7 @@ void addNewBook(BOOKNODE *head)
         current->book.b_user_ID = 0;
         current->book.b_book_status = 'A';
 
-        sec = 0.9 * time(NULL);
+        sec = time(NULL);
         printf("sec = %lu \n", sec);
         printf("current time: %s\n", ctime(&sec));
         time_of_event = *(localtime(&sec));
@@ -1091,7 +1085,6 @@ void addNewBook(BOOKNODE *head)
         current->book.b_date_issue.tm_isdst = 0;
 
 
-        //fwrite(&book, sizeof(BOOK), 1, fp);
         saveBookList(head);
 
         printf("Enter Y/y to enter another book: ");
@@ -1138,20 +1131,15 @@ void saveCounters()
 // Loads the entire library into memory using a dynamic linked list (utilizes higher reading speed of RAM and reduces file I/O process requirement)
 BOOKNODE * loadBookList(BOOKNODE *head)
 {
-    printf("loadBookList() called\n");
     loadCounters();
-    printf("loadcounters successful\n");
     FILE *fp = fopen("books.txt", "r");
     BOOK *book_load = calloc(1, sizeof(BOOK));
     BOOKNODE *current = head;
     printf("\t1\n");
     while(fread(book_load, sizeof(BOOK), 1, fp))
     {
-
-        printf("1\t");
         current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
         current = current->next;
-        printf("1\t");
 
         strcpy(current->book.b_book_title, book_load->b_book_title);
         strcpy(current->book.b_book_author, book_load->b_book_author);
@@ -1180,7 +1168,6 @@ BOOKNODE * loadBookList(BOOKNODE *head)
         current->book.b_date_issue.tm_wday = book_load->b_date_issue.tm_wday;
         current->book.b_date_issue.tm_yday = book_load->b_date_issue.tm_yday;
         current->book.b_date_issue.tm_isdst = book_load->b_date_issue.tm_isdst;
-        printf("A\n");
     }
 
     fclose(fp);
@@ -1242,12 +1229,10 @@ void loadCounters()
 
 USERNODE * loadUsers(USERNODE *head)
 {
-    printf("loadusers called");
     FILE *fp = fopen("userdata.txt", "r");
     USER *user_load = (USER *)calloc(1, sizeof(USER));
 
     USERNODE *current = head;
-    printf("\t1\n");
     while(fread(user_load, sizeof(USER), 1, fp))
     {
         current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
@@ -1272,7 +1257,6 @@ USERNODE * loadUsers(USERNODE *head)
         current->user.u_date_issue.tm_wday = user_load->u_date_issue.tm_wday;
         current->user.u_date_issue.tm_yday = user_load->u_date_issue.tm_yday;
         current->user.u_date_issue.tm_isdst = user_load->u_date_issue.tm_isdst;
-        //printf("A");
     }
     fclose(fp);
     free(user_load);
@@ -2213,207 +2197,3 @@ void vendor_inv_Management(){
         goto LAB;
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-//JUNK
-/*
-void addNewUser(USER *user)
-{
-    FILE *fp = fopen("userdata.txt", "a");
-    fprintf(fp, "%lu,%s,%lu,%lu,%s,%d,", user->u_user_ID, user->user_name, user->u_book_ID, user->u_issue_ID, user->u_user_pwd, user->u_admin);
-    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,\n", user->u_date_issue.tm_sec, user->u_date_issue.tm_min, user->u_date_issue.tm_hour,
-                                                  user->u_date_issue.tm_mday, user->u_date_issue.tm_mon, user->u_date_issue.tm_year,
-                                                  user->u_date_issue.tm_wday, user->u_date_issue.tm_yday, user->u_date_issue.tm_isdst);
-    fclose(fp);
-    return;
-}
-
-
-void addNewBook(BOOK *book)
-{
-    FILE *fp = fopen("books.txt", "a");
-
-    //fwrite(book, sizeof(BOOK), 1, fp);
-
-    fprintf(fp, "%s,%s,%lu,%lu,%lu,%c,", book->b_book_title, book->b_book_author, book->b_book_ID, book->b_issue_ID,
-                                         book->b_user_ID, book->b_book_status);
-    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,", book->book_date_of_arrival.tm_sec, book->book_date_of_arrival.tm_min,
-                                               book->book_date_of_arrival.tm_hour, book->book_date_of_arrival.tm_mday,
-                                               book->book_date_of_arrival.tm_mon, book->book_date_of_arrival.tm_year,
-                                               book->book_date_of_arrival.tm_wday, book->book_date_of_arrival.tm_yday,
-                                               book->book_date_of_arrival.tm_isdst);
-    fprintf(fp, "%d,%d,%d,%d,%d,%d,%d,%d,%d,\n", book->b_date_issue.tm_sec, book->b_date_issue.tm_min,
-                                                 book->b_date_issue.tm_hour, book->b_date_issue.tm_mday,
-                                                 book->b_date_issue.tm_mon, book->b_date_issue.tm_year,
-                                                 book->b_date_issue.tm_wday, book->b_date_issue.tm_yday,
-                                                 book->b_date_issue.tm_isdst);
-    fclose(fp);
-    return;
-}
-
-// This function takes a file pointer opened in reading mode and takes the next line of the file and stores that data using the given USER struct
-// WARNING it's upto the calling function to open a file buffer and use the USER structure
-USER * loadNextUser(FILE *fp, USER* user)
-{
-    // if the end of file has been reached, close the file pointer and return NULL
-    if(feof(fp))
-    {
-        //fclose(fp);      // Not sure if I should close the file pointer here
-        user = NULL;
-        return NULL;
-    }
-
-    char buffer[4096] = {};
-    fgets(buffer, 4096, fp);
-
-    char *pointer = strtok(buffer, ",");
-    user->u_user_ID = atol(pointer);
-
-    pointer = strtok(NULL, ",");
-    strcpy(user->user_name, pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_book_ID = atol(pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_issue_ID = atol(pointer);
-
-    pointer = strtok(NULL, ",");
-    strcpy(user->u_user_pwd, pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_admin = (bool)atoi(pointer);
-
-    // TIME tm struct part
-    pointer = strtok(NULL, ",");
-    user->u_date_issue.tm_sec = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_date_issue.tm_min = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_date_issue.tm_hour = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_date_issue.tm_mday = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_date_issue.tm_mon = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_date_issue.tm_year = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_date_issue.tm_wday = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_date_issue.tm_yday = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    user->u_date_issue.tm_isdst = atoi(pointer);
-
-    return user;
-}
-
-BOOK * loadNextBook(FILE *fp, BOOK *book)
-{
-    // if the end of file has been reached, close the file pointer and return NULL
-    if(feof(fp))
-    {
-        //fclose(fp);      // Not sure if I should close the file pointer here
-        book = NULL;
-        return NULL;
-    }
-
-    char buffer[4096] = {};
-    fgets(buffer, 4096, fp);
-
-    char *pointer = strtok(buffer, ",");
-    strcpy(book->b_book_title, pointer);
-
-    pointer = strtok(NULL, ",");
-    strcpy(book->b_book_author, pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_book_ID = atol(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_issue_ID = atol(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_user_ID = atol(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_book_status = pointer[0];
-
-    //time tm struct part for date_of_arrival
-    pointer = strtok(NULL, ",");
-    book->book_date_of_arrival.tm_sec = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->book_date_of_arrival.tm_min = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->book_date_of_arrival.tm_hour = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->book_date_of_arrival.tm_mday = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->book_date_of_arrival.tm_mon = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->book_date_of_arrival.tm_year = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->book_date_of_arrival.tm_wday = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->book_date_of_arrival.tm_yday = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->book_date_of_arrival.tm_isdst = atoi(pointer);
-
-    //time tm struct part for date_of_arrival
-    pointer = strtok(NULL, ",");
-    book->b_date_issue.tm_sec = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_date_issue.tm_min = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_date_issue.tm_hour = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_date_issue.tm_mday = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_date_issue.tm_mon = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_date_issue.tm_year = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_date_issue.tm_wday = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_date_issue.tm_yday = atoi(pointer);
-
-    pointer = strtok(NULL, ",");
-    book->b_date_issue.tm_isdst = atoi(pointer);
-
-    return book;
-}
-*/
