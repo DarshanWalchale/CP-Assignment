@@ -10,10 +10,10 @@
 
 // DEFINES
 #define MAX_TITLE_LENGTH 60 //Maximum length of title of book to be stored, can be reduced for optimisation, but cannot be increased (LIMITATION)
-#define MAX_CLOSE_TITLE_SEARCH 30
-#define MAX_CLOSE_AUTH_SEARCH 200 //Maximum number of closest seraches of authors to display
+#define MAX_CLOSE_TITLE_SEARCH 30 //Maximum number of closest searches of title to display
+#define MAX_CLOSE_AUTH_SEARCH 200 //Maximum number of closest searches of authors to display
 #define MAX_SAME_AUTHOR 100 //Maximum number of books of same author to display
-#define MAX_CLOSE_ID 1000 //Maximum number of closest seraches of ID to display
+#define MAX_CLOSE_ID 1000 //Maximum number of closest searches of ID to display
 #define MAX_SAME_TITLE 15 //Maximum number of books of same title
 
 // STRUCTURES
@@ -1690,7 +1690,7 @@ void searchBookbyTitle(BOOKNODE *head)
 void displayAllBooks(BOOKNODE *head)
 {
     BOOKNODE *current = head;
-    
+
     // if BookList in empty
     if(head->next == NULL)
     {
@@ -1700,10 +1700,10 @@ void displayAllBooks(BOOKNODE *head)
     printf("------------------------------------------------------------\n");
     printf("AVAILABILITY\tBOOK ID\t\tAUTHOR\t\tTITLE\n");
     printf("------------------------------------------------------------\n");
-    
+
     // this is to print availability of the book appropriately
     char availability[15] = {};
-    
+
     // traverses BookList
     while(current->next != NULL)
     {
@@ -1966,7 +1966,7 @@ void newlyAddedBooks(BOOKNODE *head)
     struct tm now = *(localtime(&sec));
     printf("----------------------NEWLY ADDED BOOKS----------------------\n");
     BOOKNODE *current = head;
-    
+
     // if BookList is empty
     if(head->next == NULL)
     {
@@ -1977,12 +1977,12 @@ void newlyAddedBooks(BOOKNODE *head)
     printf("AVAILABILITY\tAUTHOR\t\tTITLE\n");
     //printf("------------------------------------------------------------\n");
     char availability[15] = {};
-    
+
     // traverses BookList
     while(current->next != NULL)
     {
         current = current->next;
-        
+
         // if date of arrival year is same as current year
         if(current->book.book_date_of_arrival.tm_year == now.tm_year)
         {
@@ -2006,9 +2006,9 @@ void newlyAddedBooks(BOOKNODE *head)
         {
             continue;
         }
-            
+
             // only reaches here if the book is not more then 4 months old
-            
+
             if(current->book.b_book_status == 'A')
             {
                 strcpy(availability, "Available");
