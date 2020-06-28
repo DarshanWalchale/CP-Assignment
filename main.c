@@ -211,9 +211,8 @@ int welcomeScreen(USERNODE *head)
     while(getchar() != '\n');//To empty Input Buffer
 
     static int loginerrorcount = 0; // if user can't register or login successfully in 5 attempts, just exit
-    char c;
-    char uName[30];
-    char pwd[30]; // local char arrays to store details just as entered
+    char uName[30];                 // local char array to store username entered
+    char pwd[30];                   // local char array to store password entered
 
     do
     {
@@ -226,16 +225,24 @@ int welcomeScreen(USERNODE *head)
         scanf(" %29s", pwd);
         while(getchar() != '\n')//To empty Input Buffer
         ;
+        
+        // traversing UserList and comparing login details
         current = head;
         while (current->next != NULL)
         {
             current = current->next;
+            
+            //checks for username match
             if(strcmp(current->user.user_name, uName) == 0)
             {
                 printf("Username Matched\n");
+                
+                // checks for password match
                 if(strcmp(current->user.u_user_pwd, pwd) == 0)
                 {
                     printf ("Password Matched\n");
+                    
+                    // copies details of current user to a global variable
                     setCurrentUser(&current->user);
                     return 0;
                 }
@@ -259,16 +266,20 @@ int welcomeScreen(USERNODE *head)
     return 1;
 }
 
+// Main Menu for the program
+//Return Value      0: exit program
+//                  1: dont exit program
 int menu(){
-    int choice;
-    userchoice: // label to return to Main menu
+    int choice, option; // variables for taking input
+    mainmenuflag: // label to return to Main menu
+    
     printf("\n--------------------MAIN MENU--------------------\n");
     printf("1. Search Books\n");
     printf("2. Book Transaction\n");
     printf("3. Account Info\n");
     if(Current_User.u_admin)
     {
-        printf("9. Admin Menu\n");
+        printf("9. Admin Menu\n"); // Only printed if current user is an admin
     }
     printf("0. Exit from Library Portal\n");
 
@@ -276,17 +287,18 @@ int menu(){
     scanf(" %d", &choice);
     while(getchar() != '\n')//To empty Input Buffer
     ;
-    int option;
 
     switch(choice)
     {
         case 1:
             booksearchMenu(BookHead);
-            goto userchoice;
+            printf("Press Enter to Return to Main Menu\n");
+            while(getchar() != '\n') // To emoty Input Buffer
+            ;
+            goto mainmenuflag;
             break;
 
         case 2:
-
             transaction:  // label to reach transaction menu
             printf("\n----------Book Transaction Menu----------\n");
             printf("1. Checkout a Book\n");
@@ -298,8 +310,9 @@ int menu(){
 
             switch(option)
             {
-                case 1:
-                //checkout book
+                case 1:                     //checkout book
+                
+                // Lists book titles and closest book titles for user to see and make sure of spelling and case before entering
                 searchBookbyTitle(BookHead);
 
                 char title[MAX_TITLE_LENGTH]; // to save title entered by user temporarily
@@ -314,7 +327,7 @@ int menu(){
                     printf("Press Enter to return to Main Menu\n");
                     while(getchar() != '\n');//To empty Input Buffer
 
-                    goto userchoice;
+                    goto mainmenuflag;
 
                 }
                 else if(result == 1)          // book to checkout not found
@@ -342,18 +355,17 @@ int menu(){
                     break;
 
                 case 0:
-                    goto userchoice;
+                    goto mainmenuflag;
                     break;
 
                 default:
                 printf("\n\n\t\t\t\tINVALID OPTION");
                 printf("\n\n\t\t\tPress Enter to return to the User Menu\n");
-
-                while(getchar() != '\n');//To empty Input Buffer
-                goto userchoice;
+                while(getchar() != '\n')//To empty Input Buffer
+                ;
+                goto mainmenuflag;
              }
-
-
+             
             break;
 
         case 3:                                     // provides current user information
@@ -362,18 +374,17 @@ int menu(){
             while (getchar() != '\n');
             break;
 
-        case 9:
-                                                   // not accessable to non-admins
-            if(Current_User.u_admin == 1)
+        case 9:                                     // not accessable to non-admins
+            if(Current_User.u_admin)
             {
                 adminMenu();
             }
             else
             {
-                printf("NOT AN ADMIN!\n");
+                printf("---ERROR: You Do Not Have Admin Privileges---\n");
                 printf("Press Enter to return to the Main Menu");
                 while (getchar() != '\n');
-                goto userchoice;
+                goto mainmenuflag;
             }
             break;
 
@@ -386,10 +397,10 @@ int menu(){
             printf("\n\n\t\t\tPress Enter to return to the User Menu\n");
 
             while(getchar() != '\n');//To empty Input Buffer
-            goto userchoice;
+            goto mainmenuflag;
 
     }
-    goto userchoice;
+    goto mainmenuflag;
     return 1;
 }
 
@@ -506,6 +517,9 @@ void returnBook()
 
         Current_User.u_book_ID = 0;
         Current_User.u_issue_ID = 0;
+        
+        saveCurrentUser(UserHead, &Current_User);
+        saveUserList(UserHead);
 
         BOOKNODE *current = BookHead;
 
@@ -1299,6 +1313,10 @@ void saveUserList(USERNODE *head)
     //printf("entered saveUserList()\n");
     saveCounters();
     //printf("savecounters() done\n");
+    
+    // to update UserList with details from Current_User, saves changes in Current_User
+    saveCurrentUser(UserHead, &Current_User);
+    
     FILE *fp = fopen("userdata.txt", "w");
     if(fp == NULL)
     {
