@@ -11,9 +11,9 @@
 // DEFINES
 #define MAX_TITLE_LENGTH 60 //Maximum length of title of book to be stored, can be reduced for optimisation, but cannot be increased (LIMITATION)
 #define MAX_CLOSE_TITLE_SEARCH 30
-#define MAX_CLOSE_AUTH_SEARCH 20 //Maximum number of closest seraches of authors to display
+#define MAX_CLOSE_AUTH_SEARCH 200 //Maximum number of closest seraches of authors to display
 #define MAX_SAME_AUTHOR 100 //Maximum number of books of same author to display
-#define MAX_CLOSE_ID 20 //Maximum number of closest seraches of ID to display
+#define MAX_CLOSE_ID 1000 //Maximum number of closest seraches of ID to display
 #define MAX_SAME_TITLE 15 //Maximum number of books of same title
 
 // STRUCTURES
@@ -1866,8 +1866,6 @@ void searchBookbyID(BOOKNODE *head){
                 printf("(Not available (Issued))\n");
                 else
                 printf("Undefined)\n"); //To account for faulty/incomplete entry of status of book
-
-                printf("\tID: %s\n",str_ID);
                 printf("\tAuthor: %s\n",current->book.b_book_author);
 
                 flag=3;
@@ -2043,7 +2041,7 @@ void vendor_inv_Management(){
     FILE *fp1, *fp2, *fp3, *fp1_1, *fp3_3;
     char choice, req;
     char name[30]; //To store name of vendor/other library
-    char title[30]; //To store title of the book
+    char title[MAX_TITLE_LENGTH]; //To store title of the book
     char auth[30]; //To store author of the book
     char buf[1024];
     fp1=fopen("sentRequests.txt","a");
@@ -2136,10 +2134,28 @@ void vendor_inv_Management(){
             c=getchar();
             if(c=='Y'||c=='y')
             searchBookbyTitle(BookHead);
-            printf("Enter the title of the book you would like to request: ");
+            printf("Enter the title of the book you would like to request: \n\t(Please match case if requesting from this library)\n");
             scanf("%s",title);
+            while(getchar()!= '\n');
+            short if_lib=0; //If library is present in library
+
+                //Check if book is available in library
+                BOOKNODE *current = BookHead;
+                while(current->next != NULL)
+                {
+                    current = current->next;
+                    if(strcmp(current->book.b_book_title, title) == 0){
+                        strcpy(auth,current->book.b_book_author);
+                        if_lib=1;
+                        break;
+                    }
+                }
+
+            if(lib==0){
             printf("Enter author of the book: ");
             scanf("%s",auth);
+            while(getchar()!= '\n');
+            }
             if(strlen(name)==0||strlen(title)==0||strlen(auth)==0){
                     printf("Error, please try again");
                     goto OTHER;
@@ -2147,10 +2163,20 @@ void vendor_inv_Management(){
             //Updating recvdRequests for this library
             fputs("\nLibrary: ",fp3);
             fputs(name,fp3);
-            fputs("\tBook requested: ",fp3);
+            fputs("\n\tBook requested: ",fp3);
             fputs(title,fp3);
-            fputs("\tAuthor: ",fp3);
+            fputs("\n\tAuthor: ",fp3);
             fputs(auth,fp3);
+            if(if_lib){
+                fputs("\n\t(Book present in library)",fp3);
+            }
+            else{
+                fputs("\n\t(Book not present in library)",fp3);
+            }
+            if(if_lib)
+            printf("\nRequested book was present in library");
+            else
+            printf("\nRequested book was not present in library, we will try our best to get it for you!");
             printf("\nYour request has been successfully sent\n");
         break;
 
