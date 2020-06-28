@@ -1592,7 +1592,7 @@ void displayAllBooks(BOOKNODE *head)
         {
             strcpy(availability, "Unknown");
         }
-        printf("%s\t%lu\t\t%s\t\t%s\n", availability, current->book.b_book_ID, current->book.b_book_author,current->book.b_book_title);
+        printf("%s\t%lu\t%s\t\t%s\n", availability, current->book.b_book_ID, current->book.b_book_author,current->book.b_book_title);
     }
     printf("------------------------------------------------------------\n");
     return;
