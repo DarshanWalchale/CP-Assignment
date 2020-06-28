@@ -504,6 +504,12 @@ int checkout(char *title)
 
 void returnBook()
 {
+    if(Current_User.u_book_ID == 0)
+    {
+        printf("No Book Issued currently!\n");
+        saveCurrentUser(UserHead, &Current_User);
+        return;
+    }
     printf("Currently Issued Book\n -> %s\n", Current_User.u_book_title);
     printf("Press Y to return currently issued book\n");
     char choice;
@@ -1368,16 +1374,44 @@ int titleCount(BOOKNODE *head, char *title)
 void printUserInfo(USER *user)
 {
     printf("\n--------------------ACCOUNT INFO--------------------\n");
-    printf("User ID: %lu\n", user->u_user_ID);
-    printf("Username: %s\n", user->user_name);
-    printf("Issued Book ID: %lu\n", user->u_book_ID);
-    printf("Issued Book Title: %s\n", user->u_book_title/*getBookName(user->u_book_ID)*/);
-    printf("Issue ID = %lu\n", user->u_issue_ID);
-    char issueDate[128] = {};
-    strftime(issueDate, 128, "%d-%b-%Y %H:%M:%S", &(user->u_date_issue));
-    printf("Date Issued: %s\n", issueDate);
-    printf("Book Notify %s\n(You'll be notified once this book becomes available in the library opon login)\n", user->u_requested);
-    printf("Admin Privileges: %s\n", (user->u_admin)?"Yes":"No");
+    printf("User ID:\t\t%lu\n", user->u_user_ID);
+    printf("Username:\t\t%s\n", user->user_name);
+    
+    printf("Issued Book ID:\t\t");
+    if(user->u_book_ID == 0)
+    {
+        printf("No Book Issued\n");
+        printf("Issued Book Title:\tNo Book Issued\n");
+        printf("Issue ID =\t\tNo Book Issued\n");
+        char issueDate[128] = {};
+        strftime(issueDate, 128, "%d-%b-%Y %H:%M:%S", &(user->u_date_issue));
+        if(strcmp(issueDate, "00-Jan-1900 00:00:00") == 0)
+        {
+            printf("Date Last Issued:\tNever Issued a Book\n");
+        }
+        else
+        {
+            printf("Date Last Issued:\t%s\n", issueDate);
+        }
+    }
+    else
+    {
+        printf("%lu\n", user->u_book_ID);
+        printf("Issued Book Title: %s\n", user->u_book_title/*getBookName(user->u_book_ID)*/);
+        printf("Issue ID = %lu\n", user->u_issue_ID);
+        char issueDate[128] = {};
+        strftime(issueDate, 128, "%d-%b-%Y %H:%M:%S", &(user->u_date_issue));
+        printf("Date Issued:\t%s\n", issueDate);
+    }
+    if(strcmp(user->u_requested, "\0") == 0)
+    {
+        printf("Book Notify:\t\tNo Book to Notify\n");
+    }
+    else
+    {
+        printf("Book Notify %s\n(You'll be notified once this book becomes available in the library opon login)\n", user->u_requested);
+    }
+    printf("Admin Privileges:\t%s\n", (user->u_admin)?"Yes":"No");
     printf("----------------------------------------------------\n");
     return;
 }
