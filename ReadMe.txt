@@ -110,7 +110,7 @@ Main Menu
 	counters are also saved at the same time.
 
 ############################################################
-Known limitations of the code (if you have not been able to completely/fully implement certain features that were asked):
+Known limitations of the code:
 % Text files for vendors\libraries storing requests sent to them cannot be accessed by the program, has to be opened manually
 #############################################################
 Contributions of the team members:
