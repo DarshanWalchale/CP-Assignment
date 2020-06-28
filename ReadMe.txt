@@ -77,7 +77,7 @@ Main Menu
 				All requests made by the library are stored in sentRequests.txt. Text files named the respective
 				vendor/library records all requests made to it along with the name of the requesting library (LIMITATION %)
 			*	Other libraries can make requests for books in this library (title, library name required).
-				Search option is given here to find books in the current library. 
+				Search option is given here to find books in the current library.
 				If book with same title (case sensitive) is present, author is not asked; else request is still taken, and user
 				is informed about it. All requests are stored in recvdRequests.txt.
 			*	Option to display all sent requests and received requests for current library
@@ -111,9 +111,8 @@ Main Menu
 
 ############################################################
 Known limitations of the code (if you have not been able to completely/fully implement certain features that were asked):
-% Text files for vendors\libraries cannot be accessed by the program, has to be opened manually
+% Text files for vendors\libraries storing requests sent to them cannot be accessed by the program, has to be opened manually
 #############################################################
 Contributions of the team members:
-John Doe did modules 1, 2 and 3.
-Anon did module 4 and helped in module 3 as well.
+Shreyas did searchBookbyTitle, searchBookbyAuthor, searchBookbyID, vendorManagement
 #############################################################
