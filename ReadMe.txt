@@ -115,10 +115,11 @@ Main Menu
 	counters are also saved at the same time.
 
 ############################################################
-Known limitations of the code (if you have not been able to completely/fully implement certain features that were asked):
-% Text files for vendors\libraries cannot be accessed by the program, has to be opened manually
+Known limitations of the code:
+% Text files for vendors\libraries storing requests sent to them cannot be accessed by the program, has to be opened manually.
+% Code will check if a book is reserved or not, and if it is, won't be possible to issue the book. Limitations are, not being able to set or remove Reservations.
 #############################################################
 Contributions of the team members:
-John Doe did modules 1, 2 and 3.
-Anon did module 4 and helped in module 3 as well.
+Shreyas did searchBookbyTitle, searchBookbyAuthor, searchBookbyID, vendorManagement and helped in bookTransaction
+Aditya did the user login, addNewUser, menus, book transaction.
 #############################################################
