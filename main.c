@@ -966,7 +966,7 @@ int removeAdmin(USERNODE *head)
     return status;
 }
 
-// Gets necessary details from uesr, assigns rest of the details automatically
+// Gets necessary details from user, assigns rest of the details automatically
 // Adds new node to UserList and then saves the list to userdata.txt
 void addNewUser(USERNODE *head)
 {
@@ -1005,12 +1005,13 @@ void addNewUser(USERNODE *head)
         {
             current = current->next;
         }
+        
+        // creates a new node
         current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
         current = current->next;
         
-        // assigning username
+        // assigning username adnd other details
         strcpy(current->user.user_name, uname);
-
         printf("Choose A Password: ");
         scanf(" %29s", current->user.u_user_pwd);
         while(getchar() != '\n');//To empty Input Buffer
@@ -1027,7 +1028,6 @@ void addNewUser(USERNODE *head)
         {
             current->user.u_admin = false;
         }
-        printf("---admin parameter assigned---\n");
         
         // generating and assigning a User ID
         current->user.u_user_ID = generateUserID();
@@ -1058,6 +1058,7 @@ void addNewUser(USERNODE *head)
     return;
 }
 
+// Gets
 void addNewBook(BOOKNODE *head)
 {
     BOOKNODE *current = head;
