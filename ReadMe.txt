@@ -9,6 +9,9 @@ Team:
 3. 2019B3PS0576P	Aditya Krishna Rao
 #############################################################
 Description of how the code operates, and what to expect when running
+
+Note: This program was developed in CS50's IDE using Git for version control between members.
+
 1. The linux executable is called 2019B3PS0569P.exe, but in case this does not run, 
 	please try compiling using the command "gcc 2019B3PS0569P.c -o 2019B3PS0569.exe"
 

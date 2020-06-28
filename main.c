@@ -32,6 +32,8 @@
 */
 
 //Structure variables starting with single characters will be used in different functions
+
+// Structure for storing information about a book
 typedef struct BOOK{
     char b_book_title[MAX_TITLE_LENGTH];    // Title of Book
     char b_book_author[30];                 // Author of Book
@@ -43,6 +45,7 @@ typedef struct BOOK{
     struct tm b_date_issue;                 // Time of issuing book
 } BOOK;
 
+// Structure for storing information about a user
 typedef struct USER{
     unsigned long u_user_ID;                // Unique User ID
     char user_name[30];                     // Username
@@ -56,17 +59,21 @@ typedef struct USER{
 
 } USER;
 
+// for Linked List of Books in memory (BookList)
 typedef struct BOOKNODE         // this is used to load the library into memory
 {
     BOOK book;
     struct BOOKNODE *next;
 } BOOKNODE;
 
+
+// for Linked List of Users in memory (UserList)
 typedef struct USERNODE         // this is used to load all userdata into memory
 {
     USER user;
     struct USERNODE *next;
 } USERNODE;
+
 
 // GLOBAL VARIABLES
 unsigned long Book_ID_Counter;           // 3943
@@ -75,6 +82,7 @@ unsigned long User_ID_Counter;           // 1791111000
 USER Current_User;                       //capitalized cuz global variable
 BOOKNODE *BookHead;
 USERNODE *UserHead;
+
 
 // PROTOTYPES
 BOOKNODE * loadBookList(BOOKNODE *);
@@ -125,28 +133,35 @@ char lib[30]="BITS Pilani, Pilani Campus"; //Storing this library name
 
 int main(void)
 {
+    // Allocating memory for Head variables for BookList and UserList
     BookHead = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
     //printf("BookHead->next = %p\n", BookHead->next);
     UserHead = (USERNODE *)calloc(1, sizeof(USERNODE));
     //printf("UserHead->next = %p\n", UserHead->next);
+    
+    // Loading Counters for generating BookID, UserID, and IssueID
     loadCounters();
+    
+    // These were used for creating the initial entries in books.txt and userdata.txt
     //addNewBook(BookHead); //Don't uncomment
     //addNewUser(UserHead); //Don't unconnent
-
+    
+    
     // /*
-    printf("Program start\n");
+    //printf("Program start\n");
     BookHead = loadBookList(BookHead);
-    printf("Books database loaded into memory successfully\n");
+    printf("---Books database loaded into memory successfully---\n");
     UserHead = loadUsers(UserHead);
-    printf("Users successfully loaded\n");
+    printf("---Users successfully loaded---\n");
+    
+    // for testing, to make sure books and users loaded correctly
     displayAllBooks(BookHead);
-    //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));
+    displayAdminView(UserHead);
+    
+    //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));   // for determining memory required
+    //printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID()); // for testing counters
 
-    //printf("Press Enter to Login"); Bruh
-    //while(getchar() != '\n');
-    //printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID());
-
-
+    // Prompts user to login, continues into rest of program if successfully logged in, skips to program termination if failed attemots are 5 or more
     if(welcomeScreen(UserHead) == 0)
     {
         notifications(BookHead, &Current_User);
@@ -155,19 +170,31 @@ int main(void)
     }
     // */
 
+    // program termination sequence
+    
+    // saves list of books to books.txt
     saveBookList(BookHead);
     printf("---BookList Saved---\n");
+    
+    // frees dynamically allocated linked list of books, BookList, from memory
     freeLibrary(BookHead);
     printf("---BookList Freed---\n");
+    
+    //saves list of users to userdata.txt
     saveUserList(UserHead);
     printf("---UserList Saved---\n");
+    
+    // frees dynamically allocated linked list of users, UserList, from memory
     freeUserList(UserHead);
     printf("---BookList Freed---\n");
+    
     return 0;
 }
 
 
-
+// Welcome screen for user, displays newly added books and prompts user to login
+// Return Value-    0: login successful
+//                  1: Login Attempt Limit exceeded
 int welcomeScreen(USERNODE *head)
 {
     int choice;
@@ -177,10 +204,11 @@ int welcomeScreen(USERNODE *head)
     // displays new additions to the library
     newlyAddedBooks(BookHead);
     
+    // for traversing linked list UserList
     USERNODE *current = head;
 
     printf("\n\t\t\tPress Enter to login");
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
 
     static int loginerrorcount = 0; // if user can't register or login successfully in 5 attempts, just exit
     char c;
@@ -191,12 +219,12 @@ int welcomeScreen(USERNODE *head)
     {
         printf("Username: ");
         scanf(" %29s", uName);
-        while(getchar() != '\n')
+        while(getchar() != '\n')//To empty Input Buffer
         ;
 
         printf("Password: ");
         scanf(" %29s", pwd);
-        while(getchar() != '\n')
+        while(getchar() != '\n')//To empty Input Buffer
         ;
         current = head;
         while (current->next != NULL)
@@ -223,7 +251,7 @@ int welcomeScreen(USERNODE *head)
         }
         current = head;
         printf("\n\t\t---ERROR:Incorrect Credentials---\n\t\t\tPress Enter to retry");
-        while(getchar() != '\n')
+        while(getchar() != '\n')//To empty Input Buffer
         ;
     }while(loginerrorcount <= 5);
 
@@ -246,7 +274,7 @@ int menu(){
 
     printf("Enter your choice: ");
     scanf(" %d", &choice);
-    while(getchar() != '\n')
+    while(getchar() != '\n')//To empty Input Buffer
     ;
     int option;
 
@@ -284,7 +312,7 @@ int menu(){
                 {
                     printf("Your Book has been successfully issued\n");
                     printf("Press Enter to return to Main Menu\n");
-                    while(getchar() != '\n');
+                    while(getchar() != '\n');//To empty Input Buffer
 
                     goto userchoice;
 
@@ -293,14 +321,14 @@ int menu(){
                 {
                     printf("No such Book Title\n");
                     printf("Press Enter to return to Transaction Menu\n");
-                    while(getchar() != '\n');
+                    while(getchar() != '\n');//To empty Input Buffer
 
                     goto transaction;
                 }
                 else                        // user asked to to notify if him or not
                 {
                     printf("Press Enter to return to Transaction Menu\n");
-                    while(getchar() != '\n');
+                    while(getchar() != '\n');//To empty Input Buffer
                     goto transaction;
                 }
                 break;
@@ -309,7 +337,7 @@ int menu(){
 
                     returnBook();
                     printf("\nPress Enter to return to Transaction Menu\n");
-                    while(getchar() != '\n');
+                    while(getchar() != '\n');//To empty Input Buffer
                     goto transaction;
                     break;
 
@@ -321,7 +349,7 @@ int menu(){
                 printf("\n\n\t\t\t\tINVALID OPTION");
                 printf("\n\n\t\t\tPress Enter to return to the User Menu\n");
 
-                while(getchar() != '\n');
+                while(getchar() != '\n');//To empty Input Buffer
                 goto userchoice;
              }
 
@@ -357,7 +385,7 @@ int menu(){
             printf("\n\n\t\t\t\tINVALID OPTION");
             printf("\n\n\t\t\tPress Enter to return to the User Menu\n");
 
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             goto userchoice;
 
     }
@@ -436,7 +464,7 @@ int checkout(char *title)
             printf("All copies of the book you've requested are currently issued by other library members!\n");
             printf("Would you like to be notified if the book becomes available? (Y/N) (notified on login when book is available once, only 1 book can be notified at a time)\n");
             scanf(" %c", &choice);
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             choice = toupper(choice);
             switch (choice)
             {
@@ -454,7 +482,7 @@ int checkout(char *title)
                 default:
                     printf("INVALID RESPONSE\t\t");
                     printf("Press Enter\n");
-                    while(getchar() != '\n')
+                    while(getchar() != '\n')//To empty Input Buffer
                     ;
                     break;
             }
@@ -470,7 +498,7 @@ void returnBook()
     char choice;
 
     scanf(" %c", &choice);
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
     choice = toupper(choice);
     switch (choice)
     {
@@ -503,7 +531,7 @@ void returnBook()
 
         default:
         printf("Press Enter to return to Menu\n");
-        while(getchar() != '\n');
+        while(getchar() != '\n');//To empty Input Buffer
         return;
 
 
@@ -526,7 +554,7 @@ void booksearchMenu()
 
     printf("Enter choice: ");
     scanf(" %d", &choice);
-    while(getchar() != '\n')
+    while(getchar() != '\n')//To empty Input Buffer
     ;
 
     switch(choice)
@@ -534,28 +562,28 @@ void booksearchMenu()
         case 1:
             searchBookbyTitle(BookHead);
             printf("\nPress Enter to return to the Search menu");
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             goto booksearch;
             break;
 
         case 2:
             searchBookbyAuthor(BookHead);
             printf("\nPress Enter to return to the Search menu");
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             goto booksearch;
             break;
 
         case 3:
             searchBookbyID(BookHead);
             printf("Press Enter to return to the Search menu");
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             goto booksearch;
             break;
 
         case 4:
             displayAllBooks(BookHead);
             printf("Press Enter to return to the Search menu\n");
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             goto booksearch;
             break;
 
@@ -566,7 +594,7 @@ void booksearchMenu()
         default:
             printf("\n\n\t\t\t\tINVALID OPTION");
             printf("\n\n\t\t\tPress Enter to re-Enter the choice");
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             goto booksearch;
             break;
     }
@@ -588,7 +616,7 @@ void adminMenu()
 
     printf("Enter your choice: ");
     scanf("%d", &choice);
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
 
     switch(choice)
     {
@@ -600,7 +628,7 @@ void adminMenu()
             addNewUser(UserHead);
 
             printf("\nPress enter to return to the Admin menu");
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             goto ADMIN;
             break;
 
@@ -609,12 +637,12 @@ void adminMenu()
             printf("Enter user_id of the user you want to remove: ");
             unsigned long id;
             scanf(" %lu", &id);
-            while(getchar() != '\n')
+            while(getchar() != '\n')//To empty Input Buffer
             ;
             deleteUser(UserHead, id);
 
             printf("\nPress enter to return to the Admin menu");
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             goto ADMIN;
             break;
 
@@ -622,19 +650,19 @@ void adminMenu()
             printf("Enter title: ");
             char title[MAX_TITLE_LENGTH];
             scanf(" %60[^\n]", title); //MAX_TITLE_LENGTH
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
 
             printf("Number of books by the title \"%s\" = %d", title, titleCount(BookHead, title));
 
             printf("\nPress enter to return to the Admin menu");
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             goto ADMIN;
             break;
 
         case 5:
             vendorManagement();
             printf("\nPress enter to return to the Admin menu");
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             goto ADMIN;
             break;
 
@@ -650,7 +678,7 @@ void adminMenu()
         default:
         printf("\n\n\t\t\t\tINVALID OPTION");
         printf("\n\n\t\t\tPress Enter");
-        while(getchar() != '\n');
+        while(getchar() != '\n');//To empty Input Buffer
         goto ADMIN;
 
     }
@@ -671,42 +699,42 @@ void reviewAdminPrivileges(USERNODE *head)
     int choice;
     printf("Enter your choice: ");
     scanf("%d", &choice);
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
 
     switch(choice)
     {
         case 1:
             displayAdmins(UserHead);
             printf("Press Enter\n");
-            while(getchar() != '\n')
+            while(getchar() != '\n')//To empty Input Buffer
             ;
             break;
 
         case 2:
             displayNonAdmins(UserHead);
             printf("Press Enter\n");
-            while(getchar() != '\n')
+            while(getchar() != '\n')//To empty Input Buffer
             ;
             break;
 
         case 3:
             displayAdminView(UserHead);
             printf("Press Enter\n");
-            while(getchar() != '\n')
+            while(getchar() != '\n')//To empty Input Buffer
             ;
             break;
 
         case 4:
             makeAdmin(UserHead);
             printf("Press Enter\n");
-            while(getchar() != '\n')
+            while(getchar() != '\n')//To empty Input Buffer
             ;
             break;
 
         case 5:
             removeAdmin(UserHead);
             printf("Press Enter\n");
-            while(getchar() != '\n')
+            while(getchar() != '\n')//To empty Input Buffer
             ;
             break;
 
@@ -718,7 +746,7 @@ void reviewAdminPrivileges(USERNODE *head)
         default:
             printf("INVALID OPTION\t\t");
             printf("Press Enter\n");
-            while(getchar() != '\n');
+            while(getchar() != '\n');//To empty Input Buffer
             break;
     }
     goto reviewAdminPrivilegesFlag;
@@ -789,7 +817,7 @@ int makeAdmin(USERNODE *head)
     unsigned long id = 0;
     printf("Enter UserID of account to grant admin priveleges to\n->");
     scanf(" %lu", &id);
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
 
     while(current->next != NULL)
     {
@@ -816,7 +844,7 @@ int makeAdmin(USERNODE *head)
     // Execution reaches here only if given ID does not match in the database
     printf("ERROR: User Not Found\t\t");
     printf("Press Enter");
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
     return status;
 }
 
@@ -834,7 +862,7 @@ int removeAdmin(USERNODE *head)
     unsigned long id = 0;
     printf("Enter UserID of account to remove admin priveleges from\n->");
     scanf(" %lu", &id);
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
 
     while(current->next != NULL)
     {
@@ -861,7 +889,7 @@ int removeAdmin(USERNODE *head)
     // Execution reaches here only if given ID does not match in the database
     printf("ERROR: User Not Found\t\t");
     printf("Press Enter");
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
     return status;
 }
 
@@ -878,7 +906,7 @@ void addNewUser(USERNODE *head)
             exists = false;
             printf("Choose A Username: ");
             scanf(" %30[^\n]", uname);
-            while(getchar() != '\n')
+            while(getchar() != '\n')//To empty Input Buffer
             ;
             //checking if username exists or not
             current = head;
@@ -908,7 +936,7 @@ void addNewUser(USERNODE *head)
 
         printf("Choose A Password: ");
         scanf(" %29s", current->user.u_user_pwd);
-        while(getchar() != '\n');
+        while(getchar() != '\n');//To empty Input Buffer
 
         printf("Enter Y/y to make user admin: ");
         adminrights = 'N';
@@ -945,7 +973,7 @@ void addNewUser(USERNODE *head)
 
         printf("Press Y/y to add another account: ");
         scanf(" %c", &c);
-        while(getchar() != '\n')
+        while(getchar() != '\n')//To empty Input Buffer
         ;
     }
     while(c == 'Y'|| c == 'y');
@@ -975,11 +1003,11 @@ void addNewBook(BOOKNODE *head)
         printf("DO\n");
         printf("Enter Book Title:\n->");
         scanf(" %60[^\n]", current->book.b_book_title); //MAX_TITLE_LENGTH
-        while(getchar() != '\n');
+        while(getchar() != '\n');//To empty Input Buffer
 
         printf("Enter Book Author\n->");
         scanf(" %30[^\n]", current->book.b_book_author);
-        while(getchar() != '\n');
+        while(getchar() != '\n');//To empty Input Buffer
 
         current->book.b_book_ID = generateBookID();
         current->book.b_issue_ID = 0;
@@ -1018,7 +1046,7 @@ void addNewBook(BOOKNODE *head)
 
         printf("Enter Y/y to enter another book: ");
         scanf(" %c", &choice);
-        while(getchar() != '\n');
+        while(getchar() != '\n');//To empty Input Buffer
 
     }while((choice == 'Y') || (choice == 'y'));
 
@@ -1366,7 +1394,7 @@ void searchBookbyTitle(BOOKNODE *head)
     LAB1: //a label to return if <=3 chars entered
     printf("\nSearch by title: ");
     scanf(" %60[^\n]", title_search);
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
 
     //Restart search if less than three characters entered
     if(strlen(title_search)<4)
@@ -1539,7 +1567,7 @@ void searchBookbyAuthor(BOOKNODE *head){
 
     printf("Search by author: ");
     scanf(" %30[^\n]", author_search);
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
 
         //Restart search if less than three characters entered
      if(strlen(author_search)<4){
@@ -1645,7 +1673,7 @@ void searchBookbyID(BOOKNODE *head){
     printf("Search by ID: ");
     scanf("%s",ID_search);
     //scanf(" %11[^\n]", ID_search);
-    while(getchar() != '\n');
+    while(getchar() != '\n');//To empty Input Buffer
     if((strlen(ID_search))>10){
     printf("Invalid ID entered! (ID is 10 digits)\n");
     goto LAB3;
