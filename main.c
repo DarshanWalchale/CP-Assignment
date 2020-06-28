@@ -2152,7 +2152,7 @@ void vendor_inv_Management(){
                     }
                 }
 
-            if(lib==0){
+            if(if_lib==0){
             printf("Enter author of the book: ");
             scanf("%s",auth);
             while(getchar()!= '\n');
