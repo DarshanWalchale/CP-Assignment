@@ -200,7 +200,7 @@ int welcomeScreen(USERNODE *head)
     int choice;
     printf("\n\n\n\n\n\t\t\tLIBRARY MANAGEMENT SYSTEM");
     printf("\n\t\t\t*************************\n");
-    
+
     // displays new additions to the library
     newlyAddedBooks(BookHead);
     
@@ -1424,6 +1424,8 @@ void searchBookbyTitle(BOOKNODE *head)
                 sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
                 strcat(closest_search[cs_count],"\n\tID: ");
                 strcat(closest_search[cs_count],curr_ID);
+                strcat(closest_search[cs_count],"\n\tAuthor: ");
+                 strcat(closest_search[cs_count],current->book.b_book_author);
                 strcat(closest_search[cs_count],"\n\tStatus: ");
                     if(current->book.b_book_status=='A')
                         strcat(closest_search[cs_count], "Available ");
@@ -1433,6 +1435,7 @@ void searchBookbyTitle(BOOKNODE *head)
                         strcat(closest_search[cs_count], "Not available (Issued)");
                     else
                         strcat(closest_search[cs_count], "Undefined ");
+
                  strcat(closest_search[cs_count],"\n");
                 cs_count++;
             }
@@ -1450,6 +1453,8 @@ void searchBookbyTitle(BOOKNODE *head)
                 sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
                 strcat(same_title_found[title_found],"\n\tID: ");
                 strcat(same_title_found[title_found],curr_ID);
+                strcat(same_title_found[title_found],"\n\tAuthor: ");
+                strcat(same_title_found[title_found],current->book.b_book_author);
                 strcat(same_title_found[title_found],"\n\tStatus: ");
                     if(current->book.b_book_status=='A')
                         strcat(same_title_found[title_found], "Available ");
@@ -1491,19 +1496,9 @@ void searchBookbyTitle(BOOKNODE *head)
         }
         //To print all books found of same title (if any)
         if(title_found>0){
-        /*
-            title_found=0;
-            while(strlen(same_title_found[cs_count])!=0)
-        {
-            printf("%hi. %s\n",(short)(title_found+1),same_title_found[title_found]);
-            title_found++;
-            if(title_found==MAX_SAME_TITLE)
-            break; //Stop on reaching MAX_SAME_TITLE books of same title
-        }
-        */
-        for(int i=0;i<title_found;i++)
+         for(int i=0;i<title_found;i++)
             printf("%d. %s",i+1,same_title_found[i]);
-
+        printf("\nThere are %hi copies of %s available\n",title_found,title_search);
         }
 
          char ch;
@@ -1613,14 +1608,15 @@ void searchBookbyAuthor(BOOKNODE *head){
                 //If the search matches exactly, store the details
         else{
                 //printf("\n Found");
-                strcpy(auth_found,current->book.b_book_title);
-                strcat(all_same_auth[same_auth_count],"\nTitle: ");
+                strcpy(auth_found,current->book.b_book_author);
+                strcpy(all_same_auth[same_auth_count],"Title: ");
                 strcat(all_same_auth[same_auth_count],current->book.b_book_title);
                 char curr_ID[11];
                 sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
                 strcat(all_same_auth[same_auth_count],"\n\tID: ");
                 strcat(all_same_auth[same_auth_count],curr_ID);
-
+                strcat(all_same_auth[same_auth_count],"\n\tAuthor: ");
+                 strcat(all_same_auth[same_auth_count],current->book.b_book_author);
                  strcat(all_same_auth[same_auth_count],"\n\tStatus: ");
                 if(current->book.b_book_status=='A')
                     strcat(all_same_auth[same_auth_count], "Available\n\n");
@@ -1638,7 +1634,7 @@ void searchBookbyAuthor(BOOKNODE *head){
         }
 
         if(flag==0&&cs_count==0)
-        printf("No results found");
+        printf("No results found\n");
 
         //To print all closest searches of authors when exact match is not found
 
