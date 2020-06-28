@@ -1683,10 +1683,15 @@ void searchBookbyTitle(BOOKNODE *head)
 }
 
 
-//Function to display all books
+
+// dislplays in table format, all the books in BookList
+// Availability, Book ID, Author, and Title
+
 void displayAllBooks(BOOKNODE *head)
 {
     BOOKNODE *current = head;
+    
+    // if BookList in empty
     if(head->next == NULL)
     {
         printf("--------------------NO BOOKS TO DISPLAY--------------------\n");
@@ -1695,8 +1700,11 @@ void displayAllBooks(BOOKNODE *head)
     printf("------------------------------------------------------------\n");
     printf("AVAILABILITY\tBOOK ID\t\tAUTHOR\t\tTITLE\n");
     printf("------------------------------------------------------------\n");
+    
+    // this is to print availability of the book appropriately
     char availability[15] = {};
-
+    
+    // traverses BookList
     while(current->next != NULL)
     {
         current = current->next;
@@ -1723,7 +1731,9 @@ void displayAllBooks(BOOKNODE *head)
 }
 
 
+
 //Function takes in pointer to head node and travesrses through all books to search by author.
+
 void searchBookbyAuthor(BOOKNODE *head){
     BOOKNODE *current = head; //Initialising head pointer of linked list of all books to BOOKNODE type pointer current
     char author_search[30];
@@ -1948,15 +1958,16 @@ void searchBookbyID(BOOKNODE *head){
             searchBookbyID(head);
 }
 
-
-
-
+// Displays in table format details about books that have been added less than about a quarter of a year ago
+// Availability, AUthor, and Title
 void newlyAddedBooks(BOOKNODE *head)
 {
     time_t sec = time(NULL);
     struct tm now = *(localtime(&sec));
     printf("----------------------NEWLY ADDED BOOKS----------------------\n");
     BOOKNODE *current = head;
+    
+    // if BookList is empty
     if(head->next == NULL)
     {
         printf("--------------------NO BOOKS TO DISPLAY--------------------\n");
@@ -1966,31 +1977,38 @@ void newlyAddedBooks(BOOKNODE *head)
     printf("AVAILABILITY\tAUTHOR\t\tTITLE\n");
     //printf("------------------------------------------------------------\n");
     char availability[15] = {};
-
+    
+    // traverses BookList
     while(current->next != NULL)
     {
         current = current->next;
+        
+        // if date of arrival year is same as current year
         if(current->book.book_date_of_arrival.tm_year == now.tm_year)
         {
+            // if difference in month number is more than 4, skip this book
             if((now.tm_mon - current->book.book_date_of_arrival.tm_mon) > 4)
             {
                 continue;
             }
         }
+        // if current year number is 1 more than in date of arrival
         else if(current->book.book_date_of_arrival.tm_year == (now.tm_year - 1))
         {
+            // if difference in month number is more than 4, skip this book
             if((now.tm_mon + 12) - current->book.book_date_of_arrival.tm_mon > 4)
             {
                 continue;
             }
         }
+        // if date of arrival year is before current year
         else if(current->book.book_date_of_arrival.tm_year < now.tm_year)
         {
             continue;
         }
-
-
-
+            
+            // only reaches here if the book is not more then 4 months old
+            
             if(current->book.b_book_status == 'A')
             {
                 strcpy(availability, "Available");
@@ -2015,6 +2033,7 @@ void newlyAddedBooks(BOOKNODE *head)
     return;
 }
 
+// Displays Book to return (if borrowed for more than 15 days) and notifies if requested book is available now
 void notifications(BOOKNODE *head, USER *user)
 {
     time_t sec = time(NULL);
@@ -2064,7 +2083,7 @@ void notifications(BOOKNODE *head, USER *user)
 
     if(book_notify)
     {
-        printf("%s IS NOW AVAILABLE TO CHECKOUT!\n", user->u_requested);
+        printf("%s IS NOW AVAILABLE TO ISSUE!\n", user->u_requested);
         strcpy(user->u_requested, "\0");
         saveBookList(head);
     }
