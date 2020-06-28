@@ -77,8 +77,9 @@ Main Menu
 				All requests made by the library are stored in sentRequests.txt. Text files named the respective
 				vendor/library records all requests made to it along with the name of the requesting library (LIMITATION %)
 			*	Other libraries can make requests for books in this library (title, library name required).
-				Search option is given here to find books in the current library. All requests are stored in recvdRequests.txt. 
-				If book with same title (case sensitive) is present
+				Search option is given here to find books in the current library. All requests are stored in recvdRequests.txt.
+				If book with same title (case sensitive) is present, author is not asked; else request is still taken, and user
+				is informed about it
 			*	Option to display all sent requests and received requests for current library
 
 		6. Review Admin Privileges
