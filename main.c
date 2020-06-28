@@ -10,13 +10,14 @@
 
 // DEFINES
 #define MAX_TITLE_LENGTH 60 //Maximum length of title of book to be stored, can be reduced for optimisation, but cannot be increased (LIMITATION)
-#define MAX_CLOSE_TITLE_SEARCH 30
+#define MAX_CLOSE_TITLE_SEARCH 30 // SHREYAS ADD THIS
 #define MAX_CLOSE_AUTH_SEARCH 200 //Maximum number of closest seraches of authors to display
 #define MAX_SAME_AUTHOR 100 //Maximum number of books of same author to display
 #define MAX_CLOSE_ID 1000 //Maximum number of closest seraches of ID to display
 #define MAX_SAME_TITLE 15 //Maximum number of books of same title
 
 // STRUCTURES
+
 /*
 //struct tm {                                   //struct tm FOR REFFERENCE
 //   int tm_sec;     Seconds (0-60)
