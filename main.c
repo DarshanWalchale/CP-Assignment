@@ -565,7 +565,7 @@ void returnBook()
                          Current_User.u_book_ID = 0;
                          Current_User.u_issue_ID = 0;
                          strcpy(Current_User.u_book_title, "\0");
-                         
+
                          saveBookList(BookHead);
                          saveCurrentUser(UserHead);
                          saveUserList(UserHead);
@@ -573,7 +573,7 @@ void returnBook()
                      }
                 }
             }
-            
+
             break;
 
         default:
@@ -885,7 +885,7 @@ int makeAdmin(USERNODE *head)
     printf("Enter UserID of account to grant admin priveleges to\n->");
     scanf(" %lu", &id);
     while(getchar() != '\n');//To empty Input Buffer
-    
+
     // traverses UserList
     while(current->next != NULL)
     {
@@ -935,7 +935,7 @@ int removeAdmin(USERNODE *head)
     printf("Enter UserID of account to remove admin priveleges from\n->");
     scanf(" %lu", &id);
     while(getchar() != '\n');//To empty Input Buffer
-    
+
     // travserses UserList
     while(current->next != NULL)
     {
@@ -984,7 +984,7 @@ void addNewUser(USERNODE *head)
             scanf(" %30[^\n]", uname);
             while(getchar() != '\n')//To empty Input Buffer
             ;
-            
+
             //checking if username exists or not
             current = head;
             while(current->next != NULL)
@@ -1006,11 +1006,11 @@ void addNewUser(USERNODE *head)
         {
             current = current->next;
         }
-        
+
         // creates a new node
         current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
         current = current->next;
-        
+
         // assigning username adnd other details
         strcpy(current->user.user_name, uname);
         printf("Choose A Password: ");
@@ -1029,7 +1029,7 @@ void addNewUser(USERNODE *head)
         {
             current->user.u_admin = false;
         }
-        
+
         // generating and assigning a User ID
         current->user.u_user_ID = generateUserID();
 
@@ -1081,7 +1081,7 @@ void addNewBook(BOOKNODE *head)
         // creates a new node
         current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
         current = current->next;
-        
+
         // getting and assigning details
         printf("Enter Book Title:\n->");
         scanf(" %60[^\n]", current->book.b_book_title); //MAX_TITLE_LENGTH
@@ -1122,8 +1122,8 @@ void addNewBook(BOOKNODE *head)
         current->book.b_date_issue.tm_wday = 0;
         current->book.b_date_issue.tm_yday = 0;
         current->book.b_date_issue.tm_isdst = 0;
-        
-        
+
+
         saveBookList(head);
 
         printf("Enter Y/y to enter another book: ");
@@ -1178,14 +1178,14 @@ BOOKNODE * loadBookList(BOOKNODE *head)
     FILE *fp = fopen("books.txt", "r");
     BOOK *book_load = calloc(1, sizeof(BOOK)); // tmeporary object pointer for storing each book read
     BOOKNODE *current = head;
-    
+
     // loop ends when no more books can be read
     while(fread(book_load, sizeof(BOOK), 1, fp))
     {
         // creates a new node in BookList
         current->next = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
         current = current->next;
-        
+
         // copies info into the new node
         strcpy(current->book.b_book_title, book_load->b_book_title);
         strcpy(current->book.b_book_author, book_load->b_book_author);
@@ -1285,14 +1285,14 @@ USERNODE * loadUsers(USERNODE *head)
     FILE *fp = fopen("userdata.txt", "r");
     USER *user_load = (USER *)calloc(1, sizeof(USER)); // tmeporary object pointer for storing each user read
     USERNODE *current = head;
-    
+
     // loop ends when no more users can be read
     while(fread(user_load, sizeof(USER), 1, fp))
     {
         // creates a new node in UserList
         current->next = (USERNODE *)calloc(1, sizeof(USERNODE));
         current = current->next;
-        
+
         // copies details
         current->user.u_user_ID = user_load->u_user_ID;
         strcpy(current->user.user_name, user_load->user_name);
@@ -1400,12 +1400,12 @@ int deleteUser(USERNODE *head, unsigned long id)
 void saveCurrentUser(USERNODE *head)
 {
     USERNODE *current = head;
-    
+
     // traverses UserList
     while(current->next != NULL)
     {
         current = current->next;
-        
+
         // if ID matches Current_User ID
         if(current->user.u_user_ID == Current_User.u_user_ID)
         {
@@ -1473,7 +1473,7 @@ int titleCount(BOOKNODE *head, char *title)
 {
     BOOKNODE *current = head;
     int count = 0;
-    
+
     // traverses BookList
     while(current->next != NULL)
     {
@@ -1495,7 +1495,7 @@ void printUserInfo(USER *user)
     printf("Username:\t\t%s\n", user->user_name);
 
     printf("Issued Book ID:\t\t");
-    
+
     // If no book issued
     if(user->u_book_ID == 0)
     {
@@ -1556,7 +1556,7 @@ char * getBookName(BOOKNODE *head, unsigned long bookID)
 }
 */
 
-// 
+//Function takes in pointer to head node and travesrses through all books to search by title.
 void searchBookbyTitle(BOOKNODE *head)
 {
     BOOKNODE *current = head; //Initialising head pointer of linked list of all books to BOOKNODE type pointer current
@@ -1682,6 +1682,8 @@ void searchBookbyTitle(BOOKNODE *head)
             searchBookbyTitle(head);
 }
 
+
+//Function to display all books
 void displayAllBooks(BOOKNODE *head)
 {
     BOOKNODE *current = head;
@@ -1721,7 +1723,7 @@ void displayAllBooks(BOOKNODE *head)
 }
 
 
-
+//Function takes in pointer to head node and travesrses through all books to search by author.
 void searchBookbyAuthor(BOOKNODE *head){
     BOOKNODE *current = head; //Initialising head pointer of linked list of all books to BOOKNODE type pointer current
     char author_search[30];
@@ -1838,7 +1840,7 @@ void searchBookbyAuthor(BOOKNODE *head){
 
 }
 
-
+//Function takes in pointer to head node and travesrses through all books to search by ID
 void searchBookbyID(BOOKNODE *head){
 
     LAB3: ;//Label to return if invalid (not 10 digits)
@@ -2092,7 +2094,9 @@ void setCurrentUser(USER *user)
     return;
 }
 
-
+//Function for vendor\inventory management
+//To make requests for books to other libraries and vendors, and store them in txt files
+//and take requests from other libraries, and store them
 void vendor_inv_Management(){
     //Vendor/Inventory management
     FILE *fp1, *fp2, *fp3, *fp1_1, *fp3_3;
