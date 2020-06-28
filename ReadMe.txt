@@ -76,8 +76,9 @@ Main Menu
 			*	Can request vendors and other libraries for new books (title, author, vendor\library name required).
 				All requests made by the library are stored in sentRequests.txt. Text files named the respective
 				vendor/library records all requests made to it along with the name of the requesting library (LIMITATION %)
-			*	Other libraries can make requests for books in this library (title, author,library name required).
-				Search option is given here to find books in the current library. All requests are stored in recvdRequests.txt
+			*	Other libraries can make requests for books in this library (title, library name required).
+				Search option is given here to find books in the current library. All requests are stored in recvdRequests.txt. 
+				
 			*	Option to display all sent requests and received requests for current library
 
 		6. Review Admin Privileges

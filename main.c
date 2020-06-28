@@ -2101,6 +2101,10 @@ void vendor_inv_Management(){
             else{
                 fputs("\n\t(Book not present in library)",fp3);
             }
+            if(if_lib)
+            printf("\nRequested book was present in library");
+            else
+            printf("\nRequested book was not present in library, we will try our best to get it for you!");
             printf("\nYour request has been successfully sent\n");
         break;
 
