@@ -1580,7 +1580,8 @@ void searchBookbyAuthor(BOOKNODE *head){
 
     printf("Search by author: ");
     scanf(" %30[^\n]", author_search);
-    while(getchar() != '\n');//To empty Input Buffer
+    while(getchar() != '\n')//To empty Input Buffer
+    ;
 
         //Restart search if less than three characters entered
      if(strlen(author_search)<4){
