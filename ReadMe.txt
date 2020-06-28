@@ -115,6 +115,6 @@ Known limitations of the code:
 % Code will check if a book is reserved or not, and if it is, won't be possible to issue the book. Limitations are, not being able to set or remove Reservations.
 #############################################################
 Contributions of the team members:
-Shreyas did searchBookbyTitle, searchBookbyAuthor, searchBookbyID, vendorManagement.
+Shreyas did searchBookbyTitle, searchBookbyAuthor, searchBookbyID, vendorManagement and helped in bookTransaction
 Aditya did the user login, addNewUser, menus, book transaction.
 #############################################################
