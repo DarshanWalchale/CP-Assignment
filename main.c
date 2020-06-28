@@ -685,7 +685,7 @@ void adminMenu()
 
         case 3:
             displayAdminView(UserHead);
-            printf("Enter uUsr ID of the user you want to remove: ");
+            printf("Enter User ID of the user you want to remove: ");
             scanf(" %lu", &id);
             while(getchar() != '\n')//To empty Input Buffer
             ;
