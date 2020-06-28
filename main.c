@@ -138,26 +138,26 @@ int main(void)
     //printf("BookHead->next = %p\n", BookHead->next);
     UserHead = (USERNODE *)calloc(1, sizeof(USERNODE));
     //printf("UserHead->next = %p\n", UserHead->next);
-    
+
     // Loading Counters for generating BookID, UserID, and IssueID
     loadCounters();
-    
+
     // These were used for creating the initial entries in books.txt and userdata.txt
     //addNewBook(BookHead); //Don't uncomment
     //addNewUser(UserHead); //Don't unconnent
-    
-    
+
+
     // /*
     //printf("Program start\n");
     BookHead = loadBookList(BookHead);
     printf("---Books database loaded into memory successfully---\n");
     UserHead = loadUsers(UserHead);
     printf("---Users successfully loaded---\n");
-    
+
     // for testing, to make sure books and users loaded correctly
     displayAllBooks(BookHead);
     displayAdminView(UserHead);
-    
+
     //printf("sizeof(BOOKNODE) = %lu\nsizeof(USER) = %lu\nsizeof(int) = %lu\n", sizeof(BOOKNODE), sizeof(USER), sizeof(int));   // for determining memory required
     //printf("Counters: %lu,%lu,%lu\n", generateBookID(), generateIssueID(), generateUserID()); // for testing counters
 
@@ -171,23 +171,23 @@ int main(void)
     // */
 
     // program termination sequence
-    
+
     // saves list of books to books.txt
     saveBookList(BookHead);
     printf("---BookList Saved---\n");
-    
+
     // frees dynamically allocated linked list of books, BookList, from memory
     freeLibrary(BookHead);
     printf("---BookList Freed---\n");
-    
+
     //saves list of users to userdata.txt
     saveUserList(UserHead);
     printf("---UserList Saved---\n");
-    
+
     // frees dynamically allocated linked list of users, UserList, from memory
     freeUserList(UserHead);
     printf("---BookList Freed---\n");
-    
+
     return 0;
 }
 
@@ -203,7 +203,7 @@ int welcomeScreen(USERNODE *head)
 
     // displays new additions to the library
     newlyAddedBooks(BookHead);
-    
+
     // for traversing linked list UserList
     USERNODE *current = head;
 
@@ -2052,6 +2052,7 @@ void vendorManagement(){
         goto LAB;
     }
 }
+
 
 
 
