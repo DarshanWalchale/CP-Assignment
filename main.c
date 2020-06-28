@@ -95,7 +95,7 @@ void addNewUser(USERNODE *head);
 void printUserInfo(USER *user);
 void addNewBook(BOOKNODE *head);
 void saveCounters();
-void vendorManagement();
+void vendor_inv_Management();
 void displayAllBooks(BOOKNODE *head);
 void searchBookbyTitle(BOOKNODE *head);
 void searchBookbyAuthor(BOOKNODE *head);
@@ -225,23 +225,23 @@ int welcomeScreen(USERNODE *head)
         scanf(" %29s", pwd);
         while(getchar() != '\n')//To empty Input Buffer
         ;
-        
+
         // traversing UserList and comparing login details
         current = head;
         while (current->next != NULL)
         {
             current = current->next;
-            
+
             //checks for username match
             if(strcmp(current->user.user_name, uName) == 0)
             {
                 printf("Username Matched\n");
-                
+
                 // checks for password match
                 if(strcmp(current->user.u_user_pwd, pwd) == 0)
                 {
                     printf ("Password Matched\n");
-                    
+
                     // copies details of current user to a global variable
                     setCurrentUser(&current->user);
                     return 0;
@@ -272,7 +272,7 @@ int welcomeScreen(USERNODE *head)
 int menu(){
     int choice, option; // variables for taking input
     mainmenuflag: // label to return to Main menu
-    
+
     printf("\n--------------------MAIN MENU--------------------\n");
     printf("1. Search Books\n");
     printf("2. Book Transaction\n");
@@ -311,7 +311,7 @@ int menu(){
             switch(option)
             {
                 case 1:                     //checkout book
-                
+
                 // Lists book titles and closest book titles for user to see and make sure of spelling and case before entering
                 searchBookbyTitle(BookHead);
 
@@ -365,7 +365,7 @@ int menu(){
                 ;
                 goto mainmenuflag;
              }
-             
+
             break;
 
         case 3:                                     // provides current user information
@@ -517,7 +517,7 @@ void returnBook()
 
         Current_User.u_book_ID = 0;
         Current_User.u_issue_ID = 0;
-        
+
         saveCurrentUser(UserHead, &Current_User);
         saveUserList(UserHead);
 
@@ -674,7 +674,7 @@ void adminMenu()
             break;
 
         case 5:
-            vendorManagement();
+            vendor_inv_Management();
             printf("\nPress enter to return to the Admin menu");
             while(getchar() != '\n');//To empty Input Buffer
             goto ADMIN;
@@ -1313,10 +1313,10 @@ void saveUserList(USERNODE *head)
     //printf("entered saveUserList()\n");
     saveCounters();
     //printf("savecounters() done\n");
-    
+
     // to update UserList with details from Current_User, saves changes in Current_User
     saveCurrentUser(UserHead, &Current_User);
-    
+
     FILE *fp = fopen("userdata.txt", "w");
     if(fp == NULL)
     {
@@ -1403,8 +1403,9 @@ char * getBookName(BOOKNODE *head, unsigned long bookID)
 
 void searchBookbyTitle(BOOKNODE *head)
 {
-    BOOKNODE *current = head;
+    BOOKNODE *current = head; //Initialising head pointer of linked list of all books to BOOKNODE type pointer current
     char title_search[MAX_TITLE_LENGTH];
+    char title_matched[MAX_TITLE_LENGTH]; //To store exact case (as in books database) search matched book
     short cs_count=0; //To count number of closest searches
     char closest_search[MAX_CLOSE_TITLE_SEARCH][MAX_TITLE_LENGTH+50]; //To store MAX_CLOSE_TITLE_SEARCH closest matching title searches
     char same_title_found[MAX_SAME_TITLE][MAX_TITLE_LENGTH+50];
@@ -1421,11 +1422,11 @@ void searchBookbyTitle(BOOKNODE *head)
         goto LAB1;
     }
 
-    while(current->next != NULL)
+    while(current->next != NULL) //while loop to access all books in linked list of books
     {
         current=current->next;
-        //Iterating through all characters of a single book title
-        for(int j=0;j<MAX_TITLE_LENGTH;j++)
+
+        for(int j=0;j<MAX_TITLE_LENGTH;j++) //Iterating through all characters of a single book title
         {
 
             //Skip the current book if atleast 3 characters don't match
@@ -1433,13 +1434,15 @@ void searchBookbyTitle(BOOKNODE *head)
             break;
             }
 
-            //If atleast one character does not match,Store the closest matching search (book) and skip current iteration
+            //If atleast one character does not match, and atleast 3 characters match
+            //store the closest matching search (book) and skip current iteration
         else if(tolower(title_search[j])!=tolower(current->book.b_book_title[j])&&j<strlen(current->book.b_book_title)&&j>2){
 
-            if(cs_count<MAX_CLOSE_TITLE_SEARCH){
+            if(cs_count<MAX_CLOSE_TITLE_SEARCH){ //To ensure at most MAX_CLOSE_TITLE_SEARCH closest searches are stored and displayed
+                //Appending ID, author, status to display for the current book
                 strcpy(closest_search[cs_count],current->book.b_book_title);
                 char curr_ID[11];
-                sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
+                sprintf(curr_ID, "%ld", current->book.b_book_ID);
                 strcat(closest_search[cs_count],"\n\tID: ");
                 strcat(closest_search[cs_count],curr_ID);
                 strcat(closest_search[cs_count],"\n\tAuthor: ");
@@ -1460,12 +1463,13 @@ void searchBookbyTitle(BOOKNODE *head)
             break;
             }
 
-            //Continue if some (not all) characters match
+            //Continue if some (but not all) characters match
         else if(tolower(title_search[j])==tolower(current->book.b_book_title[j])&&j<strlen(current->book.b_book_title)){
                 continue;
         }
-                //If the search matches exactly, stop searching
+                //If the search matches exactly, store the current book's details
         else{
+                strcpy(title_matched,current->book.b_book_title);
                 strcpy(same_title_found[title_found],current->book.b_book_title);
                 char curr_ID[11];
                 sprintf(curr_ID, "%ld", current->book.b_book_ID); //Appending ID to display
@@ -1490,39 +1494,35 @@ void searchBookbyTitle(BOOKNODE *head)
 
         }
 
+        //If no results after search
         if(cs_count==0&&title_found==0){
             printf("No results found\n");
         }
 
-        //To print all closest searches (upto MAX_CLOSE_TITLE_SEARCH) when book is not found
+        //To print all closest searches (atmost MAX_CLOSE_TITLE_SEARCH) when book title is not exactly matched
         if(cs_count>0&&title_found==0)
         {
-
         printf("Closest searches:\n");
-        /*
-        cs_count=0;
-        while(strlen(closest_search[cs_count])!=0)
-        {
-            printf("%hi. %s\n",(short)(cs_count+1),closest_search[cs_count]);
-            cs_count++;
-            if(cs_count==MAX_CLOSE_TITLE_SEARCH)
-            break; //Stop on reaching MAX_CLOSE_TITLE_SEARCH closest search
-        }
-        */
         for(int i=0;i<cs_count;i++)
             printf("%d. %s",i+1,closest_search[i]);
         }
+
         //To print all books found of same title (if any)
         if(title_found>0){
          for(int i=0;i<title_found;i++)
             printf("%d. %s",i+1,same_title_found[i]);
-        printf("\nThere are %hi copies of %s available\n",title_found,title_search);
+        if(title_found>1)
+            printf("\nThere are %hi copies of %s available\n",title_found,title_matched);
+        else
+            printf("\nThere is one copy of %s available\n",title_matched);
         }
 
-         char ch;
+        //To ask if the user wants to search again
+            char ch;
             printf("Would you like to search again by title? (Y/N): ");
             ch=getchar();
-            if(ch=='Y'||ch=='y') //To ask if the user wants to search again
+            while(getchar() != '\n');
+            if(ch=='Y'||ch=='y')
             searchBookbyTitle(head);
 }
 
@@ -1567,7 +1567,7 @@ void displayAllBooks(BOOKNODE *head)
 
 
 void searchBookbyAuthor(BOOKNODE *head){
-    BOOKNODE *current = head;
+    BOOKNODE *current = head; //Initialising head pointer of linked list of all books to BOOKNODE type pointer current
     char author_search[30];
     short cs_count=0; //To count number of closest searches
     int same_auth_count=0; //To count number of books of same author
@@ -1580,52 +1580,51 @@ void searchBookbyAuthor(BOOKNODE *head){
 
     printf("Search by author: ");
     scanf(" %30[^\n]", author_search);
-    while(getchar() != '\n')//To empty Input Buffer
-    ;
+    while(getchar() != '\n');//To empty Input Buffer
 
         //Restart search if less than three characters entered
      if(strlen(author_search)<4){
-            printf("Enter atleast three characters to search\n");
+            printf("Enter atleast four characters to search\n");
             goto LAB2;
         }
 
-    while(flag==0&&current->next != NULL){
+    while(flag==0&&current->next != NULL){  //while loop to access all books in linked list of books
         current=current->next;
         //Iterating through all characters of a single book author
         for(int j=0;j<30;j++){
 
-
-        //Skip the current book if atleast 3 characters don't match
-        if((tolower(author_search[j])!=tolower(current->book.b_book_author[j]))&&j<3){
-            break;
+            //Skip the current book if atleast 3 characters don't match
+            if((tolower(author_search[j])!=tolower(current->book.b_book_author[j]))&&j<3){
+                break;
             }
 
-            //If atleast one character does not match, store the closest matching search (author) and skip current iteration
-        else if((tolower(author_search[j])!=tolower(current->book.b_book_author[j]))&&j<strlen(current->book.b_book_author)&&j>2){
+                //If atleast one character does not match, and three characters have matched for this book
+                //store the closest matching search (author) and skip current iteration
+            else if((tolower(author_search[j])!=tolower(current->book.b_book_author[j]))&&j<strlen(current->book.b_book_author)&&j>2){
+                short check_repeat=0;
+                //To prevent repetition of closest search 'authors' (Same author is not suggested twice)
+                for(int m=0;m<cs_count;m++)
+                {
+                    if(strcmp(closest_search[m],current->book.b_book_author)==0)
+                    check_repeat=1;
+                }
+                if(check_repeat!=0)
+                break;
 
-            short check_repeat=0;
-            //To prevent repetition of closest search 'authors'
-            for(int m=0;m<cs_count;m++)
-            {
-                if(strcmp(closest_search[m],current->book.b_book_author)==0)
-                check_repeat=1;
-            }
-            if(check_repeat!=0)
-            break;
-
-            if(cs_count<MAX_CLOSE_AUTH_SEARCH){
-                strcpy(closest_search[cs_count],current->book.b_book_author);
-                cs_count++;
-            }
-            break;
+                if(cs_count<MAX_CLOSE_AUTH_SEARCH){
+                    strcpy(closest_search[cs_count],current->book.b_book_author);
+                    cs_count++;
+                }
+                break;
             }
 
-            //Continue if some (not all) characters match
-        else if(tolower(author_search[j])==tolower(current->book.b_book_author[j])&&j<strlen(current->book.b_book_author)){
+                //Continue if some (not all) characters match
+            else if(tolower(author_search[j])==tolower(current->book.b_book_author[j])&&j<strlen(current->book.b_book_author)){
                 continue;
-        }
-                //If the search matches exactly, store the details
-        else{
+            }
+
+                    //If the search matches exactly, store the details
+            else{
                 //printf("\n Found");
                 strcpy(auth_found,current->book.b_book_author);
                 strcpy(all_same_auth[same_auth_count],"Title: ");
@@ -1647,52 +1646,59 @@ void searchBookbyAuthor(BOOKNODE *head){
                     strcat(all_same_auth[same_auth_count], "Undefined\n\n");
                 same_auth_count++;
                 break;
-                }
+            }
             }
 
         }
 
+        //If no exact\close matches for search
         if(flag==0&&cs_count==0)
         printf("No results found\n");
 
         //To print all closest searches of authors when exact match is not found
-
         if(cs_count>0&&same_auth_count==0){
         printf("Did you mean?:\n");
         for(int i=0;i<cs_count;i++)
             printf("%d. %s\n",(i+1),closest_search[i]);
         }
 
+        //To print all books authored by the searched author (when no exact match)
         if(same_auth_count>0){
             for(int m=0;m<same_auth_count;m++)
                 printf("%d. %s",(m+1),all_same_auth[m]);
-            printf("Total of %hi books authored by %s\n",(short)same_auth_count,auth_found);
+            if(same_auth_count>1)
+                printf("Total of %hi books authored by %s\n",(short)same_auth_count,auth_found);
+            else
+                printf("One book authored by %s\n",auth_found);
         }
 
-        char ch;
-        printf("Do you want to search books by Author again (Y\\N): ");
-        ch=getchar();
-        if(ch=='Y'||ch=='y')
-        searchBookbyAuthor(head);
+        //If the user wants to search by author again
+            char ch;
+            printf("Do you want to search books by Author again (Y\\N): ");
+            ch=getchar();
+            if(ch=='Y'||ch=='y')
+            searchBookbyAuthor(head);
 
 }
 
 
 void searchBookbyID(BOOKNODE *head){
+
     LAB3: ;//Label to return if invalid (not 10 digits)
-    BOOKNODE *current = head;
+    BOOKNODE *current = head; //Initialising head pointer of linked list of all books to BOOKNODE type pointer current
     char ID_search[11];
     short cs_count=0; //To count number of closest searches
     short flag=0; //To end searching on finding the exact search or when no results
     char closest_search[MAX_CLOSE_ID][80]; //To store MAX_CLOSE_ID closest matching searches of ID
     printf("Search by ID: ");
     scanf("%s",ID_search);
-    //scanf(" %11[^\n]", ID_search);
     while(getchar() != '\n');//To empty Input Buffer
+
     if((strlen(ID_search))>10){
     printf("Invalid ID entered! (ID is 10 digits)\n");
     goto LAB3;
     }
+
     else if(strlen(ID_search)<5){
     printf("Enter atleast 6 digits to search\n");
     goto LAB3;
@@ -1700,41 +1706,43 @@ void searchBookbyID(BOOKNODE *head){
     else{
 
     };
-    while(flag==0&&current->next != NULL){
+    while(flag==0&&current->next != NULL){  //while loop to access all books in linked list of books
         current=current->next;
         char str_ID[11]; //Storing current bookID in a separate variable for convenience
         sprintf(str_ID,"%ld",current->book.b_book_ID);
 
-            //Iterating through all characters of a single book author
+            //Iterating through all characters of a single book ID
         for(int j=0;j<10;j++){
 
-                //Skip the current book if atleast 6 characters don't match
+             //Skip the current book if atleast 6 characters of ID don't match
             if((ID_search[j]!=str_ID[j])&&j<6){
                break;
             }
 
-            //If atleast one character does not match, store the closest matching search (author) and skip current iteration
+            //If atleast one character does not match, and atleast 6 match
+            //store the closest matching search (ID) and skip current iteration
             else if(((ID_search[j])!=(str_ID[j]))&&j<strlen(str_ID)&&j>5){
-
-            if(cs_count<MAX_CLOSE_ID){
-                strcpy(closest_search[cs_count],"Title: ");
-                strcat(closest_search[cs_count],current->book.b_book_title);
-                strcat(closest_search[cs_count],"\n\tID:");
-                strcat(closest_search[cs_count],str_ID);
-                strcat(closest_search[cs_count],"\n\tAuthor: ");
-                strcat(closest_search[cs_count],current->book.b_book_author);
-                strcat(closest_search[cs_count],"\n\tStatus: ");
-                if(current->book.b_book_status=='A')
-                strcat(closest_search[cs_count],"Available");
-                else if(current->book.b_book_status=='R')
-                strcat(closest_search[cs_count],"Reserved");
-                else if(current->book.b_book_status=='I')
-                strcat(closest_search[cs_count],"Not Available (Issued)");
-                else
-                strcat(closest_search[cs_count],"Undefined");
-                //strcat(closest_search[cs_count], "\n");
-                cs_count++;
-            }
+                //To ensure at most MAX_CLOSE_ID closest searches are stored and displayed
+                if(cs_count<MAX_CLOSE_ID){
+                    //Adding title, ID, author status associated with the book
+                    strcpy(closest_search[cs_count],"Title: ");
+                    strcat(closest_search[cs_count],current->book.b_book_title);
+                    strcat(closest_search[cs_count],"\n\tID:");
+                    strcat(closest_search[cs_count],str_ID);
+                    strcat(closest_search[cs_count],"\n\tAuthor: ");
+                    strcat(closest_search[cs_count],current->book.b_book_author);
+                    strcat(closest_search[cs_count],"\n\tStatus: ");
+                    if(current->book.b_book_status=='A')
+                    strcat(closest_search[cs_count],"Available");
+                    else if(current->book.b_book_status=='R')
+                    strcat(closest_search[cs_count],"Reserved");
+                    else if(current->book.b_book_status=='I')
+                    strcat(closest_search[cs_count],"Not Available (Issued)");
+                    else
+                    strcat(closest_search[cs_count],"Undefined");
+                    //strcat(closest_search[cs_count], "\n");
+                    cs_count++;
+                }
             break;
             }
 
@@ -1742,7 +1750,7 @@ void searchBookbyID(BOOKNODE *head){
             else if((ID_search[j])==tolower(str_ID[j])&&j<(strlen(str_ID))-1){
                 continue;
             }
-                //If the search matches exactly, stop searching
+                //If the search matches exactly, stop searching and display details of the book
             else{
                 printf("Book found: %s ",current->book.b_book_title);
                 if(current->book.b_book_status=='A')
@@ -1765,21 +1773,22 @@ void searchBookbyID(BOOKNODE *head){
         }
 
         //To print all closest searches of authors when exact match is not found
-
         if(cs_count>0&&flag!=3){
         printf("Closest searches:\n");
         for(int i=0;i<cs_count;i++)
             printf("%d. %s\n",(i+1),closest_search[i]);
         }
 
+         //If no exact\close matches for search
         if(cs_count==0&&flag!=3)
         printf("No results found\n");
 
-        char ch;
-        printf("Do you want to search books by ID again (Y\\N): ");
-        ch=getchar();
-        if(ch=='Y'||ch=='y')
-        searchBookbyID(head);
+        //If the user wants to search by ID again
+            char ch;
+            printf("Do you want to search books by ID again (Y\\N): ");
+            ch=getchar();
+            if(ch=='Y'||ch=='y')
+            searchBookbyID(head);
 }
 
 
@@ -1924,7 +1933,8 @@ void setCurrentUser(USER *user)
 }
 
 
-void vendorManagement(){
+void vendor_inv_Management(){
+    //Vendor/Inventory management
     FILE *fp1, *fp2, *fp3, *fp1_1, *fp3_3;
     char choice, req;
     char name[30]; //To store name of vendor/other library
@@ -1935,7 +1945,7 @@ void vendorManagement(){
     fp3=fopen("recvdRequests.txt","a");
     //fp2 is dynamic, to store 'recieved requests' for vendors/libraries
     printf("\n----------VENDOR MANAGEMENT----------\n");
-    LAB: //Label to return
+    LAB: //Label to return if
     printf("Enter your choice: \n");
     printf("1. Make new request to other library\\vendor\n");
     printf("2. Make new request to this library\n");
@@ -1943,7 +1953,7 @@ void vendorManagement(){
     choice=getchar();
     while(getchar()!= '\n');
     switch(choice){
-        case '1':
+        case '1': //New requests to other library\vendor from this library
             printf("\nSELECT\n");
             printf("1.Request Vendor\n");
             printf("2.Request Library\n");
@@ -1955,7 +1965,8 @@ void vendorManagement(){
             scanf(" %30[^\n]",auth);
             while(getchar() != '\n');
             if(req=='1'){
-                printf("Enter vendor name: ");
+                //Requesting vendor
+                printf("Enter name of vendor to be requested: ");
                 scanf(" %30[^\n]",name);
                 while(getchar()!= '\n');
                 if(strlen(name)==0||strlen(title)==0||strlen(auth)==0){
@@ -1994,7 +2005,7 @@ void vendorManagement(){
                 fputs(title,fp1);
                 fputs("\n\tAuthor: ",fp1);
                 fputs(auth,fp1);
-                //Updating "requesting library's" received requests
+                //Updating "requested library's" received requests
                 fp2=fopen(name,"w+");
                 fputs("\nRequesting Library: ",fp2);
                 fputs(lib,fp2);
@@ -2028,17 +2039,17 @@ void vendorManagement(){
                     printf("Error, please try again");
                     goto OTHER;
                 }
-            //Updating recvdRequests
+            //Updating recvdRequests for this library
             fputs("\nLibrary: ",fp3);
             fputs(name,fp3);
             fputs("\tBook requested: ",fp3);
             fputs(title,fp3);
             fputs("\tAuthor: ",fp3);
             fputs(auth,fp3);
-            printf("Your request has been successfully sent");
+            printf("\nYour request has been successfully sent\n");
         break;
 
-        case '3':
+        case '3': //To view sent requests and received requests for this library
             REQ: ;//label to return if invalid inputs given
             char ch1;
             fp1_1=fopen("sentRequests.txt","r");
@@ -2065,7 +2076,6 @@ void vendorManagement(){
             fclose(fp1_1);
             fclose(fp3_3);
         break;
-
         default:
         printf("Invalid entry!\n");
         goto LAB;
