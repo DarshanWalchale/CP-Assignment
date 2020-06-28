@@ -38,7 +38,7 @@ Main Menu
 		3. Search Book by Book ID (ID is a 10 digit number)
 			*	Atleast 6 digits to be entered to search books by ID
 			*	If ID is exactly matched, the book's title, author and availability is displayed
-			*	If search is not exactly matched,
+			*	If search is not exactly matched, and 
 		4. Display All Books
 			Displays Availability, Title, Author, and ID
 		0. Return to Main Menu
