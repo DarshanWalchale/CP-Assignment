@@ -50,7 +50,12 @@ Main Menu
 
 	2. Book Transaction
 		1. Checkout a Book
+				First the user is allowed to search for the book title using the searchBookByTitle function
+				Once the user is satisfied with searching, a prompt to enter the precise case sensitive title is shown
+				then the first book of that title that is found in the list which is not already issued is assigned to the user
+				a unique Issue ID is generated
 		2. Return Book
+				The currently issued book is displayed and a confirmation is asked from the user to return the book
 		0. Return to Main Menu
 
 	3. Account Info
@@ -77,7 +82,7 @@ Main Menu
 				All requests made by the library are stored in sentRequests.txt. Text files named the respective
 				vendor/library records all requests made to it along with the name of the requesting library (LIMITATION %)
 			*	Other libraries can make requests for books in this library (title, library name required).
-				Search option is given here to find books in the current library. 
+				Search option is given here to find books in the current library.
 				If book with same title (case sensitive) is present, author is not asked; else request is still taken, and user
 				is informed about it. All requests are stored in recvdRequests.txt.
 			*	Option to display all sent requests and received requests for current library
@@ -92,12 +97,12 @@ Main Menu
 			4. Make a user an Admin
 				Displays all users along with their ID and Admin Status
 				asks for userID if user to grant admin privileges to.
-		`		returns prompt if user is already an admin
+				returns prompt if user is already an admin
 				returns an error if userID not found
 			5. Remove an Admin
 				Displays all users along with their ID and Admin Status
 				asks for userID if user to remove admin privileges from.
-		`		returns prompt if user is not an admin
+				returns prompt if user is not an admin
 				returns an error if userID not found
 			0. Return to Admin Menu
 
