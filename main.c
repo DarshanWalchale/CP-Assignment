@@ -143,7 +143,8 @@ int main(void)
     printf("loadcounters done in main\n");
 
     // These were used for creating the initial entries in books.txt and userdata.txt
-    addNewBook(BookHead); //Don't uncomment
+    //
+    //addNewBook(BookHead); //Don't uncomment
     //addNewUser(UserHead); //Don't uncomment
 
 
