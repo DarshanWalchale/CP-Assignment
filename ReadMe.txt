@@ -26,7 +26,7 @@ Note: This program was developed in CS50's IDE using Git for version control bet
 
 4. Once logged in, the Main Menu is displayed. Below is a map of all menu and their options, descriptions of the options are given
 Main Menu
-	1. Search Books
+	1. Search Books (all search functions are case-insensitive)
 		1. Search Book by Title
 		2. Search Book by Author
 		3. Search Book by Book ID

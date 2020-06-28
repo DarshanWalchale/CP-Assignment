@@ -9,7 +9,7 @@
 #include <stdlib.h>
 
 // DEFINES
-#define MAX_TITLE_LENGTH 60
+#define MAX_TITLE_LENGTH 60 //Maximum length of title of book to be stored, can be reduced for optimisation, but cannot be increased (LIMITATION)
 #define MAX_CLOSE_TITLE_SEARCH 30
 #define MAX_CLOSE_AUTH_SEARCH 20 //Maximum number of closest seraches of authors to display
 #define MAX_SAME_AUTHOR 100 //Maximum number of books of same author to display
