@@ -137,12 +137,13 @@ int main(void)
     // Allocating memory for Head variables for BookList and UserList
     BookHead = (BOOKNODE *)calloc(1, sizeof(BOOKNODE));
     UserHead = (USERNODE *)calloc(1, sizeof(USERNODE));
-    
+
     // Loading Counters for generating BookID, UserID, and IssueID
     loadCounters();
     printf("loadcounters done in main\n");
 
     // These were used for creating the initial entries in books.txt and userdata.txt
+    //
     //addNewBook(BookHead); //Don't uncomment
     //addNewUser(UserHead); //Don't uncomment
 
@@ -427,12 +428,12 @@ int checkout(char *title)
     }
 
     BOOKNODE *current = BookHead;
-    
+
     // traversing BookList
     while(current->next != NULL)
     {
         current = current->next;
-        
+
         // if title in current book matches given title
         if(strcmp(current->book.b_book_title, title) == 0)
         {
@@ -532,14 +533,14 @@ void returnBook()
         saveUserList(UserHead);
         return;
     }
-    
+
     // prints currently issued book title and asks for confirmation to return
     printf("Currently Issued Book\n -> %s\n", Current_User.u_book_title);
     printf("Press Y to return currently issued book\n");
     char choice;
     BOOKNODE *current = BookHead;
-    
-    
+
+
     scanf(" %c", &choice);
     while(getchar() != '\n');// To empty Input Buffer
     choice = toupper(choice);
@@ -550,7 +551,7 @@ void returnBook()
             while(current->next != NULL)
             {
                 current = current->next;
-                
+
                 // upon finding a matching title
                 if(strcmp(current->book.b_book_title, Current_User.u_book_title) == 0)
                 {
@@ -877,7 +878,7 @@ void displayAdminView(USERNODE *head)
 //          2: User Already Admin
 int makeAdmin(USERNODE *head)
 {
-    int status = 1;     
+    int status = 1;
     USERNODE *current = head;
     displayAdmins(head);
     unsigned long id = 0;
