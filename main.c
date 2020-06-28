@@ -1970,7 +1970,7 @@ void vendor_inv_Management(){
     FILE *fp1, *fp2, *fp3, *fp1_1, *fp3_3;
     char choice, req;
     char name[30]; //To store name of vendor/other library
-    char title[30]; //To store title of the book
+    char title[MAX_TITLE_LENGTH]; //To store title of the book
     char auth[30]; //To store author of the book
     char buf[1024];
     fp1=fopen("sentRequests.txt","a");
@@ -2065,8 +2065,25 @@ void vendor_inv_Management(){
             searchBookbyTitle(BookHead);
             printf("Enter the title of the book you would like to request: ");
             scanf("%s",title);
+            while(getchar()!= '\n');
+            short if_lib=0; //If library is present in library
+
+                //Check if book is available in library
+                BOOKNODE *current = BookHead;
+                while(current->next != NULL)
+                {
+                    current = current->next;
+                    if(strcmp(current->book.b_book_title, title) == 0){
+                        strcpy(auth,current->book.b_book_author);
+                        if_lib=1;
+                    }
+                }
+
+            if(lib==0){
             printf("Enter author of the book: ");
             scanf("%s",auth);
+            while(getchar()!= '\n');
+            }
             if(strlen(name)==0||strlen(title)==0||strlen(auth)==0){
                     printf("Error, please try again");
                     goto OTHER;
@@ -2074,10 +2091,16 @@ void vendor_inv_Management(){
             //Updating recvdRequests for this library
             fputs("\nLibrary: ",fp3);
             fputs(name,fp3);
-            fputs("\tBook requested: ",fp3);
+            fputs("\n\tBook requested: ",fp3);
             fputs(title,fp3);
-            fputs("\tAuthor: ",fp3);
+            fputs("\n\tAuthor: ",fp3);
             fputs(auth,fp3);
+            if(if_lib){
+                fputs("\n\t(Book present in library)",fp3);
+            }
+            else{
+                fputs("\n\t(Book not present in library)",fp3);
+            }
             printf("\nYour request has been successfully sent\n");
         break;
 

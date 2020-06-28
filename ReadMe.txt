@@ -29,16 +29,21 @@ Main Menu
 	1. Search Books (all search functions are case-insensitive)
 		1. Search Book by Title:
 			*	Atleast four characters to be entered search books by Title
-			*	If entire title of book(s) is matched, all book(s), and number of copies (defined to be at most MAX_SAME_TITLE) of the book is displayed with their details (ID, Author and availability).
-			*	If search is not exactly matched with any book, atmost MAX_CLOSE_TITLE_SEARCH books matching atleast first four characters are displayed with their details.
+			*	If entire title of book(s) is matched, all book(s), and number of copies (defined to be at most MAX_SAME_TITLE)
+				of the book is displayed with their details (ID, Author and availability).
+			*	If search is not exactly matched with any book, atmost MAX_CLOSE_TITLE_SEARCH books matching atleast first four
+				characters are suggested with their details.
 		2. Search Book by Author
 			*	Atleast four characters to be entered search books by author
-			*	If entire author's name of book(s) is matched, all book(s), and number of books (defined to be at most MAX_SAME_AUTHOR) by that author is displayed with their Title, ID, Author's name (correct case) and availability.
-			*	If search is not exactly matched with any author name in all books, atmost MAX_CLOSE_AUTH_SEARCH authors' are suggested, where atleast four characters of their name matches
+			*	If entire author's name of book(s) is matched, all book(s), and number of books (defined to be at most MAX_SAME_AUTHOR)
+				by that author is displayed with their Title, ID, Author's name (correct case) and availability.
+			*	If search is not exactly matched with any author name in all books, atmost MAX_CLOSE_AUTH_SEARCH authors' are suggested,
+				where atleast four characters of their name matches
 		3. Search Book by Book ID (ID is a 10 digit number)
 			*	Atleast 6 digits to be entered to search books by ID
 			*	If ID is exactly matched, the book's title, author and availability is displayed
-			*	If search is not exactly matched, and 
+			*	If search is not exactly matched, all books (maximum possible is 10^4), having their ID matching atleast 6 digits
+				are suggested with their title, author, ID and availability
 		4. Display All Books
 			Displays Availability, Title, Author, and ID
 		0. Return to Main Menu
@@ -68,6 +73,12 @@ Main Menu
 		4. Count Books of a Particular Title
 			Takes input from user for title to search for and returns number of books with the same title
 		5. Vendor / Library Requests
+			*	Can request vendors and other libraries for new books (title, author, vendor\library name required).
+				All requests made by the library are stored in sentRequests.txt. Text files named the respective
+				vendor/library records all requests made to it along with the name of the requesting library (LIMITATION %)
+			*	Other libraries can make requests for books in this library (title, author,library name required).
+				Search option is given here to find books in the current library. All requests are stored in recvdRequests.txt
+			*	Option to display all sent requests and received requests for current library
 
 		6. Review Admin Privileges
 			1. View Admins
@@ -98,8 +109,7 @@ Main Menu
 
 ############################################################
 Known limitations of the code (if you have not been able to completely/fully implement certain features that were asked):
-1. The cancellation feature could not be implemented.
-2. The booking feature also works partially... blah blah
+% Text files for vendors\libraries cannot be accessed by the program, has to be opened manually
 #############################################################
 Contributions of the team members:
 John Doe did modules 1, 2 and 3.
