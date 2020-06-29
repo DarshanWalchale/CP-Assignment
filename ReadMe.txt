@@ -23,6 +23,14 @@ Note: This program was developed in CS50's IDE using Git for version control bet
 	a list of new additions to the library are displayed and a login prompt is displayed
 
 3. The user will be asked to login, 5 unsuccessful logins will terminate the program
+	2 accounts have already been created
+		username: admin
+		password: admin
+		The above account has admin privileges
+
+		username: user
+		password: user
+		This account does not have admin privileges
 
 4. Once logged in, the Main Menu is displayed. Below is a map of all menu and their options, descriptions of the options are given
 Main Menu
@@ -120,10 +128,9 @@ Main Menu
 ############################################################
 Known limitations of the code:
 % Text files for vendors\libraries storing requests sent to them cannot be accessed by the program, has to be opened manually.
-% Code will check if a book is reserved or not, and if it is, won't be possible to issue the book. Limitations are, not being able to set or remove Reservations.
 #############################################################
 Contributions of the team members:
 Shreyas did searchBookbyTitle, searchBookbyAuthor, searchBookbyID, vendorManagement and helped in bookTransaction
-Aditya did the user login, addNewUser, menus, book transaction.
-Darshan did loading books and users into memory (loadLibrary, load), displaying newly added books notifications,
+Aditya did the user login, addNewUser, menus, book transaction related sections.
+Darshan did loading books and users into memory (loadLibrary, load), displaying newly added books notifications, functions realated to counters, functions related to saving book or user changes, reviewAdminPrivileges and related functions, setCurrentUser, helped with menus.
 #############################################################
